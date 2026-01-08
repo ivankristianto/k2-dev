@@ -17,7 +17,7 @@ Start the implementation workflow for one or more beads tickets using the k2-dev
 This command initiates a structured implementation workflow orchestrated by the Technical Lead agent:
 
 1. Validates that all specified ticket(s) exist and are open
-2. Creates a git worktree with branch `feature/beads-{first-ticket-id}`
+2. Creates a git worktree with branch `feature/beads-{first-ticket-id}`, create worktree outside the main tree folder.
 3. Reads task descriptions and comments from beads
 4. Hands off to Engineer agent for implementation
 5. Engineer implements, self-reviews, and creates GitHub PR
@@ -28,22 +28,26 @@ This command initiates a structured implementation workflow orchestrated by the 
 ## How to Use This Command
 
 **Parse the ticket argument:**
+
 - Accepts comma-separated ticket IDs: `beads-123,beads-234,beads-345`
 - Multiple tickets work together in same session and worktree
 - Single ticket: `beads-123`
 
 **Step 1: Validate Tickets**
+
 - Use `bd show {ticket-id}` to verify each ticket exists
 - Check status is "open" or "in_progress"
 - If any ticket doesn't exist or is closed: show error and exit immediately
 - Do NOT continue if validation fails
 
 **Step 2: Launch Technical Lead Agent**
+
 - Use the Task tool to launch the "technical-lead" agent
 - Provide the validated ticket IDs
 - Pass full context about the workflow
 
 Example:
+
 ```
 Task tool with:
 - subagent_type: "technical-lead"
@@ -53,6 +57,7 @@ Task tool with:
 ```
 
 **Step 3: Report Results**
+
 - Technical Lead will provide a final report when workflow completes
 - Show the report to the user
 - Include: tickets closed, PR URL, worktree status, any follow-up tickets created
@@ -69,6 +74,7 @@ Task tool with:
 ## Configuration Files Required
 
 The Technical Lead and other agents will read these files from project root:
+
 - **AGENTS.md**: Agent guidelines, quality gates, file validation patterns
 - **CLAUDE.md**: Claude-specific project standards
 - **constitution.md**: Project principles and constraints
@@ -78,11 +84,13 @@ These files are REQUIRED for agents to function properly.
 ## Example Usage
 
 Single ticket:
+
 ```
 User: /k2:start beads-123
 ```
 
 Multiple tickets:
+
 ```
 User: /k2:start beads-123,beads-234,beads-345
 ```
@@ -90,20 +98,24 @@ User: /k2:start beads-123,beads-234,beads-345
 ## Error Handling
 
 **If ticket doesn't exist:**
+
 - Show: "Error: Ticket beads-123 does not exist. Please check ticket ID and try again."
 - Exit immediately
 
 **If ticket is closed:**
+
 - Show: "Error: Ticket beads-123 is already closed. Use 'bd reopen beads-123' if you need to work on it."
 - Exit immediately
 
 **If worktree already exists:**
+
 - Check: `git worktree list`
 - If branch exists, show error and suggest cleanup: `git worktree remove path`
 
 ## Success Indicators
 
 The workflow is complete when Technical Lead reports:
+
 - ✅ Implementation completed
 - ✅ Review passed (or follow-up tickets created)
 - ✅ PR created and merged
