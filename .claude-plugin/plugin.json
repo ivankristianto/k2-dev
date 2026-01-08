@@ -1,0 +1,19 @@
+{
+  "name": "k2-dev",
+  "version": "0.1.0",
+  "description": "Multiagent orchestration plugin for enterprise code development with specialized agents, beads integration, and quality gates enforcement",
+  "author": {
+    "name": "K2 Development Team",
+    "email": ""
+  },
+  "keywords": [
+    "orchestration",
+    "multiagent",
+    "workflow",
+    "beads",
+    "task-management",
+    "code-review",
+    "quality-gates"
+  ],
+  "license": "MIT"
+}

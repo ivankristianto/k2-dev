@@ -1,0 +1,57 @@
+---
+defaultBranch: main
+branchPrefix: feature/beads
+maxReviewIterations: 2
+autoCreatePR: true
+qualityGateThresholds:
+  codeComplexity: medium
+  testCoverage: 80
+  documentationRequired: true
+---
+
+# K2-Dev Local Configuration
+
+This file allows you to customize k2-dev behavior for your project.
+
+## Configuration Options
+
+### defaultBranch
+The main branch name for your repository (default: main)
+
+### branchPrefix
+Prefix for feature branches created by k2-dev (default: feature/beads)
+
+### maxReviewIterations
+Maximum number of review iterations before creating follow-up tickets (default: 2)
+
+### autoCreatePR
+Whether Engineer should automatically create PR after implementation (default: true)
+
+### qualityGateThresholds
+Custom thresholds for quality validation:
+- **codeComplexity**: low | medium | high
+- **testCoverage**: percentage (0-100)
+- **documentationRequired**: true | false
+
+## Usage
+
+1. Copy this file to `.claude/k2-dev.local.md` in your project root
+2. Customize the YAML frontmatter values
+3. Add any additional project-specific notes in the markdown body
+
+## Example Customizations
+
+```yaml
+---
+defaultBranch: develop
+branchPrefix: feature/ticket
+maxReviewIterations: 3
+autoCreatePR: false
+qualityGateThresholds:
+  codeComplexity: high
+  testCoverage: 90
+  documentationRequired: true
+---
+```
+
+This file is in .gitignore and won't be committed to version control.

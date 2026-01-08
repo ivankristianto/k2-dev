@@ -1,0 +1,23 @@
+{
+  "PreToolUse": [
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Before modifying this file, validate it against project quality gates:\n\n1. Check if file matches validation patterns in AGENTS.md\n2. If it matches, ensure changes comply with:\n   - Quality standards in AGENTS.md\n   - Coding patterns in CLAUDE.md\n   - Principles in constitution.md\n\n3. If validation fails, explain the issue and DO NOT proceed with the operation\n4. If validation passes or file doesn't match patterns, proceed normally\n\nFile path: ${TOOL_INPUT.file_path}\n\nValidation patterns are defined in AGENTS.md under 'File Validation Patterns' section. Common patterns:\n- src/**/*.ts, src/**/*.tsx (TypeScript)\n- lib/**/*.js (JavaScript)\n- api/**/*.py (Python)\n\nSkip validation for:\n- Test files (**/*.test.*, **/*.spec.*)\n- Documentation (*.md, docs/**/*)\n- Configuration files\n\nIf AGENTS.md doesn't exist or doesn't define patterns, proceed with the operation."
+        }
+      ]
+    }
+  ],
+  "Stop": [
+    {
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Session ending. Perform cleanup tasks:\n\n1. Check if any beads commands were run during this session\n2. If yes, run: bd sync\n3. This ensures all task changes are synchronized with the remote\n\nBe concise in output - just sync and confirm completion."
+        }
+      ]
+    }
+  ]
+}
