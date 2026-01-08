@@ -25,6 +25,7 @@ You are running the **Technical Lead orchestration logic directly** for the k2-d
 ## Parse Tickets
 
 Parse the argument to extract ticket IDs:
+
 - Accepts comma-separated: `beads-123,beads-234,beads-345`
 - Multiple tickets share one worktree
 - Single ticket: `beads-123`
@@ -73,6 +74,7 @@ Update todo: Mark "Read project standards" as completed
 ### Phase 4: Identify Project Root
 
 Ask user for project root if not clear:
+
 - Verify it's a git repository
 - Confirm presence of `.beads/` directory
 - This is where all work will happen
@@ -113,20 +115,23 @@ Analyze the task(s) and add a comment to each ticket with:
 ## Technical Lead Analysis
 
 ### Task Assessment
+
 - {complexity_assessment}
 - {estimated_scope}
 - {dependencies_noted}
 
 ### Implementation Approach
+
 - {suggested_approach}
 - {technical_considerations}
 
 ### Next Steps
+
 - Ready for Engineer agent to implement
 - Run: Engineer agent will be launched to begin implementation
 ```
 
-Use: `bd comments beads-{id} add "..."` or `bd update` if needed
+Use: `bd comments add beads-{id} "..."` or `bd update` if needed
 
 Update todo: Mark "Analyze task" as completed
 
@@ -143,6 +148,8 @@ Task tool with:
           Standards files read: AGENTS.md, CLAUDE.md, constitution.md
 
           Task context: {brief_summary}
+
+          Use bd show beads-{id} and bd comments beads-{id} --json to get full context.
 
           Please implement following the plan in beads, perform self-review,
           and create a GitHub PR when complete."
@@ -170,10 +177,12 @@ Task tool with:
 ### Phase 10: After Reviewer Completes
 
 Track review iterations (max 2):
+
 - Iteration 1: If changes needed, launch Engineer again
 - Iteration 2: Final review, if issues remain → create follow-up tickets
 
 When approved:
+
 - Merge PR: `gh pr merge {pr_number} --squash --delete-branch`
 - Close tickets: `bd update beads-{id} --status=closed`
 - Sync beads: `bd sync`
@@ -187,6 +196,7 @@ Generate structured report:
 ## Implementation Complete: {ticket_ids}
 
 ### Summary
+
 - ✅ Tickets validated
 - ✅ Worktree created: {path}
 - ✅ Implementation completed by Engineer
@@ -196,34 +206,42 @@ Generate structured report:
 - ✅ Worktree cleaned up
 
 ### Pull Request
+
 - URL: {pr_url}
 - Branch: feature/beads-{id}
 - Review iterations: {count}/2
 
 ### Follow-up Tickets
+
 {any_created_tickets}
 
 ### Files Changed
+
 {summary_of_changes}
 ```
 
 ## Error Handling
 
 **Ticket doesn't exist:**
+
 ```
 Error: Ticket {id} does not exist.
 Please check ticket ID and try again.
 ```
+
 Exit immediately.
 
 **Ticket is closed:**
+
 ```
 Error: Ticket {id} is already closed.
 Use 'bd reopen {id}' if you need to work on it.
 ```
+
 Exit immediately.
 
 **Worktree already exists:**
+
 ```
 Error: Worktree already exists at {path}.
 Cleanup: git worktree remove {path}
@@ -233,6 +251,7 @@ Then retry.
 ## Quality Gates
 
 Enforce standards from:
+
 - **AGENTS.md**: Quality gates, validation patterns
 - **CLAUDE.md**: Project standards and patterns
 - **constitution.md**: Project principles
