@@ -1,0 +1,15 @@
+{
+  "name": "k2-dev-marketplace",
+  "description": "Local marketplace for k2-dev plugin development",
+  "owner": {
+    "name": "Ivan K2"
+  },
+  "plugins": [
+    {
+      "name": "k2-dev",
+      "source": "./",
+      "description": "Multiagent orchestration plugin for enterprise code development with specialized agents, beads integration, and quality gates enforcement",
+      "version": "0.1.0"
+    }
+  ]
+}
