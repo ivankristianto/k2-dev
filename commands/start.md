@@ -17,7 +17,7 @@ Start the implementation workflow for one or more beads tickets using the k2-dev
 This command initiates a structured implementation workflow orchestrated by the Technical Lead agent:
 
 1. Validates that all specified ticket(s) exist and are open
-2. Creates a git worktree with branch `feature/beads-{first-ticket-id}`, create worktree outside the main tree folder.
+2. Creates a git worktree with branch `feature/beads-{first-ticket-id}`, us `bd workstree create` command, also create worktree outside the main tree folder.
 3. Reads task descriptions and comments from beads
 4. Hands off to Engineer agent for implementation
 5. Engineer implements, self-reviews, and creates GitHub PR

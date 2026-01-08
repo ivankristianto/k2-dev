@@ -5,6 +5,7 @@ Enterprise-grade multiagent orchestration plugin for Claude Code that manages en
 ## Overview
 
 k2-dev simulates a complete development team with specialized roles:
+
 - **Technical Lead**: Orchestrates workflows, manages worktrees
 - **Planner**: Analyzes requirements, creates actionable plans
 - **Engineer**: Implements features following plans
@@ -31,6 +32,14 @@ k2-dev simulates a complete development team with specialized roles:
 
 ## Installation
 
+Install via Claude Marketplace:
+
+```bash
+claude plugin install k2-dev@ivankristianto/k2-dev
+```
+
+**Alternative: Manual Installation**
+
 ```bash
 # Clone or copy to Claude plugins directory
 mkdir -p ~/.claude/plugins
@@ -47,12 +56,14 @@ claude --plugins k2-dev
 Start implementation workflow for one or more tickets.
 
 **Usage:**
+
 ```
 /k2:start beads-123
 /k2:start beads-123,beads-234,beads-345
 ```
 
 **Workflow:**
+
 1. Technical Lead validates tickets exist
 2. Creates git worktree (branch: `feature/beads-{id}`)
 3. Reads task description and comments
@@ -69,11 +80,13 @@ Start implementation workflow for one or more tickets.
 Start planning workflow for new features.
 
 **Usage:**
+
 ```
 /k2:planner
 ```
 
 **Workflow:**
+
 1. Planner analyzes requirement with full codebase access
 2. Asks clarifying questions
 3. Creates initial plan
@@ -86,11 +99,13 @@ Start planning workflow for new features.
 Generate status report for a ticket.
 
 **Usage:**
+
 ```
 /k2:report beads-123
 ```
 
 **Output:** Structured markdown report with:
+
 - Task summary
 - Current status
 - Assignee
@@ -102,11 +117,13 @@ Generate status report for a ticket.
 Create test plan for a ticket.
 
 **Usage:**
+
 ```
 /k2:test beads-123
 ```
 
 **Workflow:**
+
 1. Tester agent analyzes implementation
 2. Creates comprehensive test plan
 3. Defines test cases and coverage strategy
@@ -115,6 +132,7 @@ Create test plan for a ticket.
 ## Agents
 
 ### Technical Lead
+
 - **Role**: Workflow orchestrator and system architect
 - **Responsibilities**:
   - Validate ticket status
@@ -125,6 +143,7 @@ Create test plan for a ticket.
 - **Tools**: All tools, full codebase access
 
 ### Planner
+
 - **Role**: Requirements analyst and planning specialist
 - **Responsibilities**:
   - Analyze requirements with codebase context
@@ -135,6 +154,7 @@ Create test plan for a ticket.
 - **Tools**: All tools, full codebase access
 
 ### Engineer
+
 - **Role**: Implementation specialist
 - **Responsibilities**:
   - Execute implementation following plans
@@ -145,6 +165,7 @@ Create test plan for a ticket.
 - **Tools**: Read, Write, Edit, Bash, Grep, Glob
 
 ### Reviewer
+
 - **Role**: Code quality validator
 - **Responsibilities**:
   - Review code changes for quality and security
@@ -154,6 +175,7 @@ Create test plan for a ticket.
 - **Tools**: Read, Grep, Glob, Bash (read-only operations)
 
 ### Tester
+
 - **Role**: Test strategy and validation specialist
 - **Responsibilities**:
   - Create comprehensive test plans
@@ -196,30 +218,37 @@ Custom configuration for this project...
 ### Project Configuration Files
 
 #### AGENTS.md (Project Root)
+
 Define agent behavior, quality gates, and file validation patterns:
 
 ```markdown
 # Agent Guidelines
 
 ## Quality Gates
+
 - All TypeScript files must pass type checking
 - Test coverage minimum: 80%
 - No console.log in production code
 
 ## File Validation Patterns
+
 Validate these file types before changes:
-- src/**/*.ts
-- src/**/*.tsx
-- lib/**/*.js
+
+- src/\*_/_.ts
+- src/\*_/_.tsx
+- lib/\*_/_.js
 
 ## Code Review Standards
+
 ...
 ```
 
 #### CLAUDE.md (Project Root)
+
 Claude-specific project standards and patterns.
 
 #### constitution.md (Project Root)
+
 Project principles and constraints all agents must follow.
 
 ## Workflow Details
@@ -284,6 +313,7 @@ Planner:
 ## Hooks
 
 ### PreToolUse Hook
+
 Validates file changes against quality gates before Write/Edit operations.
 
 - Checks file patterns defined in AGENTS.md
@@ -291,6 +321,7 @@ Validates file changes against quality gates before Write/Edit operations.
 - Blocks non-compliant changes
 
 ### Stop Hook
+
 Runs cleanup on session end:
 
 - Always executes `bd sync`
@@ -310,21 +341,25 @@ Runs cleanup on session end:
 ## Troubleshooting
 
 ### Ticket Validation Fails
+
 - Ensure ticket exists: `bd show beads-123`
 - Check ticket is open: `bd list --filter=id:beads-123`
 - Verify beads is synced: `bd sync`
 
 ### Worktree Creation Fails
+
 - Check git worktree list: `git worktree list`
 - Remove stale worktrees: `git worktree prune`
 - Ensure branch name doesn't conflict
 
 ### Quality Gate Validation Issues
+
 - Review AGENTS.md file patterns
 - Check if files match validation patterns
 - Verify standards in CLAUDE.md are achievable
 
 ### Agent Coordination Issues
+
 - All coordination happens through Technical Lead (hub model)
 - Check Technical Lead has access to required tools
 - Verify agent descriptions are clear
@@ -332,12 +367,15 @@ Runs cleanup on session end:
 ## Development
 
 ### Adding New Agents
+
 Add new agent `.md` files to `agents/` directory following the template.
 
 ### Adding New Skills
+
 Create skill directories under `skills/` with `SKILL.md` files.
 
 ### Customizing Workflows
+
 Modify agent system prompts and coordination logic in agent files.
 
 ## License
