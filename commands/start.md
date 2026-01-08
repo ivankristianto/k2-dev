@@ -45,6 +45,8 @@ This command initiates a structured implementation workflow orchestrated by the 
 - Use the Task tool to launch the "technical-lead" agent
 - Provide the validated ticket IDs
 - Pass full context about the workflow
+- DO NOT run /k2-dev:start command in recursive.
+- When start the implementation update the beads task to in_progress
 
 Example:
 
