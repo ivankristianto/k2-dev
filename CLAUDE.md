@@ -11,6 +11,7 @@ k2-dev is a multiagent orchestration plugin for Claude Code that simulates a com
 ### Hub-and-Spoke Model
 
 The plugin uses a hub-and-spoke coordination pattern:
+
 - **Technical Lead** is the hub that orchestrates all workflows
 - Other agents (spokes) are launched by Technical Lead and report back
 - No direct agent-to-agent communication; all coordination flows through Technical Lead
@@ -45,20 +46,20 @@ k2-dev/
 
 ### Agent Tool Access
 
-| Agent | Tools | Purpose |
-|-------|-------|---------|
-| Technical Lead | All tools | Orchestration, coordination, decisions |
-| Planner | All tools | Codebase exploration, planning |
-| Engineer | Read, Write, Edit, Bash, Grep, Glob | Implementation only |
-| Reviewer | Read, Grep, Glob, Bash | Read-only review |
-| Tester | Read, Grep, Glob, Bash | Test planning (no code changes) |
+| Agent          | Tools                               | Purpose                                |
+| -------------- | ----------------------------------- | -------------------------------------- |
+| Technical Lead | All tools                           | Orchestration, coordination, decisions |
+| Planner        | All tools                           | Codebase exploration, planning         |
+| Engineer       | Read, Write, Edit, Bash, Grep, Glob | Implementation only                    |
+| Reviewer       | Read, Grep, Glob, Bash              | Read-only review                       |
+| Tester         | Read, Grep, Glob, Bash              | Test planning (no code changes)        |
 
 ## Key Workflows
 
 ### Implementation Flow (`/k2:start`)
 
 1. Technical Lead validates tickets exist and are open
-2. Creates git worktree: `git worktree add ../feature-beads-123 feature/beads-123`
+2. Creates git worktree: `bd worktree create ../worktrees/feature-beads-123`
 3. Reads task details via `bd show` and `bd comments`
 4. Launches Engineer agent for implementation
 5. Engineer implements, self-reviews against AGENTS.md/CLAUDE.md, creates PR
@@ -106,6 +107,7 @@ bd sync                        # Sync with remote (auto via hook)
 ### PreToolUse Hook
 
 The `hooks/hooks.json` defines a PreToolUse hook that:
+
 - Intercepts Write/Edit operations
 - Checks if file matches validation patterns in AGENTS.md
 - Validates changes against AGENTS.md, CLAUDE.md, constitution.md
@@ -125,16 +127,17 @@ Each implementation uses isolated worktrees:
 
 ```bash
 # Create worktree (Technical Lead)
-git worktree add ../feature-beads-123 feature/beads-123
+bd worktree create ../worktrees/feature-beads-123
 
 # Work in isolated directory
 cd ../feature-beads-123
 
 # After merge and cleanup
-git worktree remove ../feature-beads-123
+bd worktree remove ../worktrees/feature-beads-123
 ```
 
 Benefits:
+
 - Isolated workspaces per task
 - No context switching in main tree
 - Parallel work on multiple tickets
@@ -165,6 +168,7 @@ Command instructions...
 ### Agent System Prompts
 
 Agent files in `agents/` are pure markdown system prompts:
+
 - Define agent role, responsibilities, behaviors
 - Specify workflow patterns
 - Define tool usage constraints
@@ -198,6 +202,7 @@ maxReviewIterations: 2
 ### Marketplace Configuration
 
 The plugin is published to `k2-dev-marketplace` and installed via:
+
 ```bash
 claude plugin install k2-dev@k2-dev-marketplace
 ```
@@ -238,6 +243,7 @@ claude plugin install k2-dev@k2-dev-marketplace
 ## Plugin Versioning
 
 Update `plugin.json` version field using semantic versioning:
+
 - Patch: Bug fixes, documentation
 - Minor: New features, agent improvements
 - Major: Breaking changes, workflow restructuring

@@ -1,128 +1,259 @@
 ---
 name: k2:start
-description: Start implementation workflow for one or more beads tickets
+description: Start implementation workflow for one or more beads tickets (runs Technical Lead orchestration logic directly)
 argument-hint: beads-123 or beads-123,beads-234
 allowed-tools:
   - Read
+  - Write
+  - Edit
   - Bash
+  - Grep
+  - Glob
+  - TodoWrite
   - Task
+  - AskUserQuestion
 ---
 
 # K2:Start - Implementation Workflow
 
-Start the implementation workflow for one or more beads tickets using the k2-dev multiagent orchestration system.
+You are running the **Technical Lead orchestration logic directly** for the k2-dev multiagent development system. This command validates tickets, creates worktrees, analyzes tasks, and coordinates the implementation workflow.
 
-## What This Command Does
+## Critical Design Principle
 
-This command initiates a structured implementation workflow orchestrated by the Technical Lead agent:
+**DO NOT use the Task tool to launch a "technical-lead" subagent** - that would cause recursion. Instead, execute the Technical Lead logic directly in this command context.
 
-1. Validates that all specified ticket(s) exist and are open
-2. Creates a git worktree with branch `feature/beads-{first-ticket-id}`, us `bd workstree create` command, also create worktree outside the main tree folder.
-3. Reads task descriptions and comments from beads
-4. Hands off to Engineer agent for implementation
-5. Engineer implements, self-reviews, and creates GitHub PR
-6. Reviewer agent validates against quality gates
-7. Iterates up to 2 times if needed, creates follow-up tickets
-8. Technical Lead merges PR, closes tickets, syncs, and cleans up worktree
+## Parse Tickets
 
-## How to Use This Command
-
-**Parse the ticket argument:**
-
-- Accepts comma-separated ticket IDs: `beads-123,beads-234,beads-345`
-- Multiple tickets work together in same session and worktree
+Parse the argument to extract ticket IDs:
+- Accepts comma-separated: `beads-123,beads-234,beads-345`
+- Multiple tickets share one worktree
 - Single ticket: `beads-123`
 
-**Step 1: Validate Tickets**
+## Workflow Execution
 
-- Use `bd show {ticket-id}` to verify each ticket exists
-- Check status is "open" or "in_progress"
-- If any ticket doesn't exist or is closed: show error and exit immediately
-- Do NOT continue if validation fails
+You will execute the following phases directly (not as a subagent):
 
-**Step 2: Launch Technical Lead Agent**
+### Phase 1: Initialization
 
-- Use the Task tool to launch the "technical-lead" agent
-- Provide the validated ticket IDs
-- Pass full context about the workflow
-- DO NOT run /k2-dev:start command in recursive.
-- When start the implementation update the beads task to in_progress
+Use `TodoWrite` to create initial todos:
 
-Example:
+```
+[{"content": "Validate tickets exist and are open", "status": "in_progress", "activeForm": "Validating tickets"},
+ {"content": "Read project standards (AGENTS.md, CLAUDE.md)", "status": "pending", "activeForm": "Reading project standards"},
+ {"content": "Identify project root directory", "status": "pending", "activeForm": "Identifying project root"},
+ {"content": "Create git worktree for feature branch", "status": "pending", "activeForm": "Creating git worktree"},
+ {"content": "Read task details and comments from beads", "status": "pending", "activeForm": "Reading task details"},
+ {"content": "Analyze task and add initial comments", "status": "pending", "activeForm": "Analyzing task"}]
+```
+
+### Phase 2: Ticket Validation
+
+For each ticket ID:
+
+```bash
+bd show {ticket-id}
+```
+
+- Verify ticket exists in beads
+- Confirm status is "open" or "in_progress"
+- If any ticket doesn't exist or is closed: **show error and exit immediately**
+- Update todo: Mark validation as completed
+
+### Phase 3: Read Project Standards
+
+Read from PROJECT root (where .beads/ directory is):
+
+- Read `AGENTS.md` - Quality gates, validation patterns
+- Read `CLAUDE.md` - Project standards and patterns
+- Read `(docs|specs)/constitution.md` - Project principles (if exists)
+- Note: These are optional but highly recommended
+
+Update todo: Mark "Read project standards" as completed
+
+### Phase 4: Identify Project Root
+
+Ask user for project root if not clear:
+- Verify it's a git repository
+- Confirm presence of `.beads/` directory
+- This is where all work will happen
+
+Update todo: Mark "Identify project root" as completed
+
+### Phase 5: Create Git Worktree
+
+```bash
+cd {project_root}
+bd worktree create ../worktrees/feature/beads-{first_ticket_id}
+```
+
+- Use consistent naming: `feature/beads-{id}` (use first ticket ID for multiple)
+- Create worktree in sibling directory
+- Verify worktree creation succeeded
+- Record worktree path for later use
+
+Update todo: Mark "Create git worktree" as completed
+
+### Phase 6: Read Task Details
+
+```bash
+bd show beads-{id}  # for each ticket
+```
+
+- Read full task description and all comments
+- Understand requirements, context, special instructions
+- Check dependencies if any
+
+Update todo: Mark "Read task details" as completed
+
+### Phase 7: Analyze and Document
+
+Analyze the task(s) and add a comment to each ticket with:
+
+```markdown
+## Technical Lead Analysis
+
+### Task Assessment
+- {complexity_assessment}
+- {estimated_scope}
+- {dependencies_noted}
+
+### Implementation Approach
+- {suggested_approach}
+- {technical_considerations}
+
+### Next Steps
+- Ready for Engineer agent to implement
+- Run: Engineer agent will be launched to begin implementation
+```
+
+Use: `bd comments beads-{id} add "..."` or `bd update` if needed
+
+Update todo: Mark "Analyze task" as completed
+
+### Phase 8: Launch Engineer Agent
+
+After setup is complete, use Task tool to launch Engineer:
 
 ```
 Task tool with:
-- subagent_type: "technical-lead"
-- prompt: "Start implementation workflow for tickets: beads-123, beads-234.
-          Tickets are validated and open. Create worktree, read task details,
-          and coordinate Engineer → Reviewer workflow per k2-dev process."
+- subagent_type: "k2-dev:engineer"
+- prompt: "Implement feature for tickets: {ticket_ids}
+          Worktree: {worktree_path}
+          Project root: {project_root}
+          Standards files read: AGENTS.md, CLAUDE.md, constitution.md
+
+          Task context: {brief_summary}
+
+          Please implement following the plan in beads, perform self-review,
+          and create a GitHub PR when complete."
 ```
 
-**Step 3: Report Results**
+**IMPORTANT**: Engineer is a subagent, but that's OK because THIS command is running directly (not as a subagent).
 
-- Technical Lead will provide a final report when workflow completes
-- Show the report to the user
-- Include: tickets closed, PR URL, worktree status, any follow-up tickets created
+### Phase 9: After Engineer Completes
 
-## Important Notes
+When Engineer returns with PR URL:
 
-- **Hub Model**: Technical Lead coordinates ALL agent handoffs
-- **Quality Gates**: Enforced via AGENTS.md and CLAUDE.md in project root
-- **Review Limit**: Maximum 2 iterations, then create follow-up tickets (P0 for critical)
-- **Branch Naming**: `feature/beads-{first-ticket-id}` (e.g., feature/beads-123)
-- **Review Location**: All review comments go in GitHub PR, not beads
-- **Single Worktree**: Multiple tickets use one shared worktree
-
-## Configuration Files Required
-
-The Technical Lead and other agents will read these files from project root:
-
-- **AGENTS.md**: Agent guidelines, quality gates, file validation patterns
-- **CLAUDE.md**: Claude-specific project standards
-- **constitution.md**: Project principles and constraints
-
-These files are REQUIRED for agents to function properly.
-
-## Example Usage
-
-Single ticket:
+1. Update todo: Add "Launch Reviewer agent"
+2. Use Task tool to launch Reviewer:
 
 ```
-User: /k2:start beads-123
+Task tool with:
+- subagent_type: "k2-dev:reviewer"
+- prompt: "Review PR {pr_url}
+          Worktree: {worktree_path}
+          Quality gates: AGENTS.md, CLAUDE.md, constitution.md
+
+          Validate against all quality standards and provide feedback."
 ```
 
-Multiple tickets:
+### Phase 10: After Reviewer Completes
 
-```
-User: /k2:start beads-123,beads-234,beads-345
+Track review iterations (max 2):
+- Iteration 1: If changes needed, launch Engineer again
+- Iteration 2: Final review, if issues remain → create follow-up tickets
+
+When approved:
+- Merge PR: `gh pr merge {pr_number} --squash --delete-branch`
+- Close tickets: `bd update beads-{id} --status=closed`
+- Sync beads: `bd sync`
+- Cleanup worktree: `bd worktree remove {worktree_path}`
+
+### Phase 11: Final Report
+
+Generate structured report:
+
+```markdown
+## Implementation Complete: {ticket_ids}
+
+### Summary
+- ✅ Tickets validated
+- ✅ Worktree created: {path}
+- ✅ Implementation completed by Engineer
+- ✅ Code review passed
+- ✅ PR merged: {pr_url}
+- ✅ Tickets closed and synced
+- ✅ Worktree cleaned up
+
+### Pull Request
+- URL: {pr_url}
+- Branch: feature/beads-{id}
+- Review iterations: {count}/2
+
+### Follow-up Tickets
+{any_created_tickets}
+
+### Files Changed
+{summary_of_changes}
 ```
 
 ## Error Handling
 
-**If ticket doesn't exist:**
+**Ticket doesn't exist:**
+```
+Error: Ticket {id} does not exist.
+Please check ticket ID and try again.
+```
+Exit immediately.
 
-- Show: "Error: Ticket beads-123 does not exist. Please check ticket ID and try again."
-- Exit immediately
+**Ticket is closed:**
+```
+Error: Ticket {id} is already closed.
+Use 'bd reopen {id}' if you need to work on it.
+```
+Exit immediately.
 
-**If ticket is closed:**
+**Worktree already exists:**
+```
+Error: Worktree already exists at {path}.
+Cleanup: git worktree remove {path}
+Then retry.
+```
 
-- Show: "Error: Ticket beads-123 is already closed. Use 'bd reopen beads-123' if you need to work on it."
-- Exit immediately
+## Quality Gates
 
-**If worktree already exists:**
+Enforce standards from:
+- **AGENTS.md**: Quality gates, validation patterns
+- **CLAUDE.md**: Project standards and patterns
+- **constitution.md**: Project principles
 
-- Check: `git worktree list`
-- If branch exists, show error and suggest cleanup: `git worktree remove path`
+## Branch Naming
 
-## Success Indicators
+- Single ticket: `feature/beads-123`
+- Multiple tickets: `feature/beads-123` (use first ticket ID)
 
-The workflow is complete when Technical Lead reports:
+## Review Iteration Limit
 
-- ✅ Implementation completed
-- ✅ Review passed (or follow-up tickets created)
-- ✅ PR created and merged
-- ✅ Beads tickets closed and synced
-- ✅ Worktree removed
-- ✅ Report generated
+- Maximum 2 review iterations
+- After 2 iterations with issues: Create follow-up tickets
+  - P0: Critical/blocking issues
+  - P1: Important non-blocking issues
+  - P2: Nice-to-have improvements
 
-Present the final report to the user in a clear, structured format.
+## Remember
+
+- You ARE the Technical Lead logic - run directly, don't launch yourself as subagent
+- Use TodoWrite to track progress throughout
+- Update beads tasks with comments at key milestones
+- Launch Engineer and Reviewer as subagents (that's safe from this context)
+- Provide clear reports to user at each phase completion
