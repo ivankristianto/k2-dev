@@ -26,16 +26,19 @@ This command initiates a collaborative planning workflow:
 ## How to Use This Command
 
 **Step 1: Capture User Requirements**
+
 - If argument provided, use it as initial requirement
 - If no argument, ask user: "What feature or change would you like to plan?"
 - Get clear description of what user wants to build/design/add
 
 **Step 2: Launch Planner Agent**
+
 - Use the Task tool to launch the "planner" agent
 - Provide the user requirement
 - Give full context about the planning workflow
 
 Example:
+
 ```
 Task tool with:
 - subagent_type: "planner"
@@ -53,6 +56,7 @@ Task tool with:
 ```
 
 **Step 3: Monitor Progress**
+
 - Planner will explore codebase
 - Planner will ask user questions (via AskUserQuestion tool)
 - Planner will create initial plan
@@ -60,6 +64,7 @@ Task tool with:
 - Iteration continues until plan is finalized
 
 **Step 4: Report Results**
+
 - Planner will provide final plan and created beads task IDs
 - Show the task hierarchy to user
 - Explain dependencies and suggested order
@@ -67,12 +72,14 @@ Task tool with:
 ## Planning Workflow Details
 
 ### Phase 1: Analysis
+
 - Planner explores current codebase
 - Identifies relevant files, patterns, architecture
 - Understands existing implementation
 - Has access to: Read, Grep, Glob, Bash (for exploration)
 
 ### Phase 2: Clarification
+
 - Planner asks specific questions about:
   - Scope and boundaries
   - Technical approach preferences
@@ -82,6 +89,7 @@ Task tool with:
 - Iterates until requirements are clear
 
 ### Phase 3: Initial Planning
+
 - Creates detailed implementation plan
 - Breaks down into logical steps
 - Identifies dependencies
@@ -89,6 +97,7 @@ Task tool with:
 - Documents assumptions
 
 ### Phase 4: Technical Review
+
 - Technical Lead reviews plan
 - Provides architectural feedback
 - Suggests improvements
@@ -96,17 +105,45 @@ Task tool with:
 - Checks alignment with project standards (AGENTS.md, CLAUDE.md)
 
 ### Phase 5: Refinement
+
 - Planner incorporates feedback
 - Adjusts plan based on Tech Lead input
 - Iterates until both agree
 - Finalizes technical approach
 
 ### Phase 6: Task Creation
+
 - Converts plan to beads tasks using `bd create`
 - Creates hierarchical structure with epics if needed
 - Sets up dependencies with `bd dep add`
 - Adds detailed descriptions and comments
 - Returns task IDs and hierarchy
+
+### Phase 7: Sync Tasks and Generate Report
+
+When all tickets are created, ALWAYS DO `bd sync`
+
+And Generate structured report:
+
+```markdown
+## Feature: The name of the feature
+
+### Summary
+
+High level summary 2-3 sentences.
+
+### List of Tickets in dependency graph
+
+List the ticket in dependency graph
+
+### Unblocked Tickets
+
+- List of unblock tickets
+
+### Blocked Tickets
+
+- List of blocked tickets
+```
 
 ## Important Notes
 
@@ -119,19 +156,22 @@ Task tool with:
 ## Configuration Files Used
 
 Planner and Technical Lead will reference:
+
 - **AGENTS.md**: Project guidelines and standards
 - **CLAUDE.md**: Claude-specific patterns and practices
-- **constitution.md**: Project principles
-- Any project documentation (README, docs/, etc.)
+- **(docs|specs)/constitution.md**: Project principles
+- Any project documentation (README, docs/, specs/, etc.)
 
 ## Example Usage
 
 With feature description:
+
 ```
 User: /k2:planner Add user authentication with JWT
 ```
 
 Interactive mode:
+
 ```
 User: /k2:planner
 Assistant: What feature or change would you like to plan?
@@ -141,6 +181,7 @@ User: I want to add dark mode to the entire application
 ## Success Indicators
 
 The planning workflow is complete when:
+
 - ✅ Requirements are fully understood and clarified
 - ✅ Technical Lead has reviewed and approved approach
 - ✅ Beads tasks created with clear descriptions
@@ -149,6 +190,7 @@ The planning workflow is complete when:
 - ✅ User understands the plan and next steps
 
 Present the final task structure to the user showing:
+
 - Task IDs and titles
 - Parent-child relationships
 - Dependencies

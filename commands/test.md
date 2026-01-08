@@ -15,6 +15,7 @@ Create a comprehensive test plan with test cases for a beads ticket, ensuring th
 ## What This Command Does
 
 This command initiates the test planning workflow:
+
 1. Tester agent reads ticket details and implementation
 2. Analyzes requirements and acceptance criteria
 3. Creates test strategy and coverage plan
@@ -25,20 +26,24 @@ This command initiates the test planning workflow:
 ## How to Use This Command
 
 **Step 1: Parse Ticket Argument**
+
 - Expect single ticket ID: `beads-123`
 - If no argument provided, ask user: "Which ticket would you like to create a test plan for?"
 
 **Step 2: Validate Ticket**
+
 - Use `bd show {ticket-id}` to verify ticket exists
 - Check that ticket has implementation details (not just placeholder)
 - If ticket is closed, show warning but continue (might be retrospective testing)
 
 **Step 3: Launch Tester Agent**
+
 - Use the Task tool to launch the "tester" agent
 - Provide ticket ID and context
 - Request comprehensive test planning
 
 Example:
+
 ```
 Task tool with:
 - subagent_type: "tester"
@@ -51,12 +56,13 @@ Task tool with:
           5. Define specific test cases with inputs and expected outputs
           6. Document coverage plan
           7. Add test plan as comment to beads task
-          8. Coordinate with Engineer if clarification needed
+          8. Coordinate with Technical Lead if clarification needed
 
           Follow k2-dev test planning standards."
 ```
 
 **Step 4: Present Test Plan**
+
 - Tester will create and document test plan
 - Show summary to user
 - Include:
@@ -68,6 +74,7 @@ Task tool with:
 ## Test Planning Workflow Details
 
 ### Phase 1: Analysis
+
 - Read ticket description and acceptance criteria
 - Review implementation if exists (code changes)
 - Understand feature scope and boundaries
@@ -75,6 +82,7 @@ Task tool with:
 - Check quality gates in AGENTS.md
 
 ### Phase 2: Test Strategy
+
 - Determine appropriate test types:
   - **Unit tests**: Individual function/module testing
   - **Integration tests**: Component interaction testing
@@ -85,7 +93,9 @@ Task tool with:
 - Consider test data requirements
 
 ### Phase 3: Test Case Definition
+
 For each test case, define:
+
 - **Test ID**: Unique identifier
 - **Scenario**: What is being tested
 - **Preconditions**: Required setup
@@ -94,6 +104,7 @@ For each test case, define:
 - **Priority**: Critical, high, medium, low
 
 ### Phase 4: Coverage Analysis
+
 - Identify coverage areas:
   - Happy path scenarios
   - Edge cases
@@ -104,6 +115,7 @@ For each test case, define:
 - Identify gaps
 
 ### Phase 5: Documentation
+
 - Create structured test plan document
 - Add as comment to beads task
 - Include:
@@ -114,6 +126,7 @@ For each test case, define:
   - Recommended test framework/tools
 
 ### Phase 6: Coordination
+
 - If Engineer involvement needed, coordinate handoff
 - If test implementation required, create follow-up task
 - Ensure clarity on who implements tests
@@ -126,6 +139,7 @@ The test plan should follow this structure:
 # Test Plan: {ticket-id} - {title}
 
 ## Test Strategy
+
 **Scope:** {what will be tested}
 **Approach:** {test types and methods}
 **Coverage Goal:** {target coverage percentage or criteria}
@@ -133,29 +147,35 @@ The test plan should follow this structure:
 ## Test Cases
 
 ### TC-001: {Scenario Name}
+
 **Type:** Unit / Integration / E2E
 **Priority:** Critical / High / Medium / Low
 **Preconditions:** {setup required}
 **Steps:**
+
 1. {action}
 2. {action}
-**Expected Result:** {outcome}
+   **Expected Result:** {outcome}
 
 ### TC-002: {Scenario Name}
+
 [repeat structure]
 
 ## Coverage Matrix
-| Requirement | Test Cases | Status |
-|-------------|-----------|--------|
+
+| Requirement     | Test Cases     | Status  |
+| --------------- | -------------- | ------- |
 | {requirement-1} | TC-001, TC-002 | Covered |
-| {requirement-2} | TC-003 | Covered |
+| {requirement-2} | TC-003         | Covered |
 
 ## Testing Notes
+
 - {any special considerations}
 - {test data requirements}
 - {environment setup needs}
 
 ## Recommended Tools
+
 - {test framework}
 - {additional tools}
 ```
@@ -171,6 +191,7 @@ The test plan should follow this structure:
 ## Configuration Files Used
 
 Tester agent will reference:
+
 - **AGENTS.md**: Testing standards and coverage requirements
 - **CLAUDE.md**: Project-specific testing patterns
 - **constitution.md**: Quality principles
@@ -184,6 +205,7 @@ User: /k2:test beads-123
 ## Success Indicators
 
 Test planning is complete when:
+
 - ✅ Test strategy documented
 - ✅ Test cases defined with full details
 - ✅ Coverage analysis complete
@@ -191,6 +213,7 @@ Test planning is complete when:
 - ✅ Any follow-up tasks created if needed
 
 Present the test plan summary to the user showing:
+
 - Number of test cases by type
 - Coverage areas
 - Priority breakdown
