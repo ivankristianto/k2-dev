@@ -86,7 +86,7 @@ When you receive an implementation assignment from the Technical Lead:
 
    - Confirm you're in the correct worktree (feature/beads-{id})
    - Verify branch is clean and up-to-date
-   - Check that base branch is correct (usually main/master)
+   - Identify the base branch from which this worktree was created (check git config or worktree info)
    - Note the project root directory for all file operations
 
 4. **Understand Existing Codebase**:
@@ -206,7 +206,8 @@ Before creating a PR, perform rigorous self-review:
 
 4. **Diff Review**:
    ```bash
-   git diff origin/{base_branch}...HEAD
+   # Compare against the actual base branch this worktree was created from
+   git diff {base_branch}...HEAD
    ```
    - Review all changes line by line
    - Remove debugging code or commented-out code
@@ -216,88 +217,25 @@ Before creating a PR, perform rigorous self-review:
 
 ### Phase 4: Pull Request Creation
 
-1. **Read PR Template** (if exists):
+**Use the pr-creation skill** to create a well-structured, comprehensive pull request:
 
-   ```bash
-   # Look for PR template in project
-   cat .github/pull_request_template.md
-   # or
-   cat .github/PULL_REQUEST_TEMPLATE.md
-   ```
+```bash
+# Invoke the pr-creation skill for PR creation
+Skill tool: skill="k2-dev:pr-creation"
+```
 
-2. **Prepare PR Description**:
+The pr-creation skill will:
+- Read PR templates if they exist
+- Analyze your changes and commits
+- Generate a comprehensive PR description following project standards
+- Create the GitHub PR with proper title, body, and labels
+- Link to the beads task
+- Include quality gate validation checklist
+- Provide testing details and reviewer notes
 
-   ```markdown
-   ## Summary
-
-   Brief description of what this PR implements
-
-   ## Related Issue
-
-   Closes beads-{id}
-
-   ## Changes Made
-
-   - Clear bullet point 1
-   - Clear bullet point 2
-   - Clear bullet point 3
-
-   ## Implementation Details
-
-   Key architectural decisions or approach details:
-
-   - Why certain approach was chosen
-   - Any tradeoffs made
-   - Dependencies or side effects
-
-   ## Testing
-
-   - Unit tests added for X, Y, Z
-   - Manual testing performed: [describe scenarios]
-   - Edge cases tested: [list]
-
-   ## Quality Gates
-
-   - [x] Code follows AGENTS.md standards
-   - [x] CLAUDE.md patterns followed
-   - [x] constitution.md constraints honored
-   - [x] Self-review completed
-   - [x] Tests passing
-   - [x] Build successful
-   - [x] No security vulnerabilities
-
-   ## Screenshots/Demo
-
-   [If UI changes, include screenshots or demo]
-
-   ## Reviewer Notes
-
-   Areas that need special attention:
-
-   - [Highlight complex or risky changes]
-   - [Note any deviations from plan with rationale]
-   ```
-
-3. **Create GitHub PR**:
-
-   ```bash
-   git push -u origin feature/beads-{id}
-
-   gh pr create --title "{clear, descriptive title}" --body "$(cat <<'EOF'
-   [PR description from above]
-   EOF
-   )"
-   ```
-
-   - Use clear, descriptive PR title following project conventions
-   - Include all relevant context in PR body
-   - Link to beads task
-   - Add labels if appropriate (feature, bugfix, etc.)
-   - Request review from appropriate reviewers (if applicable)
-
-4. **Record PR URL**:
-   - Save PR URL for reporting back to Technical Lead
-   - Note PR number for tracking
+**Record PR URL**:
+- Save PR URL for reporting back to Technical Lead
+- Note PR number for tracking
 
 ### Phase 5: Responding to Review Feedback
 
