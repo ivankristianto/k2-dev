@@ -78,7 +78,7 @@ Start implementation workflow for one or more tickets.
 9. Creates follow-up tickets for remaining issues
 10. Technical Lead merges and cleans up
 
-### `/k2:planner` (or `/planner`)
+### `/k2:planner`
 
 Start planning workflow for new features using the Planning skill.
 
@@ -86,8 +86,6 @@ Start planning workflow for new features using the Planning skill.
 
 ```
 /k2:planner
-# or
-/planner
 ```
 
 **Workflow:**
@@ -122,7 +120,7 @@ Generate status report for a ticket.
 - Comments and history
 - Related tickets
 
-### `/k2:test` (or `/tester`)
+### `/k2:test`
 
 Create test plan for a ticket using the Test Planning skill.
 
@@ -130,8 +128,6 @@ Create test plan for a ticket using the Test Planning skill.
 
 ```
 /k2:test beads-123
-# or
-/tester beads-123
 ```
 
 **Workflow:**
@@ -181,8 +177,8 @@ Create test plan for a ticket using the Test Planning skill.
 The plugin provides specialized skills that execute in the main conversation context:
 
 **Active Workflow Skills:**
-1. **Planning** (`/k2:planner` or `/planner`): Requirements analysis, task creation, beads task management
-2. **Test Planning** (`/k2:test` or `/tester`): Test strategy, test case definition, coverage planning
+1. **Planning** (`/k2:planner`): Requirements analysis, task creation, beads task management
+2. **Test Planning** (`/k2:test`): Test strategy, test case definition, coverage planning
 
 **Knowledge Domain Skills:**
 3. **beads-integration**: Working with beads task management

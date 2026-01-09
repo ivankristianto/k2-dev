@@ -1,6 +1,6 @@
 {
   "name": "k2-dev",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Multiagent orchestration plugin for enterprise code development with specialized agents and skills, beads integration, and quality gates enforcement",
   "author": {
     "name": "Ivan",

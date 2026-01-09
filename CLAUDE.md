@@ -35,10 +35,8 @@ k2-dev/
 ├── commands/                 # User-invocable slash commands
 │   ├── start.md             # /k2:start - begin implementation
 │   ├── planner.md           # /k2:planner - create plans (invokes skill)
-│   ├── planner-alias.md     # /planner - alias for planning skill
 │   ├── report.md            # /k2:report - status reports
-│   ├── test.md              # /k2:test - test planning (invokes skill)
-│   └── tester-alias.md      # /tester - alias for test planning skill
+│   └── test.md              # /k2:test - test planning (invokes skill)
 ├── skills/                   # Knowledge domains and active workflows
 │   ├── planner/             # Planning skill (main context execution)
 │   ├── tester/              # Test Planning skill (main context execution)
@@ -63,9 +61,9 @@ k2-dev/
 
 **Skills** (execute in main conversation context):
 | Skill | Access Method | Purpose |
-| ------------------ | ---------------------- | -------------------------------------- |
-| Planning | `/k2:planner` or `/planner` | Requirements analysis, task creation |
-| Test Planning | `/k2:test` or `/tester` | Test strategy, test case definition |
+| ------------------ | ------------- | -------------------------------------- |
+| Planning | `/k2:planner` | Requirements analysis, task creation |
+| Test Planning | `/k2:test` | Test strategy, test case definition |
 
 ## Key Workflows
 
@@ -88,7 +86,7 @@ k2-dev/
 - **Self-sufficient**: PR Writer can analyze changes independently (git log, git diff)
 - **Cleaner separation**: PR creation is a distinct, self-contained task
 
-### Planning Flow (`/k2:planner` or `/planner`)
+### Planning Flow (`/k2:planner`)
 
 1. Planning skill analyzes requirements with full codebase access
 2. Explores codebase using main conversation tools (Glob/Grep/Read)
