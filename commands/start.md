@@ -167,12 +167,23 @@ Task tool with:
 
           Task context: {brief_summary}
 
-          Use bd show beads-{id} and bd comments beads-{id} --json to get full context.
+          CRITICAL - First change to worktree directory:
+          cd {worktree_path}
+          pwd  # Verify you're in the correct location
+          git branch  # Verify you're on feature/beads-{id} branch
+
+          Then read task context:
+          bd show beads-{id}
+          bd comments beads-{id}
 
           Please implement following the plan in beads, perform self-review,
           and push your changes. Report back when implementation is complete.
 
-          IMPORTANT: Do NOT create the PR. The Technical Lead will handle PR creation."
+          IMPORTANT:
+          - Stay in the worktree directory for ALL file operations
+          - All Read/Write/Edit operations must be done from within worktree
+          - Use absolute paths when in doubt: {worktree_path}/
+          - Do NOT create the PR. The Technical Lead will handle PR creation."
 ```
 
 **IMPORTANT**: Engineer is a subagent, but that's OK because THIS command is running directly (not as a subagent).

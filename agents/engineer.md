@@ -69,18 +69,23 @@ When you receive an implementation assignment from the Technical Lead:
    - Note any special instructions or constraints
    - Check if there's an approved plan in the task or comments
 
-3. **Verify Worktree and Environment**:
+3. **Verify Worktree and Environment** (CRITICAL - Do this FIRST before any file operations):
 
    ```bash
+   # CRITICAL: Change to worktree directory immediately
+   # All file operations (Read/Write/Edit) must be done from here
    cd {worktree_path}
+   pwd  # Verify: should show {worktree_path}
    git status
-   git branch
+   git branch  # Verify: should show feature/beads-{id}
    ```
 
+   - **CRITICAL**: All Read, Write, Edit operations MUST be performed from within the worktree directory
    - Confirm you're in the correct worktree (feature/beads-{id})
    - Verify branch is clean and up-to-date
    - Identify the base branch from which this worktree was created (check git config or worktree info)
    - Note the project root directory for all file operations
+   - **NEVER** perform file operations in the main project directory when working in a worktree
 
 4. **Understand Existing Codebase**:
    - Use Grep and Glob to explore relevant code sections
