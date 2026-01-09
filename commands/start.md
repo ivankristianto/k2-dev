@@ -1,7 +1,7 @@
 ---
 name: k2:start
 description: Start implementation workflow for one or more beads tickets (runs Technical Lead orchestration logic directly)
-argument-hint: beads-123 or beads-123,beads-234
+argument-hint: "[beads-123] or beads-123,beads-234 (optional - auto-selects if omitted)"
 allowed-tools:
   - Read
   - Write
@@ -22,13 +22,28 @@ You are running the **Technical Lead orchestration logic directly** for the k2-d
 
 **DO NOT use the Task tool to launch a "technical-lead" subagent** - that would cause recursion. Instead, execute the Technical Lead logic directly in this command context.
 
+## Phase 0: Ticket Selection (if no argument provided)
+
+If the user did NOT provide a ticket ID argument:
+
+1. Run beads_viewer robot triage to get recommendation:
+
+```bash
+bv --robot-triage
+```
+
+2. Parse the output to extract the top recommended ticket ID
+3. Inform the user: "No ticket specified. Using beads_viewer recommendation: {ticket-id}"
+4. Continue with that ticket ID for the rest of the workflow
+
 ## Parse Tickets
 
-Parse the argument to extract ticket IDs:
+Parse the argument (or auto-selected ticket) to extract ticket IDs:
 
 - Accepts comma-separated: `beads-123,beads-234,beads-345`
 - Multiple tickets share one worktree
 - Single ticket: `beads-123`
+- No argument: Auto-select via `bv --robot-triage`
 
 ## Workflow Execution
 
@@ -44,7 +59,10 @@ Use `TodoWrite` to create initial todos:
  {"content": "Identify project root directory", "status": "pending", "activeForm": "Identifying project root"},
  {"content": "Create git worktree for feature branch", "status": "pending", "activeForm": "Creating git worktree"},
  {"content": "Read task details and comments from beads", "status": "pending", "activeForm": "Reading task details"},
- {"content": "Analyze task and add initial comments", "status": "pending", "activeForm": "Analyzing task"}]
+ {"content": "Analyze task and add initial comments", "status": "pending", "activeForm": "Analyzing task"},
+ {"content": "Launch Engineer agent for implementation", "status": "pending", "activeForm": "Launching Engineer agent"},
+ {"content": "Create pull request using pr-creation skill", "status": "pending", "activeForm": "Creating pull request"},
+ {"content": "Launch Reviewer agent for code review", "status": "pending", "activeForm": "Launching Reviewer agent"}]
 ```
 
 ### Phase 2: Ticket Validation
@@ -152,14 +170,46 @@ Task tool with:
           Use bd show beads-{id} and bd comments beads-{id} --json to get full context.
 
           Please implement following the plan in beads, perform self-review,
-          and create a GitHub PR when complete."
+          and push your changes. Report back when implementation is complete.
+
+          IMPORTANT: Do NOT create the PR. The Technical Lead will handle PR creation."
 ```
 
 **IMPORTANT**: Engineer is a subagent, but that's OK because THIS command is running directly (not as a subagent).
 
-### Phase 9: After Engineer Completes
+### Phase 9: Create Pull Request
 
-When Engineer returns with PR URL:
+When Engineer returns with implementation complete:
+
+1. **Change to worktree directory**:
+
+   ```bash
+   cd {worktree_path}
+   ```
+
+2. **Create PR using pr-creation skill**:
+
+   Use the Skill tool to create a well-structured pull request:
+
+   ```
+   Skill tool with:
+   - skill: "k2-dev:pr-creation"
+   - args: "{ticket-id}"
+   ```
+
+   The pr-creation skill will:
+   - Analyze the changes and commits in the worktree
+   - Read PR templates if they exist
+   - Generate comprehensive PR description
+   - Create the GitHub PR with proper formatting
+   - Link to beads tickets
+   - Return the PR URL
+
+3. **Record PR URL** for next steps
+
+### Phase 10: Launch Reviewer Agent
+
+After PR is created:
 
 1. Update todo: Add "Launch Reviewer agent"
 2. Use Task tool to launch Reviewer:
@@ -174,7 +224,7 @@ Task tool with:
           Validate against all quality standards and provide feedback."
 ```
 
-### Phase 10: After Reviewer Completes
+### Phase 11: After Reviewer Completes
 
 Track review iterations (max 2):
 
@@ -188,7 +238,7 @@ When approved:
 - Sync beads: `bd sync`
 - Cleanup worktree: `bd worktree remove {worktree_path}`
 
-### Phase 11: Final Report
+### Phase 12: Final Report
 
 Use the Skill tool to generate comprehensive reports for each completed ticket:
 
