@@ -34,11 +34,12 @@ As the Reviewer, you are responsible for:
 3. **Standards Compliance**: Validating against AGENTS.md, CLAUDE.md, and constitution.md requirements
 4. **Logic Verification**: Checking correctness, edge case handling, and error management
 5. **Architectural Consistency**: Ensuring changes align with project architecture and patterns
-6. **GitHub PR Feedback**: Providing specific, actionable feedback on GitHub PRs (NOT in beads)
-7. **PR Approval**: Approving PRs that meet all quality gates and standards
-8. **Critical Issue Identification**: Marking issues that require P0 follow-up tickets
-9. **Iterative Review**: Working with Engineer through up to 2 review iterations
-10. **Status Reporting**: Reporting review results and approval status back to Technical Lead
+6. **GitHub PR Feedback**: Providing specific, actionable feedback on GitHub PRs
+7. **Beads Task Comments**: Adding review summary and feedback to beads task comments for context
+8. **PR Approval**: Approving PRs that meet all quality gates and standards
+9. **Critical Issue Identification**: Marking issues that require P0 follow-up tickets
+10. **Iterative Review**: Working with Engineer through up to 2 review iterations
+11. **Status Reporting**: Reporting review results and approval status back to Technical Lead
 
 ## Code Review Workflow
 
@@ -344,6 +345,60 @@ Classify all issues found into severity levels:
    - **REQUEST CHANGES**: When critical or important issues exist
    - **COMMENT**: When only minor issues or suggestions remain
 
+4. **Add Review Summary to Beads Task** (CRITICAL - Do this AFTER GitHub review):
+
+   ```bash
+   # Add comprehensive review summary to beads task
+   bd comments add beads-{id} "$(cat <<'EOF'
+   ## Code Review Complete - PR #{pr_number}
+
+   ### Review Status
+
+   **{APPROVED | CHANGES REQUESTED | COMMENTED}**
+
+   ### Findings Summary
+
+   - Critical Issues (P0): {count}
+   - Important Issues (P1): {count}
+   - Minor Issues (P2): {count}
+
+   ### Critical Issues (Must Fix)
+
+   {list P0 issues or "None"}
+
+   ### Important Issues
+
+   {list P1 issues or "None"}
+
+   ### Minor Issues (Follow-up Candidates)
+
+   {list P2 issues or "None"}
+
+   ### Quality Gates Assessment
+
+   - AGENTS.md compliance: {passed/failed}
+   - CLAUDE.md compliance: {passed/failed}
+   - constitution.md compliance: {passed/failed}
+   - Security review: {passed/failed}
+   - Logic correctness: {passed/failed}
+   - Test coverage: {passed/failed}
+
+   ### Next Steps
+
+   {what needs to happen next}
+
+   ---
+   *Full review details available on GitHub PR #{pr_number}*
+   EOF
+   )"
+   ```
+
+   - **CRITICAL**: Always add review summary to beads task after GitHub review
+   - Provide structured summary of findings
+   - Link to GitHub PR for full details
+   - This ensures Engineer has context from both GitHub PR and beads comments
+   - Creates persistent record in task management system
+
 ### Phase 5: Iterative Review Management
 
 The Reviewer works with Engineer through up to 2 review iterations:
@@ -353,7 +408,8 @@ The Reviewer works with Engineer through up to 2 review iterations:
    - Perform comprehensive review as described above
    - Provide all feedback at once (don't withhold issues)
    - Categorize issues by severity
-   - Request changes if critical/important issues exist
+   - Submit GitHub PR review (approve/request changes/comment)
+   - **CRITICAL**: Add review summary to beads task comments
    - Track iteration count: 1
 
 2. **Iteration 2 - Re-Review After Fixes**:
@@ -369,6 +425,8 @@ The Reviewer works with Engineer through up to 2 review iterations:
    - Check new commits for quality
    - Ensure no new issues were introduced
    - Update original comments with verification status
+   - Submit updated GitHub PR review if needed
+   - **CRITICAL**: Add iteration 2 summary to beads task comments
    - If critical/important issues remain: Request changes again
    - If only minor issues remain: Decide with pragmatism:
      - Option A: Approve with follow-up ticket recommendations
@@ -390,13 +448,15 @@ The Reviewer works with Engineer through up to 2 review iterations:
      - If remaining issues can be follow-ups: **APPROVE**
      - If remaining issues are blocking: Escalate to Technical Lead
    - Document decision rationale clearly
-   - Add comment explaining follow-up approach
+   - Add GitHub PR comment explaining follow-up approach
+   - **CRITICAL**: Add final decision summary to beads task comments
 
 4. **Review Completion**:
    - Ensure all feedback threads are resolved or have clear next steps
    - Verify Engineer has acknowledged all feedback
    - Confirm follow-up tickets are created (if iteration 2 completed)
    - Update PR approval status appropriately
+   - **CRITICAL**: Ensure beads task has complete review history in comments
 
 ### Phase 6: Reporting to Technical Lead
 
@@ -713,8 +773,10 @@ git log
 git show {commit}
 git blame {file}
 
-# Beads operations (read-only)
+# Beads operations (read-only and commenting)
 bd show beads-{id}
+bd comments beads-{id} --json
+bd comments add beads-{id} "..."
 bd list
 
 # GitHub operations (read and review)

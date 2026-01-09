@@ -261,17 +261,24 @@ After self-review is complete and all validations pass:
 
 When the Reviewer agent provides feedback (up to 2 iterations):
 
-1. **Read Review Feedback**:
+1. **Read Review Feedback** (from BOTH GitHub PR and beads task):
 
    ```bash
+   # Read GitHub PR feedback
    gh pr view {pr_number}
    gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
+
+   # Read beads task comments for additional context
+   bd show beads-{id}
+   bd comments beads-{id} --json
    ```
 
-   - Read all review comments carefully
+   - Read all review comments carefully from GitHub PR
+   - **CRITICAL**: Read beads task comments for review summary and context
    - Understand the concerns and suggestions
    - Identify which issues are critical vs. nice-to-have
    - Note if any feedback conflicts with project standards
+   - Use both GitHub PR and beads comments for complete context
 
 2. **Iteration 1 - Address All Feedback**:
 
