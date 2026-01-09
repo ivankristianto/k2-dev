@@ -7,7 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 k2-dev is a multiagent orchestration plugin for Claude Code that simulates a complete development team. It coordinates specialized AI agents and skills (Technical Lead, Engineer, Reviewer, plus Planning and Test Planning skills) for enterprise-grade software development workflows with beads task management integration.
 
 **Agent vs Skills:**
-- **Agents** (Technical Lead, Engineer, Reviewer): Run as isolated subagents for complex, multi-step workflows
+
+- **Agents** (Technical Lead, Engineer, Reviewer, PR Writer): Run as isolated subagents for complex, multi-step workflows with isolated context
 - **Skills** (Planning, Test Planning): Execute in main conversation context for faster execution and direct user interaction
 
 ## Architecture
@@ -17,7 +18,7 @@ k2-dev is a multiagent orchestration plugin for Claude Code that simulates a com
 The plugin uses a hub-and-spoke coordination pattern:
 
 - **Technical Lead** is the hub that orchestrates all workflows
-- Other agents (spokes) are launched by Technical Lead and report back
+- Other agents (Engineer, Reviewer, PR Writer) are spokes launched by Technical Lead and report back
 - No direct agent-to-agent communication; all coordination flows through Technical Lead
 
 ### Plugin Structure
@@ -29,7 +30,8 @@ k2-dev/
 ├── agents/                   # Agent definitions (system prompts)
 │   ├── technical-lead.md    # Hub: orchestrates workflows
 │   ├── engineer.md          # Implementation
-│   └── reviewer.md          # Code review (read-only)
+│   ├── reviewer.md          # Code review (read-only)
+│   └── pr-writer.md         # Pull request creation
 ├── commands/                 # User-invocable slash commands
 │   ├── start.md             # /k2:start - begin implementation
 │   ├── planner.md           # /k2:planner - create plans (invokes skill)
@@ -57,12 +59,13 @@ k2-dev/
 | Technical Lead | All tools                           | Orchestration, coordination, decisions |
 | Engineer       | Read, Write, Edit, Bash, Grep, Glob | Implementation only                    |
 | Reviewer       | Read, Grep, Glob, Bash              | Read-only review                       |
+| PR Writer      | Read, Write, Bash, Grep, Glob, TodoWrite | Pull request creation                  |
 
 **Skills** (execute in main conversation context):
-| Skill              | Access Method          | Purpose                                |
+| Skill | Access Method | Purpose |
 | ------------------ | ---------------------- | -------------------------------------- |
-| Planning           | `/k2:planner` or `/planner` | Requirements analysis, task creation  |
-| Test Planning      | `/k2:test` or `/tester`     | Test strategy, test case definition    |
+| Planning | `/k2:planner` or `/planner` | Requirements analysis, task creation |
+| Test Planning | `/k2:test` or `/tester` | Test strategy, test case definition |
 
 ## Key Workflows
 
@@ -72,9 +75,18 @@ k2-dev/
 2. Creates git worktree: `bd worktree create ../worktrees/feature-beads-123`
 3. Reads task details via `bd show` and `bd comments`
 4. Launches Engineer agent for implementation
-5. Engineer implements, self-reviews against AGENTS.md/CLAUDE.md, creates PR
-6. Reviewer validates code (max 2 iterations)
-7. Technical Lead merges, closes tickets, syncs beads, removes worktree
+5. Engineer implements, self-reviews against AGENTS.md/CLAUDE.md, pushes changes
+6. Technical Lead launches internal PR Writer agent to create PR
+7. Technical Lead launches Reviewer agent to validate code (max 2 iterations)
+8. Technical Lead merges, closes tickets, syncs beads, removes worktree
+
+**Why PR Creation Uses Internal Subagent:**
+
+- **Self-contained plugin**: No dependency on external agents - pr-writer is part of k2-dev
+- **Context isolation**: PR creation knowledge doesn't bloat subsequent review/merge phases
+- **Token efficiency**: One-time spawn cost (~2-3K) vs carrying PR context through 3+ phases (~15-30K)
+- **Self-sufficient**: PR Writer can analyze changes independently (git log, git diff)
+- **Cleaner separation**: PR creation is a distinct, self-contained task
 
 ### Planning Flow (`/k2:planner` or `/planner`)
 
@@ -87,6 +99,7 @@ k2-dev/
 7. Converts to hierarchical beads tasks with dependencies
 
 **Benefits of skill-based approach:**
+
 - Faster execution (no agent spawning overhead)
 - Easier debugging (everything in main conversation context)
 - Direct user interaction (questions asked directly, not via AskUserQuestion)
@@ -197,8 +210,7 @@ Skills are reusable knowledge domains invoked via the Skill tool during agent ex
 - **Frontmatter**: name, description, version
 - **SKILL.md**: Comprehensive documentation
 - Used by agents when specific knowledge is needed
-
-Example: When Engineer needs to create a PR, invoke `skill: "k2-dev:pr-creation"`
+- Skills provide reference documentation and patterns (e.g., pr-creation skill documents PR best practices)
 
 ## Configuration
 
@@ -267,6 +279,7 @@ Update `plugin.json` version field using semantic versioning:
 Current version: 0.2.0
 
 **Version 0.2.0 Changes:**
+
 - Converted Planner and Tester from agents to skills
 - Skills now execute in main conversation context for faster execution
 - Added `/planner` and `/tester` command aliases
@@ -277,16 +290,19 @@ Current version: 0.2.0
 **IMPORTANT**: When the user asks to commit and push changes, you MUST bump the version number in BOTH files before executing git push:
 
 1. **Version files to update:**
+
    - `.claude-plugin/plugin.json` (line 3: `"version"` field)
    - `.claude-plugin/marketplace.json` (line 12: `"version"` field inside plugins array)
 
 2. **Version bumping rules:**
+
    - Use semantic versioning: MAJOR.MINOR.PATCH
    - Patch: Bug fixes, documentation updates, minor changes
    - Minor: New features, skills, commands, or agent improvements
    - Major: Breaking changes, workflow restructuring, incompatible changes
 
 3. **Required workflow:**
+
    ```bash
    # 1. Update version in both files (use Edit tool)
    # 2. Stage all changes including version files

@@ -54,14 +54,17 @@ You will execute the following phases directly (not as a subagent):
 Each phase logs its completion to beads comments for statelessness. This allows the workflow to resume if interrupted.
 
 **At the start of each phase:**
+
 ```bash
 # Check if phase is already completed
 bd comments beads-{id} | grep "Phase {N}: ✅"
 ```
+
 - If found: Skip to next phase (already completed)
 - If not found: Execute the phase
 
 **At the end of each phase:**
+
 ```bash
 # Log phase completion
 bd comments add beads-{id} "## Phase {N}: ✅ Completed
@@ -101,6 +104,7 @@ Use `TodoWrite` to create initial todos:
 ```bash
 bd comments beads-{id} | grep "Phase 2: ✅"
 ```
+
 - If found: Skip to Phase 3
 - If not found: Continue below
 
@@ -139,6 +143,7 @@ Tickets validated and status updated to in_progress:
 ```bash
 bd comments beads-{id} | grep "Phase 3: ✅"
 ```
+
 - If found: Skip to Phase 4
 - If not found: Continue below
 
@@ -170,6 +175,7 @@ bd comments add beads-{id} "## Phase 3: ✅ Completed
 ```bash
 bd comments beads-{id} | grep "Phase 4: ✅"
 ```
+
 - If found: Skip to Phase 5
 - If not found: Continue below
 
@@ -198,6 +204,7 @@ Path: {project_root}"
 ```bash
 bd comments beads-{id} | grep "Phase 5: ✅"
 ```
+
 - If found: Skip to Phase 6, extract worktree path from comments
 - If not found: Continue below
 
@@ -231,6 +238,7 @@ Path: {worktree_path}"
 ```bash
 bd comments beads-{id} | grep "Phase 6: ✅"
 ```
+
 - If found: Skip to Phase 7
 - If not found: Continue below
 
@@ -261,6 +269,7 @@ Tickets analyzed: {ticket_ids}"
 ```bash
 bd comments beads-{id} | grep "Phase 7: ✅"
 ```
+
 - If found: Skip to Phase 8
 - If not found: Continue below
 
@@ -309,6 +318,7 @@ Dependencies: {dependencies}"
 ```bash
 bd comments beads-{id} | grep "Phase 8: ✅"
 ```
+
 - If found: Skip to Phase 9
 - If not found: Continue below
 
@@ -366,6 +376,7 @@ Implementation completed and changes pushed."
 ```bash
 bd comments beads-{id} | grep "Phase 9: ✅"
 ```
+
 - If found: Skip to Phase 10, extract PR URL from comments
 - If not found: Continue below
 
@@ -379,19 +390,29 @@ When Engineer returns with implementation complete:
    cd {worktree_path}
    ```
 
-3. **Create PR using pr-creation skill**:
+3. **Create PR using internal pr-writer agent**:
 
-   Use the Skill tool to create a well-structured pull request:
+   Use the Task tool to launch the k2-dev pr-writer agent:
 
    ```
-   Skill tool with:
-   - skill: "k2-dev:pr-creation"
-   - args: "{ticket-id}"
+   Task tool with:
+   - subagent_type: "k2-dev:pr-writer"
+   - description: "Create PR for implementation"
+   - prompt: "Create a pull request for the implementation.
+
+             Worktree: {worktree_path}
+             Ticket: {ticket-id}
+             Branch: feature/beads-{id}
+
+             Change to the worktree directory, analyze the changes and commits,
+             read any PR templates, generate a comprehensive PR description,
+             and create the GitHub PR. Return the PR URL when complete."
    ```
 
-   The pr-creation skill will:
+   The pr-writer agent will:
 
-   - Analyze the changes and commits in the worktree
+   - Change to worktree directory
+   - Analyze the changes and commits (git log, git diff)
    - Read PR templates if they exist
    - Generate comprehensive PR description
    - Create the GitHub PR with proper formatting
@@ -420,6 +441,7 @@ Branch: feature/beads-{id}"
 ```bash
 bd comments beads-{id} | grep "Phase 10: ✅"
 ```
+
 - If found: Skip to Phase 11 or Phase 12 (depending on review result)
 - If not found: Continue below
 
@@ -472,6 +494,7 @@ This phase handles the feedback loop between Reviewer and Engineer. Maximum 2 it
 ```bash
 bd comments beads-{id} | grep "Phase 11, Iteration"
 ```
+
 - If "Iteration 2: ✅": Check final review result
 - If "Iteration 1: ✅": Check if need iteration 2
 - If neither found: Start iteration 1
@@ -584,7 +607,7 @@ EOF
 
 **Log follow-up tickets:**
 
-```bash
+````bash
 bd comments add beads-{id} "## Phase 11: Follow-Up Tickets Created
 
 Tickets: {list_of_ticket_ids}
@@ -597,7 +620,8 @@ Decision: {merge_now_or_wait}
 
 ```bash
 bd comments beads-{id} | grep "Phase 12: ✅"
-```
+````
+
 - If found: Skip to end (workflow already complete)
 - If not found: Continue below
 
