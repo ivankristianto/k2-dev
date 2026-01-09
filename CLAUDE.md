@@ -271,3 +271,36 @@ Current version: 0.2.0
 - Skills now execute in main conversation context for faster execution
 - Added `/planner` and `/tester` command aliases
 - Improved user experience with direct interaction in main conversation
+
+## Commit and Push Workflow
+
+**IMPORTANT**: When the user asks to commit and push changes, you MUST bump the version number in BOTH files before executing git push:
+
+1. **Version files to update:**
+   - `.claude-plugin/plugin.json` (line 3: `"version"` field)
+   - `.claude-plugin/marketplace.json` (line 12: `"version"` field inside plugins array)
+
+2. **Version bumping rules:**
+   - Use semantic versioning: MAJOR.MINOR.PATCH
+   - Patch: Bug fixes, documentation updates, minor changes
+   - Minor: New features, skills, commands, or agent improvements
+   - Major: Breaking changes, workflow restructuring, incompatible changes
+
+3. **Required workflow:**
+   ```bash
+   # 1. Update version in both files (use Edit tool)
+   # 2. Stage all changes including version files
+   git add .
+   # 3. Commit with descriptive message
+   git commit -m "..."
+   # 4. Push to remote
+   git push
+   ```
+
+4. **Example version bump:**
+   - Current: `0.2.1`
+   - For documentation fix: `0.2.2`
+   - For new command: `0.3.0`
+   - For breaking change: `1.0.0`
+
+**Never push without bumping both version files first.** Always keep the versions synchronized between `plugin.json` and `marketplace.json`.
