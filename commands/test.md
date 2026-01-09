@@ -8,227 +8,80 @@ allowed-tools:
   - Task
 ---
 
-# K2:Test - Test Planning Workflow
+# K2:Test - Test Planning
 
-Create a comprehensive test plan with test cases for a beads ticket, ensuring thorough coverage and validation strategy.
+Invoke Test Planning skill to create comprehensive test plan with test cases for a beads ticket.
 
-## What This Command Does
+## Benefits of Skill-Based Approach
 
-This command invokes the Test Planning skill which executes in the main conversation context:
+- **Faster:** No agent spawning overhead - executes in main conversation context
+- **Direct context:** Test planning happens in main conversation, not isolated subagent
+- **Full access:** Uses main conversation tools for analysis
 
-1. Test Planning skill reads ticket details and implementation
-2. Analyzes requirements and acceptance criteria
-3. Creates test strategy and coverage plan
-4. Defines specific test cases
-5. Documents test plan in beads task comments
-6. Coordinates with Engineer if needed
+## How to Use
 
-## Key Benefits Over Agent-Based Approach
+**1. Parse ticket ID** (ask if not provided: "Which ticket would you like to create a test plan for?")
 
-- **Faster execution**: No agent spawning overhead
-- **Easier debugging**: Everything happens in main conversation context
-- **Direct context access**: Skill uses main conversation tools
-- **Better UX**: Test planning happens in main conversation, not isolated subagent
+**2. Validate:** `bd show {ticket-id}` → verify exists. Warn if closed but continue (retrospective testing OK).
 
-## How to Use This Command
-
-**Step 1: Parse Ticket Argument**
-
-- Expect single ticket ID: `beads-123`
-- If no argument provided, ask user: "Which ticket would you like to create a test plan for?"
-
-**Step 2: Validate Ticket**
-
-- Use `bd show {ticket-id}` to verify ticket exists
-- Check that ticket has implementation details (not just placeholder)
-- If ticket is closed, show warning but continue (might be retrospective testing)
-
-**Step 3: Invoke Test Planning Skill**
-
-- Use the Skill tool to invoke the "k2-dev:test-planning" skill
-- Provide ticket ID and context
-- Skill will execute in main conversation context
-
-Example:
-
+**3. Invoke Test Planning skill:**
 ```
 Skill tool with:
 - skill: "k2-dev:test-planning"
-- args: "Create comprehensive test plan for ticket beads-123"
-
-The skill will then:
-1. Read ticket description and comments from beads
-2. If implementation exists, analyze the code changes
-3. Identify test scenarios (happy path, edge cases, errors)
-4. Create test strategy (unit, integration, e2e)
-5. Define specific test cases with inputs and expected outputs
-6. Document coverage plan
-7. Add test plan as comment to beads task
-8. Coordinate with Technical Lead if clarification needed
+- args: "Create comprehensive test plan for ticket beads-{ticket-id}"
 ```
 
-**Step 4: Present Test Plan**
+**4. Skill executes workflow in main context:**
+- **Analysis:** Read ticket (bd show/comments), review implementation (if exists), understand scope/boundaries, identify integration points, check AGENTS.md quality gates
+- **Test Strategy:** Determine types (unit/integration/e2e/performance/security), define coverage goals, consider test data needs
+- **Test Case Definition:** For each case define: ID, scenario, preconditions, steps, expected result, priority (critical/high/medium/low)
+- **Coverage Analysis:** Identify areas (happy path, edge cases, errors, boundary values, invalid inputs), map to requirements, identify gaps
+- **Documentation:** Create structured test plan, add as beads comment
+- **Coordination:** Coordinate with Engineer if needed, create follow-up tasks for test implementation
 
-- Test Planning skill will create and document test plan
-- Show summary to user
-- Include:
-  - Number of test cases
-  - Coverage areas
-  - Test types (unit, integration, e2e)
-  - Any gaps or concerns
-
-## Test Planning Workflow Details
-
-### Phase 1: Analysis
-
-- Read ticket description and acceptance criteria
-- Review implementation if exists (code changes)
-- Understand feature scope and boundaries
-- Identify integration points
-- Check quality gates in AGENTS.md
-
-### Phase 2: Test Strategy
-
-- Determine appropriate test types:
-  - **Unit tests**: Individual function/module testing
-  - **Integration tests**: Component interaction testing
-  - **End-to-end tests**: Full user flow testing
-  - **Performance tests**: If relevant
-  - **Security tests**: If relevant
-- Define coverage goals
-- Consider test data requirements
-
-### Phase 3: Test Case Definition
-
-For each test case, define:
-
-- **Test ID**: Unique identifier
-- **Scenario**: What is being tested
-- **Preconditions**: Required setup
-- **Test Steps**: Actions to perform
-- **Expected Result**: What should happen
-- **Priority**: Critical, high, medium, low
-
-### Phase 4: Coverage Analysis
-
-- Identify coverage areas:
-  - Happy path scenarios
-  - Edge cases
-  - Error conditions
-  - Boundary values
-  - Invalid inputs
-- Map test cases to requirements
-- Identify gaps
-
-### Phase 5: Documentation
-
-- Create structured test plan document
-- Add as comment to beads task
-- Include:
-  - Test strategy overview
-  - Test cases with full details
-  - Coverage matrix
-  - Testing notes and assumptions
-  - Recommended test framework/tools
-
-### Phase 6: Coordination
-
-- If Engineer involvement needed, coordinate handoff
-- If test implementation required, create follow-up task
-- Ensure clarity on who implements tests
-
-## Test Plan Format
-
-The test plan should follow this structure:
+## Test Plan Structure
 
 ```markdown
 # Test Plan: {ticket-id} - {title}
 
 ## Test Strategy
-
-**Scope:** {what will be tested}
-**Approach:** {test types and methods}
-**Coverage Goal:** {target coverage percentage or criteria}
+**Scope:** {what tested} | **Approach:** {test types} | **Coverage Goal:** {target}
 
 ## Test Cases
 
-### TC-001: {Scenario Name}
+### TC-001: {Scenario}
+**Type:** Unit/Integration/E2E | **Priority:** Critical/High/Medium/Low
+**Preconditions:** {setup}
+**Steps:** 1. {action} 2. {action}
+**Expected Result:** {outcome}
 
-**Type:** Unit / Integration / E2E
-**Priority:** Critical / High / Medium / Low
-**Preconditions:** {setup required}
-**Steps:**
-
-1. {action}
-2. {action}
-   **Expected Result:** {outcome}
-
-### TC-002: {Scenario Name}
-
-[repeat structure]
+[repeat for each case]
 
 ## Coverage Matrix
-
-| Requirement     | Test Cases     | Status  |
-| --------------- | -------------- | ------- |
-| {requirement-1} | TC-001, TC-002 | Covered |
-| {requirement-2} | TC-003         | Covered |
+| Requirement | Test Cases | Status |
+|-------------|------------|--------|
+| {req-1}     | TC-001,002 | ✓      |
 
 ## Testing Notes
-
-- {any special considerations}
-- {test data requirements}
-- {environment setup needs}
+{considerations, test data, environment needs}
 
 ## Recommended Tools
-
-- {test framework}
-- {additional tools}
+{framework, additional tools}
 ```
 
-## Important Notes
+## Configuration Files
 
-- **Comprehensive**: Cover all scenarios including edge cases
-- **Specific**: Each test case should be implementable
-- **Prioritized**: Mark critical tests for minimum viable coverage
-- **Documented**: Test plan stored in beads for reference
-- **Actionable**: Should be clear enough for anyone to implement tests
+Test Planning skill references: AGENTS.md (testing standards), CLAUDE.md, constitution.md
 
-## Configuration Files Used
+## Usage Examples
 
-Test Planning skill will reference:
-
-- **AGENTS.md**: Testing standards and coverage requirements
-- **CLAUDE.md**: Project-specific testing patterns
-- **constitution.md**: Quality principles
-
-## Example Usage
-
-```
-User: /k2:test beads-123
+```bash
+/k2:test beads-123  # create test plan
+/tester beads-123   # alias (direct skill invocation)
 ```
 
 ## Success Indicators
 
-Test planning is complete when:
+✅ Strategy documented → ✅ Test cases defined → ✅ Coverage analyzed → ✅ Plan in beads → ✅ Follow-ups created
 
-- ✅ Test strategy documented
-- ✅ Test cases defined with full details
-- ✅ Coverage analysis complete
-- ✅ Test plan added as beads comment
-- ✅ Any follow-up tasks created if needed
-
-Present the test plan summary to the user showing:
-
-- Number of test cases by type
-- Coverage areas
-- Priority breakdown
-- Next steps for test implementation
-
-## Skill Aliases
-
-This test planning functionality can also be invoked via:
-- `/k2:test` (this command)
-- `/tester` (direct skill invocation)
-
-Both invoke the same Test Planning skill and execute in the main conversation context.
+Present summary: test count by type, coverage areas, priority breakdown, next steps for implementation
