@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-k2-dev is a multiagent orchestration plugin for Claude Code that simulates a complete development team. It coordinates specialized AI agents (Technical Lead, Planner, Engineer, Reviewer, Tester) for enterprise-grade software development workflows with beads task management integration.
+k2-dev is a multiagent orchestration plugin for Claude Code that simulates a complete development team. It coordinates specialized AI agents and skills (Technical Lead, Engineer, Reviewer, plus Planning and Test Planning skills) for enterprise-grade software development workflows with beads task management integration.
+
+**Agent vs Skills:**
+- **Agents** (Technical Lead, Engineer, Reviewer): Run as isolated subagents for complex, multi-step workflows
+- **Skills** (Planning, Test Planning): Execute in main conversation context for faster execution and direct user interaction
 
 ## Architecture
 
@@ -24,21 +28,23 @@ k2-dev/
 │   └── plugin.json          # Plugin manifest
 ├── agents/                   # Agent definitions (system prompts)
 │   ├── technical-lead.md    # Hub: orchestrates workflows
-│   ├── planner.md           # Requirements analysis & planning
 │   ├── engineer.md          # Implementation
-│   ├── reviewer.md          # Code review (read-only)
-│   └── tester.md            # Test planning
+│   └── reviewer.md          # Code review (read-only)
 ├── commands/                 # User-invocable slash commands
 │   ├── start.md             # /k2:start - begin implementation
-│   ├── planner.md           # /k2:planner - create plans
+│   ├── planner.md           # /k2:planner - create plans (invokes skill)
+│   ├── planner-alias.md     # /planner - alias for planning skill
 │   ├── report.md            # /k2:report - status reports
-│   └── test.md              # /k2:test - test planning
-├── skills/                   # Knowledge domains for agents
+│   ├── test.md              # /k2:test - test planning (invokes skill)
+│   └── tester-alias.md      # /tester - alias for test planning skill
+├── skills/                   # Knowledge domains and active workflows
+│   ├── planner/             # Planning skill (main context execution)
+│   ├── tester/              # Test Planning skill (main context execution)
 │   ├── beads-integration/   # Beads CLI patterns
 │   ├── git-worktree-workflow/ # Git worktree management
 │   ├── quality-gates/       # Enforcing standards
 │   ├── pr-creation/         # Pull request structure
-│   ├── test-planning/       # Test strategy
+│   ├── test-planning/       # Test strategy (reference)
 │   └── code-review-standards/ # Review practices
 └── hooks/
     └── hooks.json           # PreToolUse (quality gates) & Stop (sync)
@@ -49,10 +55,14 @@ k2-dev/
 | Agent          | Tools                               | Purpose                                |
 | -------------- | ----------------------------------- | -------------------------------------- |
 | Technical Lead | All tools                           | Orchestration, coordination, decisions |
-| Planner        | All tools                           | Codebase exploration, planning         |
 | Engineer       | Read, Write, Edit, Bash, Grep, Glob | Implementation only                    |
 | Reviewer       | Read, Grep, Glob, Bash              | Read-only review                       |
-| Tester         | Read, Grep, Glob, Bash              | Test planning (no code changes)        |
+
+**Skills** (execute in main conversation context):
+| Skill              | Access Method          | Purpose                                |
+| ------------------ | ---------------------- | -------------------------------------- |
+| Planning           | `/k2:planner` or `/planner` | Requirements analysis, task creation  |
+| Test Planning      | `/k2:test` or `/tester`     | Test strategy, test case definition    |
 
 ## Key Workflows
 
@@ -66,14 +76,20 @@ k2-dev/
 6. Reviewer validates code (max 2 iterations)
 7. Technical Lead merges, closes tickets, syncs beads, removes worktree
 
-### Planning Flow (`/k2:planner`)
+### Planning Flow (`/k2:planner` or `/planner`)
 
-1. Planner analyzes requirements with full codebase access
-2. Explores codebase using Glob/Grep/Read tools
-3. Asks clarifying questions via AskUserQuestion
+1. Planning skill analyzes requirements with full codebase access
+2. Explores codebase using main conversation tools (Glob/Grep/Read)
+3. Asks clarifying questions directly in main conversation
 4. Creates structured implementation plan
-5. Technical Lead reviews and refines plan
-6. Planner converts to hierarchical beads tasks with dependencies
+5. Invokes Technical Lead agent via Task tool for architectural review
+6. Planning skill incorporates feedback and refines plan
+7. Converts to hierarchical beads tasks with dependencies
+
+**Benefits of skill-based approach:**
+- Faster execution (no agent spawning overhead)
+- Easier debugging (everything in main conversation context)
+- Direct user interaction (questions asked directly, not via AskUserQuestion)
 
 ### Review Iteration Limit
 
@@ -248,4 +264,10 @@ Update `plugin.json` version field using semantic versioning:
 - Minor: New features, agent improvements
 - Major: Breaking changes, workflow restructuring
 
-Current version: 0.1.2
+Current version: 0.2.0
+
+**Version 0.2.0 Changes:**
+- Converted Planner and Tester from agents to skills
+- Skills now execute in main conversation context for faster execution
+- Added `/planner` and `/tester` command aliases
+- Improved user experience with direct interaction in main conversation

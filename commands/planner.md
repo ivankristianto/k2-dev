@@ -14,14 +14,21 @@ Start the planning workflow to analyze user requirements, clarify details, and c
 
 ## What This Command Does
 
-This command initiates a collaborative planning workflow:
+This command invokes the Planning skill which executes in the main conversation context:
 
-1. Planner agent analyzes requirements with full codebase access
-2. Asks user clarifying questions
+1. Planning skill analyzes requirements with full codebase access
+2. Asks user clarifying questions directly in main conversation
 3. Creates initial implementation plan
 4. Technical Lead reviews and refines plan based on architecture
-5. Planner and Tech Lead iterate until plan is solid
-6. Planner converts plan to hierarchical beads tasks with dependencies
+5. Planner skill and Tech Lead iterate until plan is solid
+6. Planner skill converts plan to hierarchical beads tasks with dependencies
+
+## Key Benefits Over Agent-Based Approach
+
+- **Faster execution**: No agent spawning overhead
+- **Easier debugging**: Everything happens in main conversation context
+- **Direct context access**: Skill uses main conversation tools
+- **Better UX**: Questions asked directly, not in isolated subagent context
 
 ## How to Use This Command
 
@@ -31,41 +38,39 @@ This command initiates a collaborative planning workflow:
 - If no argument, ask user: "What feature or change would you like to plan?"
 - Get clear description of what user wants to build/design/add
 
-**Step 2: Launch Planner Agent**
+**Step 2: Invoke Planning Skill**
 
-- Use the Task tool to launch the "planner" agent
+- Use the Skill tool to invoke the "k2-dev:planning" skill
 - Provide the user requirement
-- Give full context about the planning workflow
+- The skill will execute in main conversation context
 
 Example:
 
 ```
-Task tool with:
-- subagent_type: "planner"
-- prompt: "User wants to: {user requirement}.
+Skill tool with:
+- skill: "k2-dev:planning"
+- args: "User wants to: {user requirement}"
 
-          Analyze this requirement with full codebase access:
-          1. Explore relevant code and architecture
-          2. Ask clarifying questions to understand scope and constraints
-          3. Create detailed implementation plan
-          4. Request Technical Lead review for architectural feedback
-          5. Refine plan based on feedback
-          6. Convert to beads tasks with dependencies
-
-          Follow the k2-dev planning workflow."
+The skill will then:
+1. Explore relevant code and architecture
+2. Ask clarifying questions (in main conversation)
+3. Create detailed implementation plan
+4. Request Technical Lead review for architectural feedback (via Task tool)
+5. Refine plan based on feedback
+6. Convert to beads tasks with dependencies
 ```
 
 **Step 3: Monitor Progress**
 
-- Planner will explore codebase
-- Planner will ask user questions (via AskUserQuestion tool)
-- Planner will create initial plan
-- Technical Lead will provide feedback
+- Planning skill will explore codebase using main conversation tools
+- Skill will ask user questions directly (not via AskUserQuestion in subagent)
+- Skill will create initial plan
+- Technical Lead will provide feedback (via Task tool invocation)
 - Iteration continues until plan is finalized
 
 **Step 4: Report Results**
 
-- Planner will provide final plan and created beads task IDs
+- Planning skill will provide final plan and created beads task IDs
 - Show the task hierarchy to user
 - Explain dependencies and suggested order
 
@@ -73,19 +78,19 @@ Task tool with:
 
 ### Phase 1: Analysis
 
-- Planner explores current codebase
+- Planning skill explores current codebase (Read, Grep, Glob, Bash)
 - Identifies relevant files, patterns, architecture
 - Understands existing implementation
-- Has access to: Read, Grep, Glob, Bash (for exploration)
+- Uses main conversation tools for exploration
 
 ### Phase 2: Clarification
 
-- Planner asks specific questions about:
+- Planning skill asks specific questions directly in main conversation
+- Questions about:
   - Scope and boundaries
   - Technical approach preferences
   - Integration points
   - Constraints and requirements
-- Uses AskUserQuestion tool for interactive clarification
 - Iterates until requirements are clear
 
 ### Phase 3: Initial Planning
@@ -98,15 +103,16 @@ Task tool with:
 
 ### Phase 4: Technical Review
 
+- Planning skill uses Task tool to invoke Technical Lead agent
 - Technical Lead reviews plan
 - Provides architectural feedback
 - Suggests improvements
 - Validates feasibility
-- Checks alignment with project standards (AGENTS.md, CLAUDE.md)
+- Checks alignment with project standards
 
 ### Phase 5: Refinement
 
-- Planner incorporates feedback
+- Planning skill incorporates feedback
 - Adjusts plan based on Tech Lead input
 - Iterates until both agree
 - Finalizes technical approach
@@ -129,33 +135,30 @@ And Generate structured report:
 ## Feature: The name of the feature
 
 ### Summary
-
 High level summary 2-3 sentences.
 
 ### List of Tickets in dependency graph
-
 List the ticket in dependency graph
 
 ### Unblocked Tickets
-
 - List of unblock tickets
 
 ### Blocked Tickets
-
 - List of blocked tickets
 ```
 
 ## Important Notes
 
-- **Full Codebase Access**: Planner can read any file to understand architecture
-- **Interactive**: User will be asked questions - be prepared to provide details
-- **Collaborative**: Planner works WITH Technical Lead for best results
+- **Main Context Execution**: Planning skill runs in main conversation, not isolated subagent
+- **Direct Interaction**: User questions asked directly in main conversation
+- **Tool Access**: Skill uses tools from main conversation context
+- **Orchestration**: Skill can still invoke Technical Lead agent via Task tool when needed
 - **Hierarchical**: Creates parent/child tasks for complex features
 - **Dependencies**: Sets up proper task dependencies automatically
 
 ## Configuration Files Used
 
-Planner and Technical Lead will reference:
+Planning skill and Technical Lead will reference:
 
 - **AGENTS.md**: Project guidelines and standards
 - **CLAUDE.md**: Claude-specific patterns and practices
@@ -196,3 +199,11 @@ Present the final task structure to the user showing:
 - Dependencies
 - Recommended execution order
 - How to start implementation (use `/k2:start beads-XXX`)
+
+## Skill Aliases
+
+This planning functionality can also be invoked via:
+- `/k2:planner` (this command)
+- `/planner` (direct skill invocation)
+
+Both invoke the same Planning skill and execute in the main conversation context.

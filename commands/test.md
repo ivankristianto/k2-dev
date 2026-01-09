@@ -14,14 +14,21 @@ Create a comprehensive test plan with test cases for a beads ticket, ensuring th
 
 ## What This Command Does
 
-This command initiates the test planning workflow:
+This command invokes the Test Planning skill which executes in the main conversation context:
 
-1. Tester agent reads ticket details and implementation
+1. Test Planning skill reads ticket details and implementation
 2. Analyzes requirements and acceptance criteria
 3. Creates test strategy and coverage plan
 4. Defines specific test cases
 5. Documents test plan in beads task comments
 6. Coordinates with Engineer if needed
+
+## Key Benefits Over Agent-Based Approach
+
+- **Faster execution**: No agent spawning overhead
+- **Easier debugging**: Everything happens in main conversation context
+- **Direct context access**: Skill uses main conversation tools
+- **Better UX**: Test planning happens in main conversation, not isolated subagent
 
 ## How to Use This Command
 
@@ -36,34 +43,33 @@ This command initiates the test planning workflow:
 - Check that ticket has implementation details (not just placeholder)
 - If ticket is closed, show warning but continue (might be retrospective testing)
 
-**Step 3: Launch Tester Agent**
+**Step 3: Invoke Test Planning Skill**
 
-- Use the Task tool to launch the "tester" agent
+- Use the Skill tool to invoke the "k2-dev:test-planning" skill
 - Provide ticket ID and context
-- Request comprehensive test planning
+- Skill will execute in main conversation context
 
 Example:
 
 ```
-Task tool with:
-- subagent_type: "tester"
-- prompt: "Create comprehensive test plan for ticket beads-123.
+Skill tool with:
+- skill: "k2-dev:test-planning"
+- args: "Create comprehensive test plan for ticket beads-123"
 
-          1. Read ticket description and comments from beads
-          2. If implementation exists, analyze the code changes
-          3. Identify test scenarios (happy path, edge cases, errors)
-          4. Create test strategy (unit, integration, e2e)
-          5. Define specific test cases with inputs and expected outputs
-          6. Document coverage plan
-          7. Add test plan as comment to beads task
-          8. Coordinate with Technical Lead if clarification needed
-
-          Follow k2-dev test planning standards."
+The skill will then:
+1. Read ticket description and comments from beads
+2. If implementation exists, analyze the code changes
+3. Identify test scenarios (happy path, edge cases, errors)
+4. Create test strategy (unit, integration, e2e)
+5. Define specific test cases with inputs and expected outputs
+6. Document coverage plan
+7. Add test plan as comment to beads task
+8. Coordinate with Technical Lead if clarification needed
 ```
 
 **Step 4: Present Test Plan**
 
-- Tester will create and document test plan
+- Test Planning skill will create and document test plan
 - Show summary to user
 - Include:
   - Number of test cases
@@ -190,7 +196,7 @@ The test plan should follow this structure:
 
 ## Configuration Files Used
 
-Tester agent will reference:
+Test Planning skill will reference:
 
 - **AGENTS.md**: Testing standards and coverage requirements
 - **CLAUDE.md**: Project-specific testing patterns
@@ -218,3 +224,11 @@ Present the test plan summary to the user showing:
 - Coverage areas
 - Priority breakdown
 - Next steps for test implementation
+
+## Skill Aliases
+
+This test planning functionality can also be invoked via:
+- `/k2:test` (this command)
+- `/tester` (direct skill invocation)
+
+Both invoke the same Test Planning skill and execute in the main conversation context.

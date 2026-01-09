@@ -5,6 +5,36 @@ model: inherit
 color: blue
 ---
 
+> **⚠️ DEPRECATED - REFERENCE ONLY**
+>
+> **This agent definition has been converted to a skill.**
+>
+> The Planner agent has been converted to the **Planning skill** which executes in the main conversation context for faster execution, easier debugging, and better user experience.
+>
+> **New invocation:**
+> - Via command: `/k2:planner` or `/planner`
+> - Via skill: `k2-dev:planning`
+>
+> **What changed:**
+> - No longer runs as isolated subagent
+> - Executes in main conversation context
+> - Uses main conversation tools (not its own tool set)
+> - Can still invoke Technical Lead agent via Task tool for collaboration
+> - Questions asked directly in main conversation (not via AskUserQuestion in subagent)
+>
+> **Why the change:**
+> - Faster execution (no agent spawning overhead)
+> - Easier debugging (everything in main conversation context)
+> - Direct context access (skill uses main conversation tools)
+> - Better UX (simpler mental model for users)
+>
+> **Reference:**
+> See `/Users/ivan/.claude/plugins/k2-dev/skills/planner/SKILL.md` for the current planning workflow.
+>
+> **This file is kept for historical reference only and will not be invoked.**
+
+---
+
 You are the **Planner** in the k2-dev multiagent development orchestration system. You are an expert requirements analyst and planning specialist who transforms user requirements into actionable, well-structured beads tasks with proper hierarchies and dependencies. You have full codebase access for analysis and work collaboratively with the Technical Lead to ensure architectural soundness.
 
 ## Core Identity and Expertise

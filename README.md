@@ -4,13 +4,16 @@ Enterprise-grade multiagent orchestration plugin for Claude Code that manages en
 
 ## Overview
 
-k2-dev simulates a complete development team with specialized roles:
+k2-dev simulates a complete development team with specialized agents and skills:
 
+**Agents:**
 - **Technical Lead**: Orchestrates workflows, manages worktrees
-- **Planner**: Analyzes requirements, creates actionable plans
 - **Engineer**: Implements features following plans
 - **Reviewer**: Performs code reviews and quality validation
-- **Tester**: Creates test plans and validates implementations
+
+**Skills (main conversation context):**
+- **Planning**: Analyzes requirements, creates actionable plans
+- **Test Planning**: Creates test plans and validates implementations
 
 ## Features
 
@@ -75,24 +78,31 @@ Start implementation workflow for one or more tickets.
 9. Creates follow-up tickets for remaining issues
 10. Technical Lead merges and cleans up
 
-### `/k2:planner`
+### `/k2:planner` (or `/planner`)
 
-Start planning workflow for new features.
+Start planning workflow for new features using the Planning skill.
 
 **Usage:**
 
 ```
 /k2:planner
+# or
+/planner
 ```
 
 **Workflow:**
 
-1. Planner analyzes requirement with full codebase access
-2. Asks clarifying questions
+1. Planning skill analyzes requirement with full codebase access
+2. Asks clarifying questions directly in main conversation
 3. Creates initial plan
-4. Technical Lead refines based on architecture
-5. Plan iteration and refinement
+4. Invokes Technical Lead agent for architectural review
+5. Planning skill incorporates feedback and refines plan
 6. Converts to beads tasks with dependencies
+
+**Benefits:**
+- Faster execution (no agent spawning overhead)
+- Easier debugging (everything in main conversation context)
+- Direct user interaction (questions asked directly)
 
 ### `/k2:report`
 
@@ -112,22 +122,25 @@ Generate status report for a ticket.
 - Comments and history
 - Related tickets
 
-### `/k2:test`
+### `/k2:test` (or `/tester`)
 
-Create test plan for a ticket.
+Create test plan for a ticket using the Test Planning skill.
 
 **Usage:**
 
 ```
 /k2:test beads-123
+# or
+/tester beads-123
 ```
 
 **Workflow:**
 
-1. Tester agent analyzes implementation
+1. Test Planning skill analyzes implementation
 2. Creates comprehensive test plan
 3. Defines test cases and coverage strategy
-4. Validates with Engineer
+4. Adds test plan to beads comments
+5. Coordinates with Engineer for implementation
 
 ## Agents
 
@@ -140,17 +153,6 @@ Create test plan for a ticket.
   - Coordinate agent handoffs (hub model)
   - Make architectural decisions
   - Merge PRs and cleanup
-- **Tools**: All tools, full codebase access
-
-### Planner
-
-- **Role**: Requirements analyst and planning specialist
-- **Responsibilities**:
-  - Analyze requirements with codebase context
-  - Ask clarifying questions
-  - Create actionable plans
-  - Collaborate with Technical Lead on refinement
-  - Convert plans to beads tasks
 - **Tools**: All tools, full codebase access
 
 ### Engineer
@@ -174,26 +176,21 @@ Create test plan for a ticket.
   - No code changes (review only)
 - **Tools**: Read, Grep, Glob, Bash (read-only operations)
 
-### Tester
-
-- **Role**: Test strategy and validation specialist
-- **Responsibilities**:
-  - Create comprehensive test plans
-  - Define test cases and coverage
-  - Validate implementation completeness
-  - Work with Engineer on test coverage
-- **Tools**: Read, Grep, Glob, Bash
-
 ## Skills
 
-The plugin provides specialized knowledge domains:
+The plugin provides specialized skills that execute in the main conversation context:
 
-1. **beads-integration**: Working with beads task management
-2. **git-worktree-workflow**: Managing git worktrees for isolation
-3. **quality-gates**: Reading and enforcing project standards
-4. **pr-creation**: Creating well-structured pull requests
-5. **test-planning**: Test strategy and planning
-6. **code-review-standards**: Code review best practices
+**Active Workflow Skills:**
+1. **Planning** (`/k2:planner` or `/planner`): Requirements analysis, task creation, beads task management
+2. **Test Planning** (`/k2:test` or `/tester`): Test strategy, test case definition, coverage planning
+
+**Knowledge Domain Skills:**
+3. **beads-integration**: Working with beads task management
+4. **git-worktree-workflow**: Managing git worktrees for isolation
+5. **quality-gates**: Reading and enforcing project standards
+6. **pr-creation**: Creating well-structured pull requests
+7. **test-planning**: Test strategy and planning (reference)
+8. **code-review-standards**: Code review best practices
 
 ## Configuration
 
@@ -290,21 +287,19 @@ Technical Lead:
 ```
 User: /k2:planner "Add user authentication"
     ↓
-Planner:
+Planning Skill (main conversation context):
   - Analyzes requirement
   - Explores codebase
-  - Asks clarifying questions
+  - Asks clarifying questions directly
   - Creates initial plan
     ↓
-Technical Lead:
+Planning Skill invokes Technical Lead agent:
   - Reviews plan
   - Provides architectural feedback
     ↓
-Planner:
+Planning Skill:
   - Refines plan
   - Iterates with Tech Lead
-    ↓
-Planner:
   - Converts to beads tasks
   - Sets up dependencies
   - Adds detailed descriptions
