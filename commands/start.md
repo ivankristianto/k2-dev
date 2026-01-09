@@ -76,6 +76,12 @@ bd show {ticket-id}
 - Verify ticket exists in beads
 - Confirm status is "open" or "in_progress"
 - If any ticket doesn't exist or is closed: **show error and exit immediately**
+- Update ticket status to in_progress:
+
+```bash
+bd update {ticket-id} --status=in_progress
+```
+
 - Update todo: Mark validation as completed
 
 ### Phase 3: Read Project Standards
