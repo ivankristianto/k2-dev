@@ -60,6 +60,27 @@ bd comments add beads-{id} "## Phase {N}: ✅ Completed
 
 ---
 
+## Task Tool Usage (CRITICAL)
+
+**IMPORTANT:** When using the Task tool to launch agents (Engineer, Reviewer, PR Writer):
+
+1. **The Task tool BLOCKS by default** - it waits until the agent completes
+2. **The result is returned automatically** in the Task tool response
+3. **DO NOT call TaskOutput** after the Task tool completes - the output is already in the result
+4. **TaskOutput is ONLY for background tasks** (run_in_background=true)
+
+**Common mistake:** Calling `TaskOutput` with the agent ID after Task tool completes causes errors because the task has already been cleaned up.
+
+**Correct pattern:**
+```
+Task tool → agent completes → read result from Task response → continue workflow
+```
+
+**Incorrect pattern:**
+```
+Task tool → agent completes → call TaskOutput → ERROR: task not found
+```
+
 ## Workflow Phases
 
 ### P0: Parse Arguments
@@ -409,7 +430,7 @@ Then: implement following plan, self-review, push changes.
 IMPORTANT: Stay in work path for all file ops. Do NOT create PR."
 ```
 
-Wait for completion.
+**Agent completion:** The Task tool blocks and returns the result automatically when the engineer completes. Read the result from the Task tool response directly. DO NOT call TaskOutput - the output is already in the result.
 
 **CRITICAL - Log to beads:**
 
@@ -437,7 +458,7 @@ Change to work path, analyze changes/commits (git log, git diff), read PR templa
 generate description, create GitHub PR with proper formatting, link tickets, return URL."
 ```
 
-Record PR URL.
+**Agent completion:** The Task tool returns the result (including PR URL) automatically. DO NOT call TaskOutput. Extract PR URL from the Task tool response.
 
 **CRITICAL - Log to beads:**
 
@@ -461,7 +482,9 @@ Quality gates: AGENTS.md, CLAUDE.md, constitution.md
 Validate standards, add GitHub comments, add summary to beads."
 ```
 
-Wait for result:
+**Agent completion:** The Task tool blocks and returns the result automatically when the reviewer completes. Read the approval status from the Task tool response directly. DO NOT call TaskOutput - the output is already in the result.
+
+**Parse result:**
 
 - **Approved:** → P12 (merge)
 - **Changes requested:** → P11 (iterations)
@@ -497,6 +520,8 @@ Read feedback:
 Fix issues, respond to comments, run quality gates, push changes."
 ```
 
+**Agent completion:** The Task tool returns the result automatically. DO NOT call TaskOutput.
+
 **CRITICAL - Log iteration 1 to beads:**
 
 ```bash
@@ -507,7 +532,9 @@ Review Feedback Addressed
 Changes pushed and re-review requested"
 ```
 
-Re-launch Reviewer (same prompt as P10).
+**Re-launch Reviewer** (same prompt as P10). The Task tool returns the result automatically. DO NOT call TaskOutput.
+
+**Parse result:**
 
 - **Approved:** → P12
 - **Changes:** → Iteration 2
@@ -526,7 +553,9 @@ Second Review Feedback Addressed
 Changes pushed and final review requested"
 ```
 
-Final Reviewer launch.
+**Final Reviewer launch.** The Task tool returns the result automatically. DO NOT call TaskOutput.
+
+**Parse result:**
 
 - **Approved:** → P12
 - **Issues remain:** → Create follow-up tickets
