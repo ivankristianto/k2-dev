@@ -1,7 +1,7 @@
 ---
 name: Git Worktree Workflow
 description: This skill should be used when the user asks to "create a worktree", "manage git worktrees", "work on multiple branches simultaneously", "isolate task work", "use bd worktree", or needs guidance on git worktree patterns for task isolation in k2-dev workflows.
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Git Worktree Workflow Skill
@@ -10,43 +10,13 @@ version: 0.1.0
 
 Git worktrees enable working on multiple branches simultaneously by creating separate working directories. In k2-dev, each task gets its own worktree for complete isolation.
 
-**Key Benefits:**
+**Key Benefits:** Work on multiple tasks without branch switching, complete isolation prevents conflicts, clean separation of concerns, easy context switching, safe cleanup without losing work.
 
-- Work on multiple tasks without branch switching
-- Complete isolation prevents conflicts
-- Clean separation of concerns
-- Easy context switching
-- Safe cleanup without losing work
+**Reference:** See k2-dev-reference.md#git-worktree-basics for core git worktree concepts and commands.
 
-## Core Concepts
-
-### What is a Git Worktree?
-
-A worktree is an additional working directory linked to the same repository:
-
-- Shares git history and objects
-- Has its own working directory
-- Checks out a different branch
-- Independent of other worktrees
-
-**Example structure:**
-
-```
-project/               # Main worktree (main branch)
-├── .git/
-├── .beads/
-└── src/
-
-../beads-123/         # Linked worktree (feature/beads-123 branch)
-├── .git -> project/.git/worktrees/beads-123
-├── .beads/
-└── src/
-```
-
-### K2-Dev Worktree Pattern
+## K2-Dev Worktree Pattern
 
 For each task:
-
 1. Create worktree: `../beads-{id}/`
 2. Branch: `feature/beads-{id}`
 3. Work in isolation
@@ -60,39 +30,32 @@ For each task:
 Beads provides integrated worktree management:
 
 ```bash
-# Create worktree for task
 bd worktree create beads-123
 ```
 
-This:
-
-- Creates `../beads-123/` directory
-- Creates branch `feature/beads-123`
-- Checks out the branch
+This creates:
+- Directory: `../beads-123/`
+- Branch: `feature/beads-123`
 - Links to main repository
 - Updates beads context
 
-**Location:**
+**Location:** Worktrees created at `../beads-{id}/` (sibling to main repo) for easy organization and management.
 
-- Default: `../beads-{id}/` (sibling to main repo)
-- Keeps worktrees organized
-- Easy to find and manage
-
-### Using Git Directly
-
-For manual control:
+### Using Git Directly (Manual Control)
 
 ```bash
-# Create worktree with specific branch
+# Create worktree with new branch
 git worktree add ../beads-123 -b feature/beads-123
 
 # Create from existing branch
 git worktree add ../beads-123 feature/beads-123
 ```
 
+**Reference:** See k2-dev-reference.md#git-worktree-basics for complete git worktree commands.
+
 ### Multiple Tickets in One Worktree
 
-When k2:start receives multiple tickets:
+When `/k2:start` receives multiple tickets:
 
 ```bash
 # Use first ticket ID for worktree name
@@ -106,22 +69,15 @@ bd worktree create beads-123
 
 ### Switching Context
 
-**Navigate to worktree:**
-
 ```bash
+# Navigate to worktree
 cd ../beads-123
-```
 
-**Verify worktree:**
-
-```bash
+# Verify location
 pwd
 git branch --show-current
-```
 
-**Check status:**
-
-```bash
+# Check status
 git status
 ```
 
@@ -133,10 +89,8 @@ Work normally in worktree:
 # Edit files
 vi src/auth/middleware.ts
 
-# Stage changes
+# Stage and commit
 git add src/auth/middleware.ts
-
-# Commit
 git commit -m "Add JWT middleware"
 
 # Push to remote
@@ -146,7 +100,7 @@ git push -u origin feature/beads-123
 ### Returning to Main Repo
 
 ```bash
-cd - # Or use absolute path
+cd -  # Or use absolute path
 cd ~/projects/my-project
 ```
 
@@ -163,21 +117,10 @@ git worktree list
 ```
 
 **Output example:**
-
 ```
 /Users/dev/project           abc1234 [main]
 /Users/dev/beads-123         def5678 [feature/beads-123]
 /Users/dev/beads-456         ghi9012 [feature/beads-456]
-```
-
-### Checking Worktree Status
-
-```bash
-# From any worktree or main repo
-git worktree list
-
-# Check specific worktree
-cd ../beads-123 && git status
 ```
 
 ### Removing Worktrees
@@ -196,7 +139,6 @@ git worktree prune
 ```
 
 **Force remove (if needed):**
-
 ```bash
 git worktree remove --force ../beads-123
 ```
@@ -206,7 +148,6 @@ git worktree remove --force ../beads-123
 ### Technical Lead Responsibilities
 
 **Creating worktree:**
-
 ```bash
 # After validating ticket
 bd worktree create beads-123
@@ -221,7 +162,6 @@ bd show beads-123
 ```
 
 **Cleanup after merge:**
-
 ```bash
 # Return to main repo
 cd ~/projects/my-project
@@ -236,7 +176,6 @@ git worktree list
 ### Engineer Workflow
 
 **Start working:**
-
 ```bash
 # Should already be in worktree (Tech Lead created it)
 pwd  # Verify: ../beads-123
@@ -250,7 +189,6 @@ vi src/feature.ts
 ```
 
 **During implementation:**
-
 ```bash
 # Regular git workflow
 git add .
@@ -259,7 +197,6 @@ git push
 ```
 
 **Create PR:**
-
 ```bash
 # From worktree
 gh pr create --title "feat: Add feature X (beads-123)" \
@@ -279,22 +216,16 @@ vi src/auth.ts
 cd ../beads-456
 vi src/profile.ts
 
-# Each worktree is independent
-# No branch switching needed
+# Each worktree is independent - no branch switching needed
 ```
 
 ## Branching Strategy
 
 ### Branch Naming
 
-**Standard pattern:**
-
-```
-feature/beads-{id}
-```
+**Standard pattern:** `feature/beads-{id}`
 
 **Examples:**
-
 ```
 feature/beads-123
 feature/beads-456
@@ -302,18 +233,18 @@ feature/beads-789
 ```
 
 **Why this pattern:**
-
 - Clear association with task
 - Easy to identify in PR list
 - Consistent and predictable
 - Sortable and searchable
+
+**Reference:** See k2-dev-reference.md#branch-naming
 
 ### Base Branch
 
 Create worktrees from main/master:
 
 ```bash
-# Worktree automatically branches from current HEAD
 # Ensure main is up to date first
 cd ~/projects/my-project
 git checkout main
@@ -326,15 +257,13 @@ bd worktree create beads-123
 ### Keeping Up to Date
 
 **Rebase on main:**
-
 ```bash
 cd ../beads-123
 git fetch origin
 git rebase origin/main
 ```
 
-**Merge main if preferred:**
-
+**Merge main (if preferred):**
 ```bash
 cd ../beads-123
 git merge origin/main
@@ -344,63 +273,35 @@ git merge origin/main
 
 ### DO
 
-✅ **Create worktree per task**
+✅ **Create worktree per task** - Each beads ticket gets its own worktree for complete isolation
 
-- Each beads ticket gets its own worktree
-- Complete isolation
-- Easy context switching
+✅ **Use consistent naming** - `../beads-{id}/` for location, `feature/beads-{id}` for branch
 
-✅ **Use consistent naming**
+✅ **Clean up after merge** - Remove worktree after PR merged to keep workspace tidy
 
-- `../beads-{id}/` for location
-- `feature/beads-{id}` for branch
-- Predictable and organized
-
-✅ **Clean up after merge**
-
-- Remove worktree after PR merged
-- Keeps workspace tidy
-- Prevents confusion
-
-✅ **Verify before creating**
-
+✅ **Verify before creating:**
 ```bash
-# Check worktree doesn't already exist
-git worktree list | grep beads-123
+git worktree list | grep beads-123  # Check doesn't already exist
 ```
 
-✅ **Stay in worktree context**
-
-```bash
-# Work entirely in worktree until PR merged
-cd ../beads-123
-# ... all work here ...
-```
+✅ **Stay in worktree context** - Work entirely in worktree until PR merged
 
 ### DON'T
 
-❌ **Don't nest worktrees**
+❌ **Don't nest worktrees** - Keep flat structure, don't create worktree inside another
 
-- Don't create worktree inside another worktree
-- Keep flat structure
-
-❌ **Don't manually delete worktree directories**
-
+❌ **Don't manually delete worktree directories:**
 ```bash
 # Wrong:
 rm -rf ../beads-123
 
 # Right:
-bd worktree remove ../beads-123
+bd worktree remove beads-123
 ```
 
-❌ **Don't reuse worktree for different tasks**
+❌ **Don't reuse worktree for different tasks** - One worktree = one task, create new for new task
 
-- One worktree = one task
-- Create new worktree for new task
-
-❌ **Don't forget to push**
-
+❌ **Don't forget to push:**
 ```bash
 # Before creating PR, push changes
 git push -u origin feature/beads-123
@@ -410,62 +311,35 @@ git push -u origin feature/beads-123
 
 ### Worktree Already Exists
 
-**Error:**
-
-```
-fatal: '../beads-123' already exists
-```
+**Error:** `fatal: '../beads-123' already exists`
 
 **Solution:**
-
 ```bash
-# Check existing worktrees
-git worktree list
-
-# Remove if stale
-git worktree remove ../beads-123
-
-# If directory deleted manually, prune
-git worktree prune
+git worktree list  # Check existing worktrees
+git worktree remove ../beads-123  # Remove if stale
+git worktree prune  # If directory deleted manually
 ```
 
 ### Branch Already Exists
 
-**Error:**
-
-```
-fatal: a branch named 'feature/beads-123' already exists
-```
+**Error:** `fatal: a branch named 'feature/beads-123' already exists`
 
 **Solution:**
-
 ```bash
-# Check if worktree exists
-git worktree list
-
-# If no worktree, delete branch and recreate
-git branch -D feature/beads-123
-bd worktree create beads-123
+git worktree list  # Check if worktree exists
+git branch -D feature/beads-123  # Delete branch if no worktree
+bd worktree create beads-123  # Recreate
 ```
 
 ### Can't Remove Worktree
 
-**Error:**
-
-```
-fatal: validation failed, cannot remove working tree
-```
+**Error:** `fatal: validation failed, cannot remove working tree`
 
 **Solution:**
-
 ```bash
-# Check for uncommitted changes
 cd ../beads-123
-git status
-
-# Commit or stash changes
-git add .
-git commit -m "WIP"
+git status  # Check for uncommitted changes
+git add . && git commit -m "WIP"  # Commit or stash changes
 
 # Or force remove (caution: loses changes)
 git worktree remove --force ../beads-123
@@ -476,18 +350,12 @@ git worktree remove --force ../beads-123
 **Scenario:** Worktree directory deleted but git still tracks it
 
 **Solution:**
-
 ```bash
-# Prune stale worktree entries
-git worktree prune
-
-# Verify cleanup
-git worktree list
+git worktree prune  # Prune stale entries
+git worktree list  # Verify cleanup
 ```
 
 ## Integration with Beads
-
-### Task-Worktree Relationship
 
 Beads tracks worktree association:
 
@@ -502,60 +370,34 @@ bd show beads-123  # Shows worktree info
 bd worktree list
 ```
 
-### Worktree in Task Context
-
-When reading task context:
-
-```bash
-bd show beads-123
-```
-
-Output may include:
-
+When reading task context, `bd show beads-123` may include:
 - Worktree location
 - Branch name
 - Work status
-
-## Command Reference
-
-| Action          | BD Command                     | Git Command                                          |
-| --------------- | ------------------------------ | ---------------------------------------------------- |
-| Create worktree | `bd worktree create beads-123` | `git worktree add ../beads-123 -b feature/beads-123` |
-| List worktrees  | `bd worktree list`             | `git worktree list`                                  |
-| Remove worktree | `bd worktree remove beads-123` | `git worktree remove ../beads-123`                   |
-| Prune stale     | N/A                            | `git worktree prune`                                 |
-| Force remove    | N/A                            | `git worktree remove --force ../beads-123`           |
 
 ## Workflow Summary
 
 **Standard k2-dev workflow:**
 
 1. **Technical Lead:** Create worktree
-
    ```bash
    bd worktree create beads-123
    cd ../beads-123
    ```
 
 2. **Engineer:** Work in worktree
-
    ```bash
    # Already in ../beads-123
    # ... implement feature ...
-   git add .
-   git commit -m "feat: Add feature"
-   git push -u origin feature/beads-123
+   git add . && git commit -m "feat: Add feature" && git push -u origin feature/beads-123
    ```
 
 3. **Engineer:** Create PR
-
    ```bash
    gh pr create --title "feat: Feature (beads-123)"
    ```
 
-4. **After merge**
-
-5. **Technical Lead:** Clean up
+4. **After merge, Technical Lead:** Clean up
    ```bash
    cd ~/projects/my-project
    bd worktree remove beads-123
@@ -564,3 +406,5 @@ Output may include:
    ```
 
 Follow this pattern for consistent, isolated task development with clean separation of concerns.
+
+**Reference:** See k2-dev-reference.md for git worktree commands, branch naming, and common patterns.

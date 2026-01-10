@@ -1,21 +1,16 @@
 ---
 name: Code Review Standards
 description: This skill should be used when the user asks to "review code", "perform code review", "check code quality", "review PR", "provide code feedback", or needs guidance on code review best practices and standards in k2-dev workflows.
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Code Review Standards Skill
 
 ## Overview
 
-Code review is a critical quality control process that catches bugs, ensures standards compliance, and facilitates knowledge sharing. This skill provides comprehensive guidance for conducting effective code reviews.
+Code review is a critical quality control process that catches bugs, ensures standards compliance, and facilitates knowledge sharing.
 
-**Review Objectives:**
-- Ensure code quality and maintainability
-- Catch bugs and logic errors
-- Validate security practices
-- Enforce project standards
-- Share knowledge
+**Review Objectives:** Ensure code quality and maintainability, catch bugs and logic errors, validate security practices, enforce project standards, share knowledge.
 
 ## Review Process
 
@@ -52,7 +47,7 @@ Code review is a critical quality control process that catches bugs, ensures sta
 **Readability:**
 - [ ] Code is self-documenting
 - [ ] Variable names are descriptive
-- [ ] Functions are appropriately sized (<50 lines ideal)
+- [ ] Functions appropriately sized (<50 lines ideal)
 - [ ] Complex logic has explanatory comments
 - [ ] No commented-out code
 
@@ -86,12 +81,6 @@ Code review is a critical quality control process that catches bugs, ensures sta
 - [ ] Proper data transformations
 - [ ] No data loss scenarios
 
-**Concurrency (if applicable):**
-- [ ] Race conditions prevented
-- [ ] Proper locking/synchronization
-- [ ] Thread-safe operations
-- [ ] Deadlock prevention
-
 ### Security
 
 **OWASP Top 10 Check:**
@@ -103,7 +92,7 @@ Code review is a critical quality control process that catches bugs, ensures sta
 - [ ] No sensitive data exposure
 - [ ] No insufficient logging
 - [ ] No insecure deserialization
-- [ ] No using components with known vulnerabilities
+- [ ] No components with known vulnerabilities
 - [ ] No unvalidated redirects
 
 **Input Validation:**
@@ -143,12 +132,6 @@ Code review is a critical quality control process that catches bugs, ensures sta
 - [ ] Caching implemented where beneficial
 - [ ] Batch operations used appropriately
 
-**Scalability:**
-- [ ] Handles expected load
-- [ ] Scales horizontally if needed
-- [ ] No single points of contention
-- [ ] Asynchronous where appropriate
-
 ### Testing
 
 **Coverage:**
@@ -164,12 +147,6 @@ Code review is a critical quality control process that catches bugs, ensures sta
 - [ ] Good test data
 - [ ] Appropriate mocking
 - [ ] Tests run fast
-
-**Test Types:**
-- [ ] Unit tests for business logic
-- [ ] Integration tests for APIs
-- [ ] E2E tests for critical flows (if applicable)
-- [ ] Security tests for sensitive operations
 
 ### Documentation
 
@@ -211,7 +188,7 @@ Code review is a critical quality control process that catches bugs, ensures sta
 
 ### Feedback Structure
 
-**Use standard format:**
+**Standard format:**
 ```markdown
 **[Severity]** [Category]: [Issue]
 
@@ -228,6 +205,8 @@ Code review is a critical quality control process that catches bugs, ensures sta
 - **P2 (Minor):** Style issues, optimization opportunities, refactoring suggestions
 - **Suggestion:** Nice-to-haves, alternative approaches, learning opportunities
 
+**Reference:** See k2-dev-reference.md#review-severity-levels
+
 ### Example Feedback
 
 **P0 - Security Issue:**
@@ -236,14 +215,14 @@ Code review is a critical quality control process that catches bugs, ensures sta
 
 The search query is directly concatenated into the SQL statement, allowing injection attacks.
 
-```typescript
+\```typescript
 // Current (vulnerable)
 const query = `SELECT * FROM users WHERE name = '${searchTerm}'`;
 
 // Fix: Use parameterized queries
 const query = 'SELECT * FROM users WHERE name = ?';
 const results = await db.query(query, [searchTerm]);
-```
+\```
 
 Reference: OWASP SQL Injection Prevention Cheat Sheet
 ```
@@ -254,68 +233,35 @@ Reference: OWASP SQL Injection Prevention Cheat Sheet
 
 The pagination logic will skip the last item on each page due to incorrect boundary condition.
 
-```typescript
+\```typescript
 // Current (incorrect)
-const start = page * pageSize;
 const end = start + pageSize;  // Should be exclusive
 
 // Fix
-const start = page * pageSize;
 const end = Math.min(start + pageSize, totalItems);
-```
+\```
 
 Add test case TC-045 to catch this.
-```
-
-**P2 - Style Issue:**
-```markdown
-**P2** Style: Inconsistent Error Handling
-
-Some functions return error objects while others throw exceptions. This is inconsistent with the pattern in CLAUDE.md section 3.2.
-
-Consider refactoring to use consistent error handling:
-```typescript
-// Preferred pattern from CLAUDE.md
-return { success: false, error: 'Invalid input' };
-```
-
-This is non-blocking but worth addressing for consistency.
-```
-
-**Suggestion:**
-```markdown
-**Suggestion** Refactoring: Extract Common Logic
-
-The validation logic in lines 45-60 is similar to the validation in users.ts:123-138. Consider extracting to a shared validation utility.
-
-```typescript
-// Potential refactoring
-import { validateEmail, validatePassword } from './utils/validation';
-
-// Benefits: DRY, easier testing, consistent validation
-```
-
-Not required for this PR, but could be a good follow-up task.
 ```
 
 ### Tone and Approach
 
 **DO:**
-- ✅ Be specific and objective
-- ✅ Explain the reasoning
-- ✅ Provide examples and references
-- ✅ Suggest solutions, not just problems
-- ✅ Distinguish between must-fix and nice-to-have
-- ✅ Acknowledge good practices
-- ✅ Ask questions if unclear
+✅ Be specific and objective
+✅ Explain the reasoning
+✅ Provide examples and references
+✅ Suggest solutions, not just problems
+✅ Distinguish between must-fix and nice-to-have
+✅ Acknowledge good practices
+✅ Ask questions if unclear
 
 **DON'T:**
-- ❌ Be vague ("this looks wrong")
-- ❌ Be condescending or dismissive
-- ❌ Focus only on negatives
-- ❌ Nitpick style in isolation (P2 or suggestion)
-- ❌ Demand specific implementations (suggest)
-- ❌ Leave feedback without explanation
+❌ Be vague ("this looks wrong")
+❌ Be condescending or dismissive
+❌ Focus only on negatives
+❌ Nitpick style in isolation
+❌ Demand specific implementations
+❌ Leave feedback without explanation
 
 ## Review Iterations
 
@@ -367,11 +313,6 @@ bd create "Fix authentication bypass vulnerability" \
 bd create "Refactor validation logic" \
   -d "Code quality issue from PR #456. Details: [...]" \
   -p P1
-
-# Minor improvements
-bd create "Extract common validation utilities" \
-  -d "Refactoring opportunity from PR #456. Details: [...]" \
-  -p P2
 ```
 
 **Document in PR:**
@@ -383,70 +324,12 @@ After 2 review iterations, the following issues remain:
 ### Created Follow-Up Tickets
 - **P0:** beads-789 - Fix authentication bypass (blocking next release)
 - **P1:** beads-790 - Refactor validation logic
-- **P2:** beads-791 - Extract validation utilities
 
 ### Decision
 Merging this PR to maintain forward progress. Critical issues tracked in P0 ticket and will be addressed immediately.
 ```
 
-**Reviewer approves with conditions:**
-```markdown
-Approving with understanding that:
-- P0 follow-up ticket beads-789 created
-- Will be addressed before next release
-- Current implementation is functional but needs security hardening
-```
-
-## GitHub PR Review Interface
-
-### Inline Comments
-
-```markdown
-src/auth/middleware.ts:45
-
-**P1** Security: Missing Input Validation
-
-The email parameter should be validated before use.
-
-Suggestion:
-```typescript
-if (!isValidEmail(email)) {
-  return res.status(400).json({ error: 'Invalid email format' });
-}
-```
-```
-
-### Summary Comment
-
-```markdown
-## Review Summary
-
-Thank you for this implementation! Overall structure is good. Found a few issues that need addressing:
-
-### Critical Issues (P0)
-- SQL injection vulnerability in search function (line 123)
-
-### Important Issues (P1)
-- Missing input validation (lines 45, 67)
-- Off-by-one error in pagination (line 234)
-
-### Minor Issues (P2)
-- Inconsistent error handling pattern (throughout)
-- Magic numbers should be constants (lines 89, 91)
-
-### Positive Notes
-✅ Excellent test coverage (95%)
-✅ Clear variable names
-✅ Good separation of concerns
-
-### Next Steps
-Please address P0 and P1 issues. P2 issues can be addressed or deferred to follow-up tickets. Let me know if you have questions!
-
-### Standards Validation
-✅ AGENTS.md quality gates pass
-✅ CLAUDE.md patterns followed
-⚠️ constitution.md: Missing rate limiting (see line 156)
-```
+**Reference:** See k2-dev-reference.md#beads-cli-commands for beads task creation.
 
 ## K2-Dev Review Workflow
 
@@ -484,62 +367,23 @@ Review complete for beads-123 (PR #456):
 - Verify no new issues introduced
 - Approve or continue iteration
 
+**Reference:** See k2-dev-reference.md#github-cli-gh-commands for gh pr commands.
+
 ## Best Practices
 
-### Review Timing
+### DO
+✅ Review within 24 hours of PR creation
+✅ Block time for focused review
+✅ Review all changed files (including tests and docs)
+✅ Consider broader impact
+✅ Be constructive and helpful
 
-**DO:**
-- ✅ Review within 24 hours of PR creation
-- ✅ Block time for focused review
-- ✅ Review when alert and focused
-- ✅ Take breaks for large PRs
-
-**DON'T:**
-- ❌ Rush through review
-- ❌ Review when tired or distracted
-- ❌ Delay reviews indefinitely
-
-### Review Scope
-
-**DO:**
-- ✅ Review all changed files
-- ✅ Check test coverage
-- ✅ Validate documentation updates
-- ✅ Consider broader impact
-
-**DON'T:**
-- ❌ Only review main files
-- ❌ Skip test files
-- ❌ Ignore documentation
-- ❌ Focus only on syntax
-
-### Communication
-
-**DO:**
-- ✅ Be constructive and helpful
-- ✅ Explain reasoning clearly
-- ✅ Provide examples and references
-- ✅ Acknowledge good work
-- ✅ Ask for clarification if needed
-
-**DON'T:**
-- ❌ Be dismissive or condescending
-- ❌ Make personal attacks
-- ❌ Demand without explaining
-- ❌ Ignore engineer's responses
-
-## Command Reference
-
-| Action | Command |
-|--------|---------|
-| View PR | `gh pr view 456` |
-| View on web | `gh pr view 456 --web` |
-| View diff | `gh pr diff 456` |
-| Check CI | `gh pr checks 456` |
-| Add review comment | Use GitHub web interface |
-| Approve | `gh pr review 456 --approve` |
-| Request changes | `gh pr review 456 --request-changes` |
-| Comment | `gh pr review 456 --comment` |
+### DON'T
+❌ Rush through review or review when tired
+❌ Only review main files (skip tests/docs)
+❌ Be dismissive or condescending
+❌ Make personal attacks
+❌ Ignore engineer's responses
 
 ## Review Templates
 
@@ -602,3 +446,5 @@ Please address P0/P1 issues and push updates. Let me know if you have questions!
 ```
 
 Follow these code review standards to maintain high code quality and catch issues early in k2-dev development workflows.
+
+**Reference:** See k2-dev-reference.md for priority levels, common patterns, and gh commands.

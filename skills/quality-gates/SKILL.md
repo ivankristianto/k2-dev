@@ -1,25 +1,27 @@
 ---
 name: Quality Gates
 description: This skill should be used when the user asks to "check quality gates", "validate against standards", "read AGENTS.md", "enforce CLAUDE.md patterns", "follow constitution.md", "validate code quality", or needs guidance on quality standards enforcement in k2-dev workflows.
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Quality Gates Skill
 
 ## Overview
 
-Quality gates are project-defined standards that all code changes must meet. In k2-dev, quality gates are defined in three configuration files at the project root and enforced throughout the development workflow.
+Quality gates are project-defined standards that all code changes must meet. In k2-dev, gates are defined in three configuration files at project root and enforced throughout the development workflow.
 
 **Configuration Files:**
-- **AGENTS.md** - Agent behavior, quality standards, file validation patterns
+- **AGENTS.md** - Quality standards, file validation patterns, agent guidelines
 - **CLAUDE.md** - Claude-specific project standards and coding patterns
-- **constitution.md** - Core project principles and immutable constraints
+- **constitution.md** - Core principles and immutable constraints
+
+**Reference:** See k2-dev-reference.md#quality-standards-files for overview.
 
 ## Core Concepts
 
 ### What are Quality Gates?
 
-Quality gates are checkpoints that code must pass before progressing:
+Checkpoints code must pass before progressing:
 - **Type checking:** No TypeScript errors
 - **Test coverage:** Minimum percentage coverage
 - **Linting:** Code style compliance
@@ -29,15 +31,14 @@ Quality gates are checkpoints that code must pass before progressing:
 
 ### Why Quality Gates?
 
-**Consistency:** Maintain uniform code quality across team
-**Standards:** Enforce project-specific patterns and practices
+**Consistency:** Uniform code quality across team
+**Standards:** Enforce project-specific patterns
 **Prevention:** Catch issues before review
 **Automation:** Reduce manual review burden
 **Documentation:** Codify team agreements
 
 ### Enforcement Points
 
-Quality gates enforced at:
 1. **Engineer self-review** before creating PR
 2. **PreToolUse hook** before file changes
 3. **Reviewer validation** during code review
@@ -45,184 +46,72 @@ Quality gates enforced at:
 
 ## Configuration Files
 
-### AGENTS.md
+### AGENTS.md Structure
 
 Located at project root, defines:
+- Quality gate thresholds (type checking, test coverage, linting)
+- File validation patterns (which files trigger validation)
+- Coding standards and review criteria
 - Agent behavioral guidelines
-- Quality standards and thresholds
-- File validation patterns
-- Coding standards
-- Review criteria
 
-**Example structure:**
+**Example sections:**
 ```markdown
-# Agent Guidelines
-
 ## Quality Gates
-
-### Type Checking
-- All TypeScript files must pass `tsc --noEmit`
-- No `any` types without explicit justification
-- Strict mode enabled
-
-### Test Coverage
-- Minimum 80% line coverage
-- 100% coverage for critical paths
-- Tests for all public APIs
-
-### Code Quality
-- No `console.log` in production code
-- Maximum function complexity: 15
-- Maximum file length: 500 lines
-
-### Security
-- Input validation on all external data
-- No hardcoded secrets or credentials
-- OWASP Top 10 compliance
+- Type Checking: All TypeScript files must pass `tsc --noEmit`
+- Test Coverage: Minimum 80% line coverage
+- Linting: ESLint must pass
+- Security: OWASP Top 10 compliance
 
 ## File Validation Patterns
-
-Validate these file types before changes:
-- `src/**/*.ts`
-- `src/**/*.tsx`
-- `lib/**/*.js`
-- `api/**/*.py`
-
-Skip validation for:
-- `**/*.test.ts`
-- `**/*.spec.js`
-- `docs/**/*`
-- `*.md`
+Validate: `src/**/*.ts`, `src/**/*.tsx`, `lib/**/*.js`
+Skip: `**/*.test.ts`, `docs/**/*`, `*.md`
 
 ## Code Review Standards
-
-### Blocking Issues
-- Security vulnerabilities
-- Logic errors
-- Performance regressions
-- Breaking changes without migration
-
-### Non-Blocking Issues
-- Style preferences
-- Naming suggestions
-- Refactoring opportunities
+Blocking: Security vulnerabilities, logic errors, performance regressions
+Non-Blocking: Style preferences, naming suggestions, refactoring opportunities
 ```
 
-### CLAUDE.md
+### CLAUDE.md Structure
 
-Located at project root, defines Claude-specific patterns:
+Defines Claude-specific patterns:
 - Project architecture patterns
 - Preferred libraries and tools
 - File organization conventions
 - Coding style preferences
 - Integration patterns
 
-**Example structure:**
+**Example:**
 ```markdown
-# Claude Project Standards
-
 ## Architecture
-
-### API Layer
-- Use Express.js for REST APIs
-- OpenAPI spec in `api/openapi.yaml`
-- Route handlers in `api/routes/`
-- Middleware in `api/middleware/`
-
-### Data Layer
-- TypeORM for database access
-- Entities in `src/entities/`
-- Repositories in `src/repositories/`
-- Migrations in `migrations/`
-
-### Testing
-- Jest for unit and integration tests
-- Supertest for API tests
-- Test files colocated: `feature.ts` + `feature.test.ts`
+- API Layer: Express.js for REST APIs, routes in `api/routes/`
+- Data Layer: TypeORM, entities in `src/entities/`
+- Testing: Jest for unit/integration, test files colocated
 
 ## Coding Patterns
-
-### Error Handling
-```typescript
-// Preferred pattern
-try {
-  const result = await operation();
-  return { success: true, data: result };
-} catch (error) {
-  logger.error('Operation failed', { error });
-  return { success: false, error: error.message };
-}
+- Error Handling: Return `{ success: boolean, data?, error? }`
+- API Responses: Standard APIResponse<T> interface
 ```
 
-### API Responses
-```typescript
-// Standard response format
-interface APIResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-```
+### constitution.md Structure
 
-## File Organization
-
-```
-src/
-├── entities/      # TypeORM entities
-├── repositories/  # Data access
-├── services/      # Business logic
-├── controllers/   # Request handlers
-├── middleware/    # Express middleware
-└── utils/         # Shared utilities
-```
-```
-
-### constitution.md
-
-Located at project root, defines immutable principles:
+Defines immutable principles:
 - Core project values
 - Non-negotiable constraints
 - Architectural decisions
 - Security policies
 - Compliance requirements
 
-**Example structure:**
+**Example:**
 ```markdown
-# Project Constitution
-
 ## Core Principles
-
-### Security First
-- Never compromise security for convenience
-- All external input must be validated
-- Follow OWASP guidelines strictly
-- Regular security audits required
-
-### User Privacy
-- Minimal data collection
-- Explicit consent required
-- GDPR compliance mandatory
-- Data retention limits enforced
-
-### Performance
-- API response time <200ms (p95)
-- Database queries optimized
-- Caching strategy required
-- Load testing before major releases
-
-### Maintainability
-- Code must be self-documenting
-- Complex logic requires comments
-- Public APIs must have docs
-- Breaking changes need migration guides
+- Security First: Never compromise security for convenience
+- User Privacy: GDPR compliance mandatory
+- Performance: API response time <200ms (p95)
 
 ## Non-Negotiable Constraints
-
-1. No third-party analytics without approval
-2. All passwords hashed with bcrypt (cost factor ≥12)
-3. HTTPS only in production
-4. Rate limiting on all public endpoints
-5. Automated backups every 6 hours
+1. All passwords hashed with bcrypt (cost factor ≥12)
+2. HTTPS only in production
+3. Rate limiting on all public endpoints
 ```
 
 ## Reading Configuration Files
@@ -295,7 +184,7 @@ Reviewer checks compliance:
 # Read configuration
 cat AGENTS.md CLAUDE.md constitution.md
 
-# Review changes against standards
+# Review changes
 git diff main...feature/beads-123
 
 # Validate specific checks
@@ -308,6 +197,8 @@ npm test -- --coverage
 - **P0 (Critical):** Security, data loss, breaking changes
 - **P1 (Important):** Quality gates, architecture violations
 - **P2 (Minor):** Style issues, optimization opportunities
+
+**Reference:** See k2-dev-reference.md#review-severity-levels
 
 ### PreToolUse Hook Validation
 
@@ -329,81 +220,42 @@ Validates:
 
 ### Type Checking
 
-**Standard:**
-```typescript
-// AGENTS.md: "All TypeScript must type-check"
-npm run type-check  # Must pass
-```
-
-**Validation:**
-```bash
-tsc --noEmit
-```
-
-**Pass:** No errors
-**Fail:** Any type errors
+**Standard:** All TypeScript must type-check
+**Validation:** `tsc --noEmit`
+**Pass:** No errors | **Fail:** Any type errors
 
 ### Test Coverage
 
-**Standard:**
-```
-// AGENTS.md: "Minimum 80% coverage"
-```
-
-**Validation:**
-```bash
-npm test -- --coverage
-```
-
-**Pass:** ≥80% line coverage
-**Fail:** <80% line coverage
+**Standard:** Minimum 80% coverage (from AGENTS.md)
+**Validation:** `npm test -- --coverage`
+**Pass:** ≥80% line coverage | **Fail:** <80%
 
 ### Linting
 
-**Standard:**
-```
-// AGENTS.md: "ESLint must pass"
-```
-
-**Validation:**
-```bash
-npm run lint
-```
-
-**Pass:** No errors
-**Fail:** Any linting errors
+**Standard:** ESLint must pass
+**Validation:** `npm run lint`
+**Pass:** No errors | **Fail:** Any linting errors
 
 ### Security
 
-**Standard:**
-```
-// constitution.md: "No hardcoded secrets"
-// AGENTS.md: "Input validation required"
-```
-
+**Standard:** No hardcoded secrets (constitution.md), input validation required (AGENTS.md)
 **Validation:**
 ```bash
-# Check for secrets
-git diff | grep -E '(api_key|password|secret)'
-
-# Review for input validation
-grep -r "req.body" src/api/
+git diff | grep -E '(api_key|password|secret)'  # Check for secrets
+grep -r "req.body" src/api/                     # Review for input validation
 ```
-
-**Pass:** No secrets, all inputs validated
-**Fail:** Secrets found, missing validation
+**Pass:** No secrets, all inputs validated | **Fail:** Secrets found, missing validation
 
 ## Handling Quality Gate Failures
 
 ### During Self-Review
 
 If quality gates fail:
-
-1. **Identify failure:** Which check failed?
-2. **Fix issue:** Address root cause
-3. **Re-validate:** Run checks again
-4. **Repeat:** Until all gates pass
-5. **Document:** Note any challenges in PR
+1. Identify which check failed
+2. Fix root cause
+3. Re-validate
+4. Repeat until all gates pass
+5. Document any challenges in PR
 
 ### During Review
 
@@ -427,11 +279,10 @@ If Reviewer finds issues:
 ### PreToolUse Hook Blocks
 
 If hook blocks operation:
-
-1. **Read error message:** Understand what failed
-2. **Check AGENTS.md:** Review validation patterns
-3. **Fix issue:** Address root cause
-4. **Retry operation:** Should now pass
+1. Read error message (understand what failed)
+2. Check AGENTS.md (review validation patterns)
+3. Fix issue (address root cause)
+4. Retry operation (should now pass)
 
 **Example:**
 ```bash
@@ -441,59 +292,23 @@ Error: Type checking failed for src/auth.ts
 # Fix type errors
 vi src/auth.ts
 
-# Retry
-# Should succeed now
+# Retry - should succeed now
 ```
 
 ## Best Practices
 
 ### DO
-
-✅ **Read configuration first**
-```bash
-cat AGENTS.md CLAUDE.md constitution.md
-```
-
-✅ **Validate early and often**
-- Check during implementation
-- Validate before PR
-- Re-check after changes
-
-✅ **Understand rationale**
-- Why does this standard exist?
-- What problem does it prevent?
-- How does it help the project?
-
-✅ **Ask for clarification**
-- Use AskUserQuestion if standard is unclear
-- Request examples if needed
-- Propose alternatives if justified
-
-✅ **Document exceptions**
-- Explain why standard can't be met
-- Propose mitigation
-- Get explicit approval
+✅ Read configuration first: `cat AGENTS.md CLAUDE.md constitution.md`
+✅ Validate early and often during implementation
+✅ Understand rationale for each standard
+✅ Ask for clarification if standard is unclear
+✅ Document exceptions with rationale and mitigation
 
 ### DON'T
-
-❌ **Don't skip configuration reading**
-- Always read AGENTS.md, CLAUDE.md, constitution.md
-- Never assume you know the standards
-
-❌ **Don't bypass quality gates**
-- Don't disable checks
-- Don't commit with `--no-verify`
-- Don't merge failing PRs
-
-❌ **Don't ignore warnings**
-- Address all linting warnings
-- Fix all test failures
-- Resolve all type errors
-
-❌ **Don't negotiate immutable constraints**
-- constitution.md defines non-negotiables
-- These cannot be bypassed
-- Raise concerns with user if needed
+❌ Skip reading AGENTS.md, CLAUDE.md, constitution.md
+❌ Bypass quality gates (disable checks, commit --no-verify, merge failing PRs)
+❌ Ignore warnings (address linting warnings, test failures, type errors)
+❌ Negotiate immutable constraints (constitution.md is non-negotiable)
 
 ## Project Configuration Templates
 
@@ -503,37 +318,17 @@ If AGENTS.md doesn't exist, suggest creating:
 # AGENTS.md Template
 
 ## Quality Gates
-
-### Type Checking
-- Command: `npm run type-check`
-- Must pass: Yes
-
-### Test Coverage
-- Command: `npm test -- --coverage`
-- Threshold: 80%
-
-### Linting
-- Command: `npm run lint`
-- Must pass: Yes
+- Type Checking: `npm run type-check` - Must pass
+- Test Coverage: `npm test -- --coverage` - Threshold: 80%
+- Linting: `npm run lint` - Must pass
 
 ## File Validation Patterns
-
-Validate before changes:
-- `src/**/*.ts`
-- `src/**/*.tsx`
-
-Skip validation:
-- `**/*.test.ts`
-- `docs/**/*`
+Validate: `src/**/*.ts`, `src/**/*.tsx`
+Skip: `**/*.test.ts`, `docs/**/*`
 
 ## Review Standards
-
-### Blocking
-- Security vulnerabilities
-- Logic errors
-
-### Non-Blocking
-- Style preferences
+Blocking: Security vulnerabilities, logic errors
+Non-Blocking: Style preferences
 ```
 
 ## Integration with K2-Dev Workflow
@@ -561,3 +356,5 @@ Skip validation:
 - Considers quality gate requirements
 
 Follow quality gates rigorously to maintain code quality and project standards throughout the k2-dev development lifecycle.
+
+**Reference:** See k2-dev-reference.md for priority levels and common patterns.

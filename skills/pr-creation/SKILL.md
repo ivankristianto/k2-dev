@@ -1,7 +1,7 @@
 ---
 name: PR Creation
 description: This skill should be used when the user asks to "create a pull request", "create a PR", "submit changes for review", "use gh pr create", "write PR description", or needs guidance on creating well-structured GitHub pull requests in k2-dev workflows.
-version: 0.1.0
+version: 0.2.0
 ---
 
 # PR Creation Skill
@@ -10,19 +10,15 @@ version: 0.1.0
 
 Creating high-quality pull requests is essential for effective code review and team collaboration. This skill provides guidance for creating well-structured, informative PRs using GitHub CLI.
 
-**Key Objectives:**
+**Key Objectives:** Clear communication of changes, context for reviewers, traceability to requirements, professional presentation.
 
-- Clear communication of changes
-- Context for reviewers
-- Traceability to requirements
-- Professional presentation
+**Reference:** See k2-dev-reference.md#github-cli-gh-commands for complete gh command syntax.
 
 ## PR Structure
 
 ### Essential Components
 
 Every PR should include:
-
 1. **Title** - Clear, concise summary
 2. **Description** - What and why
 3. **Changes** - What was modified
@@ -32,66 +28,47 @@ Every PR should include:
 
 ### Title Format
 
-**Pattern:**
+**Pattern:** `<type>: <summary> (<ticket-id>)`
 
-```
-<type>: <summary> (<ticket-id>)
-```
-
-**Types:**
-
-- `feat`: New feature
-- `fix`: Bug fix
-- `refactor`: Code restructuring
-- `docs`: Documentation
-- `test`: Test additions/fixes
-- `chore`: Maintenance tasks
-- `perf`: Performance improvements
-- `security`: Security fixes
+**Types:** feat, fix, refactor, docs, test, chore, perf, security
 
 **Examples:**
-
 ```
 feat: Add JWT authentication middleware (beads-123)
 fix: Resolve memory leak in image processor (beads-456)
-refactor: Extract validation logic to utils (beads-789)
-docs: Update API documentation for v2 endpoints (beads-234)
 security: Fix SQL injection vulnerability in search (beads-567)
 ```
 
+**Reference:** See k2-dev-reference.md#git-commit-format
+
 ### Description Template
 
-**Always Follow the Pull Request template inside .github folder if exists**
+**IMPORTANT:** Always follow the Pull Request template in `.github/pull_request_template.md` if it exists.
 
-If Pull Request template not exists then follow the following template:
+**If no template exists, use:**
 
 ```markdown
 ## Summary
-
 Brief overview of what this PR does and why it's needed.
 
 ## Changes
-
 - Bullet point list of specific changes
 - File modifications
 - New dependencies
 - Configuration updates
 
 ## Testing
-
 - Test scenarios covered
 - Manual testing performed
 - Automated test additions
 
 ## Reviewer Notes
-
 - Areas requiring special attention
 - Design decisions made
 - Known limitations or trade-offs
 - Follow-up work planned
 
 ## References
-
 - Fixes beads-123
 - Related to beads-456
 - Documentation: [link]
@@ -107,20 +84,7 @@ gh pr create --title "feat: Add feature X (beads-123)" \
              --body "PR description here..."
 ```
 
-### Using PR Template
-
-If project has `.github/pull_request_template.md`:
-
-```bash
-# Auto-fills with template
-gh pr create --title "feat: Add feature X (beads-123)"
-```
-
-Template prompts for structured information.
-
-### From Heredoc
-
-For complex descriptions:
+### Using Heredoc for Complex Descriptions
 
 ```bash
 gh pr create --title "feat: Add user authentication (beads-123)" \
@@ -153,29 +117,24 @@ EOF
 )"
 ```
 
-### With Reviewers
+### Additional Options
 
 ```bash
-gh pr create --title "feat: Add feature X (beads-123)" \
-             --body "..." \
-             --reviewer @teammate1,@teammate2
+# With reviewers
+gh pr create --title "..." --body "..." --reviewer @teammate
+
+# Draft PR (work in progress)
+gh pr create --title "..." --body "..." --draft
+
+# With labels
+gh pr create --title "..." --body "..." --label security
 ```
 
-### Draft PR
-
-For work in progress:
-
-```bash
-gh pr create --title "feat: Add feature X (beads-123)" \
-             --body "..." \
-             --draft
-```
+**Reference:** See k2-dev-reference.md#github-cli-gh-commands for all gh pr commands.
 
 ## K2-Dev PR Workflow
 
-### Engineer Creates PR
-
-After implementation and self-review:
+### Engineer Creates PR (After Implementation and Self-Review)
 
 ```bash
 # Ensure all changes committed and pushed
@@ -220,93 +179,53 @@ Implements JWT authentication as specified in beads-123.
 - Security: constitution.md password handling requirements
 EOF
 )"
-```
 
-### PR URL in Beads Comment
-
-Link PR to task:
-
-```bash
-# Get PR URL
+# Get PR URL and add to beads
 PR_URL=$(gh pr view --json url -q .url)
-
-# Add to beads comment
 bd comments beads-123 add "PR created: ${PR_URL}"
-```
-
-### Reviewer Access
-
-Reviewer uses PR for feedback:
-
-```bash
-# View PR
-gh pr view 123
-
-# Review on GitHub web interface
-gh pr view 123 --web
-
-# Add comments via CLI or web
 ```
 
 ## PR Description Best Practices
 
 ### DO
 
-✅ **Be specific about changes**
-
+✅ **Be specific about changes:**
 ```markdown
 ## Changes
-
 - Added JWT middleware in src/auth/middleware.ts
 - Implemented token validation with expiry checking
 - Added refresh token rotation
 ```
 
-Not:
-
-```markdown
-## Changes
-
-- Added authentication
-```
-
-✅ **Include test coverage**
-
+✅ **Include test coverage:**
 ```markdown
 ## Testing
-
-- Unit tests: 95% coverage (src/auth/\*.test.ts)
+- Unit tests: 95% coverage (src/auth/*.test.ts)
 - Integration tests: Login flow, token refresh, logout
 - Manual: Tested with Postman collection (attached)
 - Security: OWASP ZAP scan - no vulnerabilities
 ```
 
-✅ **Explain design decisions**
-
+✅ **Explain design decisions:**
 ```markdown
 ## Reviewer Notes
-
 - Used RS256 for JWT signing (more secure than HS256)
 - Token expiry: 15min access + 7day refresh (industry standard)
 - Chose jsonwebtoken over jose (better TypeScript support)
 ```
 
-✅ **Link to requirements**
-
+✅ **Link to requirements:**
 ```markdown
 ## References
-
 - Implements: beads-123
 - Blocked by: beads-120 (now merged)
 - Follows: AGENTS.md authentication patterns
 - Architecture: Matches existing OAuth flow in src/auth/oauth.ts
 ```
 
-✅ **Highlight quality gates**
-
+✅ **Highlight quality gates:**
 ```markdown
 ## Quality Gates
-
 ✅ Type checking passed
 ✅ Linting passed
 ✅ Tests passed (95% coverage)
@@ -315,71 +234,35 @@ Not:
 
 ### DON'T
 
-❌ **Don't be vague**
-
+❌ **Don't be vague:**
 ```markdown
 ## Changes
-
 - Updated some files
 - Fixed bugs
 - Added tests
 ```
 
-❌ **Don't skip testing details**
-
+❌ **Don't skip testing details:**
 ```markdown
 ## Testing
-
 - Tested it
 ```
 
-❌ **Don't omit reviewer context**
-
+❌ **Don't omit reviewer context:**
 ```markdown
 ## Reviewer Notes
-
 - Please review
 ```
 
-❌ **Don't forget references**
-
+❌ **Don't forget references:**
 ```markdown
 ## References
-
 (empty)
-```
-
-## PR Title Best Practices
-
-### Good Titles
-
-✅ Clear and specific:
-
-```
-feat: Add JWT authentication with refresh tokens (beads-123)
-fix: Resolve race condition in payment processor (beads-456)
-refactor: Extract common validation logic to utils (beads-789)
-perf: Optimize database queries with eager loading (beads-234)
-security: Fix XSS vulnerability in comment rendering (beads-567)
-```
-
-### Bad Titles
-
-❌ Vague or unclear:
-
-```
-Update files (beads-123)
-Fix bug (beads-456)
-Changes (beads-789)
-beads-234
-Improvements (beads-567)
 ```
 
 ## Special Cases
 
 ### Multiple Tickets in One PR
-
-When working on multiple tickets in same worktree:
 
 ```bash
 gh pr create --title "feat: Implement user profile features (beads-123, beads-234)" \
@@ -405,7 +288,7 @@ EOF
 
 ### Breaking Changes
 
-Highlight breaking changes:
+Highlight prominently:
 
 ```markdown
 ## ⚠️ Breaking Changes
@@ -415,15 +298,12 @@ Highlight breaking changes:
 - Migration guide: docs/migrations/v2.md
 
 ## Migration Steps
-
 1. Update API calls to use new endpoint
 2. Update response parsing for new field names
 3. Update tests
 ```
 
 ### Security Fixes
-
-Mark as security fix:
 
 ```bash
 gh pr create --title "security: Fix SQL injection in search (beads-567)" \
@@ -432,10 +312,8 @@ gh pr create --title "security: Fix SQL injection in search (beads-567)" \
 ```
 
 Add sensitivity note:
-
 ```markdown
 ## Security Note
-
 This PR fixes a critical SQL injection vulnerability. Details in private security advisory GHSA-xxxx.
 
 Do not merge until security advisory is prepared.
@@ -446,10 +324,7 @@ Do not merge until security advisory is prepared.
 ### Update Beads Task
 
 ```bash
-# Get PR number
 PR_NUM=$(gh pr view --json number -q .number)
-
-# Update beads
 bd comments beads-123 add "PR created: #${PR_NUM}"
 bd update beads-123 --status in_progress
 ```
@@ -457,14 +332,9 @@ bd update beads-123 --status in_progress
 ### Monitor PR
 
 ```bash
-# Check status
-gh pr status
-
-# View checks
-gh pr checks
-
-# View reviews
-gh pr view 123 --json reviews
+gh pr status              # Check status
+gh pr checks              # View CI checks
+gh pr view 123 --json reviews   # View reviews
 ```
 
 ## PR Template Example
@@ -473,29 +343,22 @@ Create `.github/pull_request_template.md`:
 
 ```markdown
 ## Summary
-
 <!-- Brief overview of changes and motivation -->
 
 ## Changes
-
-## <!-- Bullet list of specific changes -->
-
+<!-- Bullet list of specific changes -->
 -
 -
 
 ## Testing
-
 <!-- How were these changes tested? -->
-
 - [ ] Unit tests added/updated
 - [ ] Integration tests added/updated
 - [ ] Manual testing performed
 - [ ] Security testing completed
 
 ## Quality Gates
-
 <!-- Check all that apply -->
-
 - [ ] Type checking passes
 - [ ] Linting passes
 - [ ] Tests pass (coverage ≥80%)
@@ -503,38 +366,19 @@ Create `.github/pull_request_template.md`:
 - [ ] Self-review completed
 
 ## Reviewer Notes
-
-## <!-- Important context for reviewers -->
-
+<!-- Important context for reviewers -->
 -
 
 ## References
-
 <!-- Related tickets, docs, PRs -->
-
 - Implements: beads-XXX
 - Related:
 - Docs:
 ```
 
-## Command Reference
-
-| Action          | Command                                   |
-| --------------- | ----------------------------------------- |
-| Create PR       | `gh pr create --title "..." --body "..."` |
-| Create draft PR | `gh pr create --draft`                    |
-| Use template    | `gh pr create` (interactive)              |
-| View PR         | `gh pr view 123`                          |
-| View on web     | `gh pr view 123 --web`                    |
-| Check status    | `gh pr status`                            |
-| List my PRs     | `gh pr list --author @me`                 |
-| Add reviewer    | `gh pr edit 123 --add-reviewer @user`     |
-| Add label       | `gh pr edit 123 --add-label bug`          |
-
 ## Integration with Review Process
 
 After PR creation:
-
 1. **Engineer:** PR created, URL added to beads
 2. **Reviewer:** Reviews PR, adds comments on GitHub
 3. **Engineer:** Addresses feedback, updates PR
@@ -545,3 +389,5 @@ After PR creation:
 All review feedback happens on GitHub PR, not in beads. Beads only tracks PR URL and status.
 
 Create clear, comprehensive PRs to facilitate efficient reviews and maintain high code quality standards in k2-dev workflows.
+
+**Reference:** See k2-dev-reference.md for gh commands, PR template structure, and common patterns.

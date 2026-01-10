@@ -1,54 +1,32 @@
 ---
 name: Test Planning
 description: This skill should be used when the user asks to "create a test plan", "write test cases", "plan testing strategy", "define test coverage", "create test scenarios", or needs guidance on comprehensive test planning in k2-dev workflows.
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Test Planning Skill
 
 ## Overview
 
-Comprehensive test planning ensures code quality, catches bugs early, and provides confidence in implementations. This skill provides guidance for creating structured test plans with specific test cases.
+Comprehensive test planning ensures code quality, catches bugs early, and provides confidence in implementations. This skill provides reference patterns for creating structured test plans with specific test cases.
 
-**Key Objectives:**
-- Define clear test strategy
-- Create specific, implementable test cases
-- Ensure comprehensive coverage
-- Document testing approach
+**Key Objectives:** Define clear test strategy, create specific and implementable test cases, ensure comprehensive coverage, document testing approach.
+
+**Note:** For active test planning workflow (executing in main context), use the Tester skill instead. This is a reference skill for test planning patterns.
 
 ## Test Strategy Components
 
 ### Test Types
 
-**Unit Tests:**
-- Test individual functions/methods
-- Fast execution
-- Isolated from dependencies
-- Mock external services
+**Reference:** See k2-dev-reference.md#test-types for complete test type definitions.
 
-**Integration Tests:**
-- Test component interactions
-- Database access
-- API endpoints
-- Service integrations
-
-**End-to-End Tests:**
-- Test complete user flows
-- Full system integration
-- UI interactions
-- Real or staging environment
-
-**Performance Tests:**
-- Load testing
-- Stress testing
-- Response time validation
-- Resource usage
-
-**Security Tests:**
-- Input validation
-- Authentication/authorization
-- Injection vulnerabilities
-- Security headers
+| Type | Focus | When to Use |
+|------|-------|-------------|
+| **Unit** | Individual functions/methods | Business logic, algorithms, utilities |
+| **Integration** | Component interactions | APIs, databases, service integrations |
+| **E2E** | Complete user flows | Critical workflows, UI, multi-step journeys |
+| **Performance** | Load and speed | High-traffic features, resource-intensive ops |
+| **Security** | Security controls | Auth, validation, sensitive data |
 
 ### Coverage Goals
 
@@ -58,22 +36,19 @@ Comprehensive test planning ensures code quality, catches bugs early, and provid
 - Integration tests: Major flows
 - E2E tests: Key user journeys
 
-**Project-specific:**
-- Check AGENTS.md for requirements
-- May specify higher thresholds
-- May require specific test types
+**Project-specific:** Check AGENTS.md for requirements (may specify higher thresholds or specific test types).
+
+**Reference:** See k2-dev-reference.md#test-coverage-levels for standard thresholds.
 
 ## Test Case Structure
 
 ### Standard Format
 
-Each test case should define:
-
 ```markdown
 ### TC-XXX: Test Case Title
 
-**Type:** Unit / Integration / E2E / Performance / Security
-**Priority:** Critical / High / Medium / Low
+**Type:** Unit | Integration | E2E | Performance | Security
+**Priority:** Critical | High | Medium | Low
 
 **Preconditions:**
 - Required setup
@@ -96,31 +71,14 @@ Each test case should define:
 - Sample payloads
 ```
 
+**Reference:** See k2-dev-reference.md#priority-levels for priority guidelines.
+
 ### Priority Levels
 
-**Critical:**
-- Security validations
-- Data integrity checks
-- Core business logic
-- Payment processing
-- Authentication
-
-**High:**
-- Main user flows
-- API endpoints
-- Data transformations
-- Error handling
-
-**Medium:**
-- Edge cases
-- Secondary features
-- Optional flows
-- UI variations
-
-**Low:**
-- Nice-to-have features
-- Rare edge cases
-- Performance optimizations
+**Critical:** Security validations, data integrity checks, core business logic, payment processing, authentication
+**High:** Main user flows, API endpoints, data transformations, error handling
+**Medium:** Edge cases, secondary features, optional flows, UI variations
+**Low:** Nice-to-have features, rare edge cases, performance optimizations
 
 ## Test Plan Document Structure
 
@@ -215,7 +173,6 @@ What will be tested in this plan.
 
 Test the expected, successful flow:
 
-**Example:**
 ```markdown
 ### TC-001: Successful User Login
 
@@ -247,9 +204,8 @@ Test the expected, successful flow:
 
 ### Edge Case Tests
 
-Test boundary conditions and limits:
+Test boundary conditions:
 
-**Example:**
 ```markdown
 ### TC-015: Login with Maximum Length Password
 
@@ -275,7 +231,6 @@ Test boundary conditions and limits:
 
 Test failure scenarios:
 
-**Example:**
 ```markdown
 ### TC-020: Login with Invalid Credentials
 
@@ -306,7 +261,6 @@ Test failure scenarios:
 
 Test security requirements:
 
-**Example:**
 ```markdown
 ### TC-030: Prevent SQL Injection in Login
 
@@ -449,6 +403,8 @@ EOF
 )"
 ```
 
+**Reference:** See k2-dev-reference.md#beads-cli-commands for beads commands.
+
 ### In Test Files
 
 Reference test plan in code:
@@ -476,83 +432,15 @@ describe('Authentication', () => {
 
 ### Priority-Based
 
-1. **Critical tests first:**
-   - Security validations
-   - Core business logic
-   - Data integrity
-
-2. **High priority tests:**
-   - Main user flows
-   - API endpoints
-   - Error handling
-
-3. **Medium/Low priority:**
-   - Edge cases
-   - Optional features
-   - Performance tests
+1. **Critical tests first:** Security validations, core business logic, data integrity
+2. **High priority tests:** Main user flows, API endpoints, error handling
+3. **Medium/Low priority:** Edge cases, optional features, performance tests
 
 ### Coverage-Driven
 
-1. **Establish baseline:**
-   - Write tests for existing code
-   - Reach minimum coverage threshold
-
-2. **Test new features:**
-   - TDD approach if preferred
-   - Write tests alongside implementation
-
-3. **Fill gaps:**
-   - Add missing edge cases
-   - Complete coverage matrix
-
-## K2-Dev Test Planning Workflow
-
-### Tester Agent Creates Plan
-
-When /k2:test command executed:
-
-```bash
-# Tester reads task
-bd show beads-123
-bd comments beads-123
-
-# Analyzes implementation
-cat src/auth/middleware.ts
-grep -r "auth" src/
-
-# Creates comprehensive test plan
-# Adds to beads as comment
-bd comments beads-123 add "[Test plan content]"
-```
-
-### Engineer Implements Tests
-
-```bash
-# Read test plan
-bd comments beads-123
-
-# Implement test cases
-vi src/auth/middleware.test.ts
-
-# Run tests
-npm test
-
-# Verify coverage
-npm test -- --coverage
-```
-
-### Reviewer Validates
-
-```bash
-# Check test plan exists
-bd comments beads-123 | grep "Test Plan"
-
-# Review test implementation
-git diff main...feature/beads-123 -- '**/*.test.ts'
-
-# Verify coverage
-npm test -- --coverage
-```
+1. **Establish baseline:** Write tests for existing code, reach minimum coverage threshold
+2. **Test new features:** TDD approach if preferred, write tests alongside implementation
+3. **Fill gaps:** Add missing edge cases, complete coverage matrix
 
 ## Best Practices
 
@@ -601,14 +489,6 @@ TC-001: Test login
 - No load tests for critical paths
 - No response time validation
 
-## Command Reference
-
-| Action | Command |
-|--------|---------|
-| Run tests | `npm test` or `pytest` |
-| Coverage report | `npm test -- --coverage` |
-| Watch mode | `npm test -- --watch` |
-| Specific file | `npm test -- auth.test.ts` |
-| Update snapshots | `npm test -- -u` |
-
 Create comprehensive, specific test plans to ensure quality and catch issues early in k2-dev development workflows.
+
+**Reference:** See k2-dev-reference.md for test types, coverage levels, and priority guidelines. For active test planning workflow, use the Tester skill.
