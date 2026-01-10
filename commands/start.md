@@ -40,9 +40,13 @@ If found → skip to next phase. If not found → execute phase.
 
 **2. Execute phase work** (see phase details below)
 
-**3. Update todos:** Mark current as completed, next as in_progress
+**3. CRITICAL - Update Progress (Both Required):**
 
-**4. Log completion:**
+You MUST complete BOTH of these before proceeding to the next phase:
+
+a) **Update TodoWrite:** Mark current todo as completed, next as in_progress
+
+b) **Log to beads (MANDATORY):**
 
 ```bash
 bd comments add beads-{id} "## Phase {N}: ✅ Completed
@@ -51,6 +55,8 @@ bd comments add beads-{id} "## Phase {N}: ✅ Completed
 
 {relevant_details}"
 ```
+
+**Logging is NOT optional. Every phase MUST be logged to beads.**
 
 ---
 
@@ -243,7 +249,15 @@ For each ticket: `bd show {ticket-id}` → verify exists & status is open/in_pro
 
 Update status: `bd update {ticket-id} --status=in_progress`
 
-Log: `Tickets validated and status updated to in_progress: {ticket_ids}`
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 2: ✅ Completed
+
+Tickets Validated
+
+Tickets validated and status updated to in_progress: {ticket_ids}"
+```
 
 ### P3: Read Project Standards
 
@@ -253,13 +267,29 @@ Read from project root (where .beads/ directory is):
 - `CLAUDE.md` - Project standards
 - `(docs|specs)/constitution.md` - Project principles (optional)
 
-Log: `AGENTS.md: {read/not_found}, CLAUDE.md: {read/not_found}, constitution.md: {read/not_found}`
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 3: ✅ Completed
+
+Project Standards Read
+
+AGENTS.md: {read/not_found}, CLAUDE.md: {read/not_found}, constitution.md: {read/not_found}"
+```
 
 ### P4: Identify Project Root
 
 Ask user if unclear. Verify: git repo with `.beads/` directory.
 
-Log: `Path: {project_root}`
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 4: ✅ Completed
+
+Project Root Identified
+
+Path: {project_root}"
+```
 
 ### P5: Create Git Worktree or Branch (Conditional)
 
@@ -276,7 +306,17 @@ Naming: `feature/beads-{id}` (first ticket ID for multiple). Record worktree pat
 
 Set: `work_path = ../worktrees/feature/beads-{first_ticket_id}`
 
-Log: `Branch: feature/beads-{first_ticket_id}, Path: {work_path}, Mode: worktree`
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 5: ✅ Completed
+
+Git Worktree Created
+
+Branch: feature/beads-{first_ticket_id}
+Path: {work_path}
+Mode: worktree"
+```
 
 **If use_worktree = false:**
 
@@ -289,7 +329,17 @@ Naming: `feature/beads-{id}` (first ticket ID for multiple). Work happens in mai
 
 Set: `work_path = {project_root}`
 
-Log: `Branch: feature/beads-{first_ticket_id}, Path: {project_root}, Mode: main-branch`
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 5: ✅ Completed
+
+Branch Created in Main Repository
+
+Branch: feature/beads-{first_ticket_id}
+Path: {project_root}
+Mode: main-branch"
+```
 
 ### P6: Read Task Details
 
@@ -299,7 +349,15 @@ bd show beads-{id}  # for each ticket
 
 Read description, comments, requirements, dependencies.
 
-Log: `Tickets analyzed: {ticket_ids}`
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 6: ✅ Completed
+
+Task Details Read
+
+Tickets analyzed: {ticket_ids}"
+```
 
 ### P7: Analyze & Document
 
@@ -321,7 +379,17 @@ bd comments add beads-{id} "## Technical Lead Analysis
 Ready for Engineer agent to implement"
 ```
 
-Log: `Complexity: {complexity}, Scope: {scope}, Dependencies: {dependencies}`
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 7: ✅ Completed
+
+Technical Lead Analysis Added
+
+Complexity: {complexity}
+Scope: {scope}
+Dependencies: {dependencies}"
+```
 
 ### P8: Launch Engineer
 
@@ -343,7 +411,16 @@ IMPORTANT: Stay in work path for all file ops. Do NOT create PR."
 
 Wait for completion.
 
-Log: `Implementation completed and changes pushed`
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 8: ✅ Completed
+
+Engineer Implementation Complete
+
+Implementation completed and changes pushed
+Branch: feature/beads-{first_ticket_id}"
+```
 
 ### P9: Create Pull Request
 
@@ -362,7 +439,16 @@ generate description, create GitHub PR with proper formatting, link tickets, ret
 
 Record PR URL.
 
-Log: `PR: {pr_url}, Branch: feature/beads-{id}`
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 9: ✅ Completed
+
+Pull Request Created
+
+PR: {pr_url}
+Branch: feature/beads-{first_ticket_id}"
+```
 
 ### P10: Launch Reviewer
 
@@ -380,7 +466,16 @@ Wait for result:
 - **Approved:** → P12 (merge)
 - **Changes requested:** → P11 (iterations)
 
-Log: `Review result: {approved/changes_requested}. {if_approved: "Ready for merge"} {if_changes: "Feedback received, iterations needed"}`
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 10: ✅ Completed
+
+Initial Code Review Complete
+
+Review result: {approved/changes_requested}
+Status: {if_approved: 'Ready for merge' | if_changes: 'Feedback received, iterations needed'}"
+```
 
 ### P11: Review Iterations (max 2)
 
@@ -402,7 +497,15 @@ Read feedback:
 Fix issues, respond to comments, run quality gates, push changes."
 ```
 
-Log iteration 1: `Review Feedback Addressed. Changes pushed. Re-review requested.`
+**CRITICAL - Log iteration 1 to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 11, Iteration 1: ✅ Completed
+
+Review Feedback Addressed
+
+Changes pushed and re-review requested"
+```
 
 Re-launch Reviewer (same prompt as P10).
 
@@ -413,7 +516,15 @@ Re-launch Reviewer (same prompt as P10).
 
 Same process as Iteration 1.
 
-Log iteration 2: `Second Review Feedback Addressed. Changes pushed. Final review requested.`
+**CRITICAL - Log iteration 2 to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 11, Iteration 2: ✅ Completed
+
+Second Review Feedback Addressed
+
+Changes pushed and final review requested"
+```
 
 Final Reviewer launch.
 
@@ -443,7 +554,16 @@ EOF
 
 **Decision:** P0 → ask user (merge now or wait?). P1/P2 → can merge with follow-ups.
 
-Log: `Follow-Up Tickets Created. Tickets: {ids}. Decision: {merge_now_or_wait}`
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 11 (After Iteration 2): ✅ Completed
+
+Follow-Up Tickets Created
+
+Follow-up tickets: {ids}
+Decision: {merge_now_or_wait}"
+```
 
 ### P12: Merge & Cleanup
 
@@ -498,9 +618,31 @@ git checkout main  # or default branch
 Skill tool → k2-dev:report (for each ticket-id)
 ```
 
-Log (if use_worktree = true): `PR merged: {pr_url}, Tickets closed: {ticket_ids}, Worktree cleaned up, Reports generated`
+**CRITICAL - Log to beads:**
 
-Log (if use_worktree = false): `PR merged: {pr_url}, Tickets closed: {ticket_ids}, Branch deleted, Reports generated`
+If use_worktree = true:
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 12: ✅ Completed
+
+Merge and Cleanup Complete
+
+PR merged: {pr_url}
+Tickets closed: {ticket_ids}
+Worktree cleaned up
+Reports generated"
+```
+
+If use_worktree = false:
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 12: ✅ Completed
+
+Merge and Cleanup Complete
+
+PR merged: {pr_url}
+Tickets closed: {ticket_ids}
+Branch deleted
+Reports generated"
+```
 
 **User summary:**
 
