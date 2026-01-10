@@ -51,6 +51,21 @@ Check if beads is properly initialized:
 - Run `bd list` to verify beads is working
 - Report beads status
 
+### 4. Beads Task Statistics
+
+Analyze beads task health and suggest maintenance:
+
+**Checks to perform:**
+- Run `bd stats` to get task statistics
+- Count closed and tombstone tasks
+- Calculate percentage of closed/tombstone vs total tasks
+- Suggest pruning if there are many closed/tombstone tasks
+
+**Pruning recommendations:**
+- If closed tasks > 50: Suggest `bd compact` to prune old closed tasks
+- If tombstone tasks > 20: Suggest cleanup of tombstone tasks
+- Explain benefits of compaction (reduced git repo size, faster operations)
+
 ## Output Format
 
 Provide a clear diagnostic report:
@@ -75,8 +90,21 @@ Provide a clear diagnostic report:
   ✓ .beads/ directory - Present
   ✓ Beads operational - 15 total issues
 
+📊 Beads Task Statistics
+  • Total tasks: 150
+  • Open: 15 (10%)
+  • In Progress: 5 (3%)
+  • Closed: 85 (57%)
+  • Tombstone: 45 (30%)
+
+  ⚠ Maintenance Recommended:
+    → Run `bd compact` to prune 85 closed tasks
+    → This will reduce git repo size and improve performance
+    → Closed tasks will be semantically summarized and archived
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Status: All critical requirements met ✓
+Note: Consider running beads maintenance (see recommendations above)
 ```
 
 ## Error Handling
@@ -93,8 +121,11 @@ If optional files are missing:
 
 ## Implementation Notes
 
-- Use `Bash` tool to check for CLI tools
+- Use `Bash` tool to check for CLI tools and beads statistics
 - Use `Read` and `Glob` tools to check for configuration files
+- Run `bd stats` to get beads task statistics
+- Parse the stats output to count closed and tombstone tasks
 - Do NOT use `Task` tool - this should be fast and synchronous
 - Provide actionable feedback if anything is missing
 - Keep output clean and easy to read
+- Be specific about maintenance commands (e.g., `bd compact --help` for options)

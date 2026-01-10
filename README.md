@@ -165,8 +165,9 @@ Check system prerequisites and project configuration.
 - **System Prerequisites**: Verifies `bd` (beads), `bv` (beads_viewer), `gh` (GitHub CLI), and `git` with worktree support are installed
 - **Project Configuration**: Checks for `AGENTS.md`, `CLAUDE.md`, and `constitution.md` files
 - **Beads Setup**: Validates `.beads/` directory and beads operational status
+- **Beads Task Statistics**: Analyzes task health (open/closed/tombstone counts) and suggests maintenance with `bd compact` if needed
 
-**Output:** Diagnostic report showing which requirements are met, missing, or need attention.
+**Output:** Diagnostic report showing which requirements are met, missing, or need attention, plus actionable recommendations for beads maintenance.
 
 ## Agents
 
