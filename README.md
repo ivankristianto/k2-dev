@@ -7,12 +7,14 @@ Enterprise-grade multiagent orchestration plugin for Claude Code that manages en
 k2-dev simulates a complete development team with specialized agents and skills:
 
 **Agents:**
+
 - **Technical Lead**: Orchestrates workflows, manages worktrees
 - **Engineer**: Implements features following plans
 - **PR Writer**: Creates well-structured pull requests
 - **Reviewer**: Performs code reviews and quality validation
 
 **Skills (main conversation context):**
+
 - **Planning**: Analyzes requirements, creates actionable plans
 - **Test Planning**: Creates test plans and validates implementations
 
@@ -44,17 +46,6 @@ Install via Claude Marketplace:
 claude plugin install k2-dev@ivankristianto/k2-dev
 ```
 
-**Alternative: Manual Installation**
-
-```bash
-# Clone or copy to Claude plugins directory
-mkdir -p ~/.claude/plugins
-cp -r k2-dev ~/.claude/plugins/
-
-# Enable in Claude Code
-claude --plugins k2-dev
-```
-
 ## Commands
 
 ### `/k2:start`
@@ -64,10 +55,9 @@ Start implementation workflow for one or more tickets.
 **Usage:**
 
 ```
-/k2:start beads-123
-/k2:start beads-123,beads-234,beads-345
-/k2:start beads-123 --skip-worktree
-/k2:start                              # No ticket - launches beads_viewer (bv) for interactive selection
+/k2:start beads-123 [--skip-worktree]
+/k2:start beads-123,beads-234,beads-345 [--skip-worktree]
+/k2:start [--skip-worktree] # No ticket - launches beads_viewer (bv) for interactive selection
 ```
 
 **Options:**
@@ -111,6 +101,7 @@ Start planning workflow for new features using the Planning skill.
 6. Converts to beads tasks with dependencies
 
 **Benefits:**
+
 - Faster execution (no agent spawning overhead)
 - Easier debugging (everything in main conversation context)
 - Direct user interaction (questions asked directly)
@@ -219,10 +210,12 @@ Check system prerequisites and project configuration.
 The plugin provides specialized skills that execute in the main conversation context:
 
 **Active Workflow Skills:**
+
 1. **Planning** (`/k2:planner`): Requirements analysis, task creation, beads task management
 2. **Test Planning** (`/k2:test`): Test strategy, test case definition, coverage planning (replaces legacy Tester agent)
 
 **Knowledge Domain Skills:**
+
 3. **beads-integration**: Working with beads task management
 4. **git-worktree-workflow**: Managing git worktrees for isolation
 5. **quality-gates**: Reading and enforcing project standards
@@ -323,6 +316,7 @@ Technical Lead:
 ```
 
 **Why PR Creation Uses Internal Subagent:**
+
 - Separates PR creation logic from implementation and review
 - Ensures consistent PR formatting and template usage
 - Reduces context overhead for subsequent agents
