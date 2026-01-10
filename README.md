@@ -9,6 +9,7 @@ k2-dev simulates a complete development team with specialized agents and skills:
 **Agents:**
 - **Technical Lead**: Orchestrates workflows, manages worktrees
 - **Engineer**: Implements features following plans
+- **PR Writer**: Creates well-structured pull requests
 - **Reviewer**: Performs code reviews and quality validation
 
 **Skills (main conversation context):**
@@ -20,7 +21,7 @@ k2-dev simulates a complete development team with specialized agents and skills:
 - 🎯 **Task-Driven Development**: Integrated with beads task management
 - 🌲 **Git Worktree Workflow**: Isolated workspaces for each task
 - ✅ **Quality Gates**: Enforces standards from AGENTS.md and CLAUDE.md
-- 🔄 **Structured Workflows**: Planning → Implementation → Review → Merge
+- 🔄 **Structured Workflows**: Planning → Implementation → PR Creation → Review → Merge
 - 📋 **Automated Reporting**: Track progress and generate status reports
 - 🧪 **Test Planning**: Automated test strategy and coverage planning
 
@@ -188,10 +189,20 @@ Check system prerequisites and project configuration.
 - **Responsibilities**:
   - Execute implementation following plans
   - Perform self-review against quality gates
-  - Create well-structured GitHub PRs
+  - Push changes to feature branch
   - Respond to review feedback
   - Create follow-up tickets
 - **Tools**: Read, Write, Edit, Bash, Grep, Glob
+
+### PR Writer
+
+- **Role**: Pull request creator
+- **Responsibilities**:
+  - Analyze changes and commit history
+  - Generate comprehensive PR descriptions
+  - Create GitHub PRs using gh CLI
+  - Follow project PR templates and standards
+- **Tools**: Read, Bash, Grep, Glob (no code modification)
 
 ### Reviewer
 
@@ -209,14 +220,14 @@ The plugin provides specialized skills that execute in the main conversation con
 
 **Active Workflow Skills:**
 1. **Planning** (`/k2:planner`): Requirements analysis, task creation, beads task management
-2. **Test Planning** (`/k2:test`): Test strategy, test case definition, coverage planning
+2. **Test Planning** (`/k2:test`): Test strategy, test case definition, coverage planning (replaces legacy Tester agent)
 
 **Knowledge Domain Skills:**
 3. **beads-integration**: Working with beads task management
 4. **git-worktree-workflow**: Managing git worktrees for isolation
 5. **quality-gates**: Reading and enforcing project standards
-6. **pr-creation**: Creating well-structured pull requests
-7. **test-planning**: Test strategy and planning (reference)
+6. **pr-creation**: Creating well-structured pull requests (used by PR Writer)
+7. **test-planning**: Test strategy and planning reference documentation
 8. **code-review-standards**: Code review best practices
 
 ## Configuration
@@ -280,34 +291,41 @@ Project principles and constraints all agents must follow.
 ### Implementation Workflow
 
 ```
-User: /k2:start beads-123,beads-234
+User: /k2:start beads-123
     ↓
 Technical Lead:
   - Validates tickets exist and are open
-  - Creates worktree: feature/beads-123
-  - Reads task descriptions
+  - Creates worktree (feature/beads-123) or branch (--skip-worktree)
+  - Reads task descriptions and context
     ↓
 Engineer:
-  - Implements changes
+  - Implements changes following plan
   - Self-reviews against quality gates
-  - Creates GitHub PR
+  - Pushes changes to feature branch
+    ↓
+PR Writer:
+  - Analyzes changes and commit history
+  - Generates description from templates/context
+  - Creates GitHub Pull Request
     ↓
 Reviewer:
   - Reviews code changes
-  - Comments on GitHub PR
-  - Validates quality gates
+  - Validates against AGENTS.md/CLAUDE.md
+  - Provides feedback on GitHub PR
     ↓
 [Iteration: max 2 times]
     ↓
-Engineer (if needed):
-  - Creates follow-up tickets (P0 for critical)
-    ↓
 Technical Lead:
-  - Closes beads tasks
-  - Syncs with bd sync
-  - Removes worktree
-  - Provides report to user
+  - Merges approved PR
+  - Closes beads tasks & syncs
+  - Removes worktree/branch
+  - Provides final report
 ```
+
+**Why PR Creation Uses Internal Subagent:**
+- Separates PR creation logic from implementation and review
+- Ensures consistent PR formatting and template usage
+- Reduces context overhead for subsequent agents
 
 ### Planning Workflow
 
