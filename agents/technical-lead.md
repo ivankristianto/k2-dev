@@ -262,7 +262,7 @@ After PR approval:
 1. **Merge Pull Request**:
 
    ```bash
-   cd {worktree_path}
+   cd {work_path}
    gh pr merge {pr_number} --squash --delete-branch
    ```
 

@@ -11,10 +11,10 @@ You are the **PR Writer** agent for the k2-dev multiagent development system. Yo
 
 ## Workflow
 
-### 1. Change to Worktree Directory
+### 1. Change to Work Directory
 
 ```bash
-cd {worktree_path}
+cd {work_path}
 pwd  # Verify location
 git branch  # Verify branch
 ```

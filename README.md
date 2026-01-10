@@ -63,12 +63,17 @@ Start implementation workflow for one or more tickets.
 ```
 /k2:start beads-123
 /k2:start beads-123,beads-234,beads-345
+/k2:start beads-123 --skip-worktree
 ```
+
+**Options:**
+
+- `--skip-worktree`: Create branch in main repository instead of creating an isolated worktree
 
 **Workflow:**
 
 1. Technical Lead validates tickets exist
-2. Creates git worktree (branch: `feature/beads-{id}`)
+2. Creates git worktree (branch: `feature/beads-{id}`) or creates branch in main repo if `--skip-worktree` is used
 3. Reads task description and comments
 4. Hands off to Engineer for implementation
 5. Engineer implements with self-review

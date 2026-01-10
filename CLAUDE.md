@@ -70,13 +70,13 @@ k2-dev/
 ### Implementation Flow (`/k2:start`)
 
 1. Technical Lead validates tickets exist and are open
-2. Creates git worktree: `bd worktree create ../worktrees/feature-beads-123`
+2. Creates git worktree: `bd worktree create ../worktrees/feature-beads-123` OR creates branch in main repo if `--skip-worktree` flag is used
 3. Reads task details via `bd show` and `bd comments`
 4. Launches Engineer agent for implementation
 5. Engineer implements, self-reviews against AGENTS.md/CLAUDE.md, pushes changes
 6. Technical Lead launches internal PR Writer agent to create PR
 7. Technical Lead launches Reviewer agent to validate code (max 2 iterations)
-8. Technical Lead merges, closes tickets, syncs beads, removes worktree
+8. Technical Lead merges, closes tickets, syncs beads, removes worktree (or deletes branch if using `--skip-worktree`)
 
 **Why PR Creation Uses Internal Subagent:**
 
@@ -150,7 +150,9 @@ If these don't exist, quality gate validation is skipped.
 
 ## Git Worktree Workflow
 
-Each implementation uses isolated worktrees:
+Each implementation uses isolated worktrees by default, or can use main repository with `--skip-worktree`:
+
+**Default (Worktree Mode):**
 
 ```bash
 # Create worktree (Technical Lead)
@@ -169,6 +171,26 @@ Benefits:
 - No context switching in main tree
 - Parallel work on multiple tickets
 - Clean cleanup after completion
+
+**Alternative (--skip-worktree Mode):**
+
+```bash
+# Create branch in main repo
+git checkout -b feature/beads-123
+
+# Work in main repository
+# (current directory)
+
+# After merge
+git checkout main
+# Branch deleted via PR merge --delete-branch
+```
+
+Benefits:
+
+- Simpler workflow for single-task development
+- No worktree management overhead
+- Familiar git branch workflow
 
 ## Command Development
 

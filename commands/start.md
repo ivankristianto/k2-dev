@@ -1,7 +1,7 @@
 ---
 name: k2:start
 description: Start implementation workflow for one or more beads tickets (runs Technical Lead orchestration logic directly)
-argument-hint: "[beads-123] or beads-123,beads-234 (optional - auto-selects if omitted)"
+argument-hint: "[beads-123] [--skip-worktree] or beads-123,beads-234 (optional - auto-selects if omitted)"
 allowed-tools:
   - Read
   - Write
@@ -16,7 +16,7 @@ allowed-tools:
 
 # K2:Start - Implementation Workflow
 
-Run Technical Lead orchestration logic directly to coordinate the full implementation lifecycle: validation → worktree → implementation → review → merge → cleanup.
+Run Technical Lead orchestration logic directly to coordinate the full implementation lifecycle: validation → worktree/branch → implementation → review → merge → cleanup.
 
 **CRITICAL:** Execute logic directly in this context. DO NOT launch "technical-lead" subagent (causes recursion).
 
@@ -24,6 +24,7 @@ Run Technical Lead orchestration logic directly to coordinate the full implement
 
 **No argument:** Run `bv --robot-triage`, parse recommendation, inform user, continue with that ticket
 **Parse argument:** Accept comma-separated `beads-123,beads-234` (multiple tickets share one worktree) or single `beads-123`
+**Flag support:** `--skip-worktree` to create branch in main repository instead of creating a worktree
 
 ## Phase Execution Pattern
 
@@ -55,9 +56,27 @@ bd comments add beads-{id} "## Phase {N}: ✅ Completed
 
 ## Workflow Phases
 
+### P0: Parse Arguments
+
+**Parse the command arguments:**
+
+1. Extract ticket IDs (comma-separated or single)
+2. Detect `--skip-worktree` flag
+3. Store `use_worktree` boolean (true by default, false if `--skip-worktree` present)
+
+**Example parsing:**
+
+```
+"beads-123 --skip-worktree" → ticket_ids: ["beads-123"], use_worktree: false
+"beads-123,beads-234" → ticket_ids: ["beads-123", "beads-234"], use_worktree: true
+"--skip-worktree beads-123" → ticket_ids: ["beads-123"], use_worktree: false
+```
+
 ### P1: Initialize Todos
 
-TodoWrite initial task list:
+TodoWrite initial task list (conditional based on `use_worktree`):
+
+**If use_worktree = true:**
 
 ```json
 [
@@ -139,6 +158,85 @@ TodoWrite initial task list:
 ]
 ```
 
+**If use_worktree = false:**
+
+```json
+[
+  {
+    "content": "Validate tickets exist and are open",
+    "status": "in_progress",
+    "activeForm": "Validating tickets"
+  },
+  {
+    "content": "Read project standards (AGENTS.md, CLAUDE.md)",
+    "status": "pending",
+    "activeForm": "Reading project standards"
+  },
+  {
+    "content": "Identify project root directory",
+    "status": "pending",
+    "activeForm": "Identifying project root"
+  },
+  {
+    "content": "Create new branch in main repository",
+    "status": "pending",
+    "activeForm": "Creating new branch"
+  },
+  {
+    "content": "Read task details and comments from beads",
+    "status": "pending",
+    "activeForm": "Reading task details"
+  },
+  {
+    "content": "Analyze task and add initial comments",
+    "status": "pending",
+    "activeForm": "Analyzing task"
+  },
+  {
+    "content": "Launch Engineer agent for implementation",
+    "status": "pending",
+    "activeForm": "Launching Engineer agent"
+  },
+  {
+    "content": "Create pull request using pr-writer agent",
+    "status": "pending",
+    "activeForm": "Creating pull request"
+  },
+  {
+    "content": "Launch Reviewer agent for code review",
+    "status": "pending",
+    "activeForm": "Launching Reviewer agent"
+  },
+  {
+    "content": "Review iteration 1: Address feedback (if needed)",
+    "status": "pending",
+    "activeForm": "Review iteration 1"
+  },
+  {
+    "content": "Review iteration 2: Address final feedback (if needed)",
+    "status": "pending",
+    "activeForm": "Review iteration 2"
+  },
+  {
+    "content": "Merge approved pull request",
+    "status": "pending",
+    "activeForm": "Merging pull request"
+  },
+  {
+    "content": "Close tickets and sync beads",
+    "status": "pending",
+    "activeForm": "Closing tickets"
+  },
+  {
+    "content": "Generate final report",
+    "status": "pending",
+    "activeForm": "Generating final report"
+  }
+]
+```
+
+Note: When `use_worktree = false`, there is no "Clean up git worktree" todo.
+
 ### P2: Validate Tickets
 
 For each ticket: `bd show {ticket-id}` → verify exists & status is open/in_progress. If any ticket missing/closed: exit with error.
@@ -163,7 +261,11 @@ Ask user if unclear. Verify: git repo with `.beads/` directory.
 
 Log: `Path: {project_root}`
 
-### P5: Create Git Worktree
+### P5: Create Git Worktree or Branch (Conditional)
+
+**Mode Selection:** Based on `use_worktree` flag from P0.
+
+**If use_worktree = true (default):**
 
 ```bash
 cd {project_root}
@@ -172,7 +274,22 @@ bd worktree create ../worktrees/feature/beads-{first_ticket_id}
 
 Naming: `feature/beads-{id}` (first ticket ID for multiple). Record worktree path.
 
-Log: `Branch: feature/beads-{first_ticket_id}, Path: {worktree_path}`
+Set: `work_path = ../worktrees/feature/beads-{first_ticket_id}`
+
+Log: `Branch: feature/beads-{first_ticket_id}, Path: {work_path}, Mode: worktree`
+
+**If use_worktree = false:**
+
+```bash
+cd {project_root}
+git checkout -b feature/beads-{first_ticket_id}
+```
+
+Naming: `feature/beads-{id}` (first ticket ID for multiple). Work happens in main repository.
+
+Set: `work_path = {project_root}`
+
+Log: `Branch: feature/beads-{first_ticket_id}, Path: {project_root}, Mode: main-branch`
 
 ### P6: Read Task Details
 
@@ -211,17 +328,17 @@ Log: `Complexity: {complexity}, Scope: {scope}, Dependencies: {dependencies}`
 ```
 Task tool → k2-dev:engineer
 Prompt: "Implement tickets: {ticket_ids}
-Worktree: {worktree_path}
+Work path: {work_path}
 Project root: {project_root}
 Standards: AGENTS.md, CLAUDE.md, constitution.md
 
 CRITICAL - First:
-cd {worktree_path}
+cd {work_path}
 pwd && git branch  # verify location
 bd show beads-{id} && bd comments beads-{id}  # read context
 
 Then: implement following plan, self-review, push changes.
-IMPORTANT: Stay in worktree for all file ops. Do NOT create PR."
+IMPORTANT: Stay in work path for all file ops. Do NOT create PR."
 ```
 
 Wait for completion.
@@ -230,16 +347,16 @@ Log: `Implementation completed and changes pushed`
 
 ### P9: Create Pull Request
 
-**Change to worktree:** `cd {worktree_path}`
+**Change to work path:** `cd {work_path}`
 
 **Launch pr-writer:**
 
 ```
 Task tool → k2-dev:pr-writer
 Description: "Create PR for implementation"
-Prompt: "Create PR. Worktree: {worktree_path}, Ticket: {ticket-id}, Branch: feature/beads-{id}
+Prompt: "Create PR. Work path: {work_path}, Ticket: {ticket-id}, Branch: feature/beads-{id}
 
-Change to worktree, analyze changes/commits (git log, git diff), read PR templates,
+Change to work path, analyze changes/commits (git log, git diff), read PR templates,
 generate description, create GitHub PR with proper formatting, link tickets, return URL."
 ```
 
@@ -252,7 +369,7 @@ Log: `PR: {pr_url}, Branch: feature/beads-{id}`
 ```
 Task tool → k2-dev:reviewer
 Prompt: "Review PR {pr_url}
-Worktree: {worktree_path}
+Work path: {work_path}
 Quality gates: AGENTS.md, CLAUDE.md, constitution.md
 
 Validate standards, add GitHub comments, add summary to beads."
@@ -276,7 +393,7 @@ Launch Engineer to address feedback:
 ```
 Task tool → k2-dev:engineer
 Prompt: "Address review feedback for PR {pr_url}
-Worktree: {worktree_path}
+Work path: {work_path}
 
 Read feedback:
 - gh pr view {pr_number} --comments
@@ -333,7 +450,7 @@ Log: `Follow-Up Tickets Created. Tickets: {ids}. Decision: {merge_now_or_wait}`
 **Merge:**
 
 ```bash
-cd {worktree_path}
+cd {work_path}
 gh pr merge {pr_number} --squash
 ```
 
@@ -357,12 +474,22 @@ Review iterations: {count}/2
 
 **Sync:** `bd sync`
 
-**Cleanup:**
+**Cleanup (conditional):**
+
+**If use_worktree = true:**
 
 ```bash
 cd {project_root}
 bd worktree remove {worktree_path}
 git worktree prune
+```
+
+**If use_worktree = false:**
+
+```bash
+cd {project_root}
+git checkout main  # or default branch
+# Branch automatically deleted during PR merge (gh pr merge --delete-branch in P12)
 ```
 
 **Generate reports:**
@@ -371,7 +498,9 @@ git worktree prune
 Skill tool → k2-dev:report (for each ticket-id)
 ```
 
-Log: `PR merged: {pr_url}, Tickets closed: {ticket_ids}, Worktree cleaned up, Reports generated`
+Log (if use_worktree = true): `PR merged: {pr_url}, Tickets closed: {ticket_ids}, Worktree cleaned up, Reports generated`
+
+Log (if use_worktree = false): `PR merged: {pr_url}, Tickets closed: {ticket_ids}, Branch deleted, Reports generated`
 
 **User summary:**
 
@@ -399,13 +528,17 @@ Review iterations: {count}/2
 
 **Ticket missing:** `Error: Ticket {id} does not exist. Check ID and retry.` → exit
 **Ticket closed:** `Error: Ticket {id} already closed. Use 'bd reopen {id}' if needed.` → exit
-**Worktree exists:** `Error: Worktree exists at {path}. Cleanup: git worktree remove {path}` → exit
+**Worktree exists (only when use_worktree = true):** `Error: Worktree exists at {path}. Cleanup: git worktree remove {path}` → exit
+**Branch exists (only when use_worktree = false):** `Error: Branch feature/beads-{id} already exists. Delete with: git branch -D feature/beads-{id}` → exit
 
 ## Configuration
 
 **Quality gates:** AGENTS.md, CLAUDE.md, constitution.md
 **Branch naming:** Single: `feature/beads-123`, Multiple: `feature/beads-123` (first ID)
 **Review limit:** Max 2 iterations → then create follow-up tickets (P0/P1/P2)
+**Workflow modes:**
+- Default (worktree): Creates isolated worktree at `../worktrees/feature/beads-{id}`
+- `--skip-worktree`: Creates branch in main repository, skips worktree creation/cleanup
 
 ## Reminders
 
