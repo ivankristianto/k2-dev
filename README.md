@@ -27,6 +27,8 @@ k2-dev simulates a complete development team with specialized agents and skills:
 ## Prerequisites
 
 - [beads](https://github.com/steveyegge/beads) - Task management system
+- [beads_viewer](https://github.com/steveyegge/beads) - Interactive task viewer for beads (`bv` command)
+- [GitHub CLI](https://cli.github.com/) - Command-line tool for GitHub operations (`gh` command)
 - Git with worktree support
 - Project configuration files (optional but recommended):
   - `AGENTS.md` - Agent behavior guidelines
@@ -64,11 +66,16 @@ Start implementation workflow for one or more tickets.
 /k2:start beads-123
 /k2:start beads-123,beads-234,beads-345
 /k2:start beads-123 --skip-worktree
+/k2:start                              # No ticket - launches beads_viewer (bv) for interactive selection
 ```
 
 **Options:**
 
 - `--skip-worktree`: Create branch in main repository instead of creating an isolated worktree
+
+**Interactive Mode:**
+
+When called without a ticket ID, `/k2:start` will launch the `bv` (beads_viewer) command for interactive task selection. This provides a visual interface to browse and select tasks from your beads project.
 
 **Workflow:**
 
@@ -142,6 +149,24 @@ Create test plan for a ticket using the Test Planning skill.
 3. Defines test cases and coverage strategy
 4. Adds test plan to beads comments
 5. Coordinates with Engineer for implementation
+
+### `/k2:doctor`
+
+Check system prerequisites and project configuration.
+
+**Usage:**
+
+```
+/k2:doctor
+```
+
+**What it checks:**
+
+- **System Prerequisites**: Verifies `bd` (beads), `bv` (beads_viewer), `gh` (GitHub CLI), and `git` with worktree support are installed
+- **Project Configuration**: Checks for `AGENTS.md`, `CLAUDE.md`, and `constitution.md` files
+- **Beads Setup**: Validates `.beads/` directory and beads operational status
+
+**Output:** Diagnostic report showing which requirements are met, missing, or need attention.
 
 ## Agents
 
