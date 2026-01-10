@@ -22,7 +22,7 @@ Run Technical Lead orchestration logic directly to coordinate the full implement
 
 ## Ticket Selection & Parsing
 
-**No argument:** Run `bv --robot-triage`, parse recommendation, inform user, continue with that ticket
+**No argument:** Run `bv --robot-next`, parse recommendation, inform user, continue with that ticket
 **Parse argument:** Accept comma-separated `beads-123,beads-234` (multiple tickets share one worktree) or single `beads-123`
 **Flag support:** `--skip-worktree` to create branch in main repository instead of creating a worktree
 
@@ -537,6 +537,7 @@ Review iterations: {count}/2
 **Branch naming:** Single: `feature/beads-123`, Multiple: `feature/beads-123` (first ID)
 **Review limit:** Max 2 iterations → then create follow-up tickets (P0/P1/P2)
 **Workflow modes:**
+
 - Default (worktree): Creates isolated worktree at `../worktrees/feature/beads-{id}`
 - `--skip-worktree`: Creates branch in main repository, skips worktree creation/cleanup
 
