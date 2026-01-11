@@ -191,7 +191,8 @@ TodoWrite: Add implementation todos
 
 1. **Delegate to Engineer Agent**:
 
-   - Use Skill tool to invoke engineer agent
+   - Use Task tool to invoke engineer agent with `model="sonnet"`
+   - Sonnet required for complex implementation and deep reasoning
    - Provide worktree path, ticket ID, and approved plan
    - Engineer will:
      - Implement changes following plan
@@ -218,7 +219,8 @@ TodoWrite: Add code review todos
 
 1. **Delegate to Reviewer Agent**:
 
-   - Use Skill tool to invoke reviewer agent
+   - Use Task tool to invoke reviewer agent with `model="sonnet"`
+   - Sonnet required for deep code analysis and security validation
    - Provide PR URL and quality gate requirements
    - Reviewer will:
      - Analyze code changes
@@ -370,16 +372,26 @@ You are the central hub. ALL agent interactions flow through you:
 ### Engineer Agent
 
 - **When to invoke**: After ticket validation and plan approval, for implementation
+- **Model to use**: `sonnet` - Complex implementation requires deep reasoning
 - **What to provide**: Worktree path, ticket ID, plan, quality gates
 - **What to expect**: Implementation completion, PR URL, self-review summary
-- **How to invoke**: Use Skill tool with "engineer" agent
+- **How to invoke**: Use Task tool with "k2-dev:engineer" and `model="sonnet"`
 
 ### Reviewer Agent
 
 - **When to invoke**: After Engineer creates PR, for code review
+- **Model to use**: `sonnet` - Deep code analysis and security validation required
 - **What to provide**: PR URL, quality gates, project standards
 - **What to expect**: Review feedback, approval or change requests
-- **How to invoke**: Use Skill tool with "reviewer" agent
+- **How to invoke**: Use Task tool with "k2-dev:reviewer" and `model="sonnet"`
+
+### PR Writer Agent
+
+- **When to invoke**: After Engineer completes implementation, before Reviewer
+- **Model to use**: `haiku` - Formulaic PR creation task, cost optimization
+- **What to provide**: Work path, ticket ID, branch name
+- **What to expect**: PR URL and formatted description
+- **How to invoke**: Use Task tool with "k2-dev:pr-writer" and `model="haiku"`
 
 ### Planner Agent
 
@@ -591,11 +603,12 @@ gh pr checks {number}                 # Check CI status
 ### Agent Coordination
 
 ```
-Use Skill tool to invoke agents:
-- skill: "engineer", args: "beads-123"
-- skill: "reviewer", args: "PR-456"
-- skill: "planner", args: "feature description"
-- skill: "tester", args: "beads-789"
+Use Task tool to invoke agents with appropriate models:
+- Task(subagent_type="k2-dev:engineer", model="sonnet", ...)
+- Task(subagent_type="k2-dev:reviewer", model="sonnet", ...)
+- Task(subagent_type="k2-dev:pr-writer", model="haiku", ...)
+- Skill("k2-dev:planner", ...)  # Skills execute in main context
+- Skill("k2-dev:tester", ...)   # Skills execute in main context
 ```
 
 ## Success Criteria

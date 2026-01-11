@@ -416,6 +416,7 @@ Dependencies: {dependencies}"
 
 ```
 Task tool → k2-dev:engineer
+Model: sonnet  # Complex implementation requires deep reasoning
 Prompt: "Implement tickets: {ticket_ids}
 Work path: {work_path}
 Project root: {project_root}
@@ -451,6 +452,7 @@ Branch: feature/beads-{first_ticket_id}"
 
 ```
 Task tool → k2-dev:pr-writer
+Model: haiku  # Formulaic PR creation task, cost optimization
 Description: "Create PR for implementation"
 Prompt: "Create PR. Work path: {work_path}, Ticket: {ticket-id}, Branch: feature/beads-{id}
 
@@ -475,6 +477,7 @@ Branch: feature/beads-{first_ticket_id}"
 
 ```
 Task tool → k2-dev:reviewer
+Model: sonnet  # Deep code analysis and security validation required
 Prompt: "Review PR {pr_url}
 Work path: {work_path}
 Quality gates: AGENTS.md, CLAUDE.md, constitution.md
@@ -510,6 +513,7 @@ Launch Engineer to address feedback:
 
 ```
 Task tool → k2-dev:engineer
+Model: sonnet  # Complex fixes require deep reasoning
 Prompt: "Address review feedback for PR {pr_url}
 Work path: {work_path}
 

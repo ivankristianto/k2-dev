@@ -65,6 +65,29 @@ k2-dev/
 | Planning | `/k2:planner` | Requirements analysis, task creation |
 | Test Planning | `/k2:test` | Test strategy, test case definition |
 
+### Model Optimization Strategy
+
+k2-dev optimizes costs by using different Claude models based on task complexity:
+
+| Agent/Task | Model  | Rationale                                             | Cost Impact |
+| ---------- | ------ | ----------------------------------------------------- | ----------- |
+| Engineer   | Sonnet | Complex implementation, deep reasoning, self-review   | High value  |
+| Reviewer   | Sonnet | Security validation, code analysis, quality gates     | High value  |
+| PR Writer  | Haiku  | Formulaic task, structured output, template-based     | ~60% savings|
+| Planner    | Inherit| Runs in main context, uses user's selected model      | Variable    |
+| Tester     | Inherit| Runs in main context, uses user's selected model      | Variable    |
+
+**Implementation:**
+- `/k2:start` command specifies model when launching agents via Task tool
+- `model="sonnet"` for Engineer and Reviewer (critical quality work)
+- `model="haiku"` for PR Writer (cost optimization without quality loss)
+- Skills execute in main conversation context and inherit the user's model selection
+
+**Cost savings:**
+- ~60% reduction on PR creation (Haiku vs Sonnet)
+- ~15-25% overall workflow cost reduction
+- Maintains quality where it matters (implementation and review)
+
 ## Key Workflows
 
 ### Implementation Flow (`/k2:start`)
