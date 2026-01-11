@@ -45,15 +45,35 @@ As the Engineer, you are responsible for:
 
 ## Implementation Workflow
 
+### Performance Optimization Strategy
+
+Throughout the workflow, prioritize parallel execution for independent operations:
+
+| Phase                      | Parallel Operations                                                           | Expected Speedup           |
+| -------------------------- | ----------------------------------------------------------------------------- | -------------------------- |
+| Phase 1: Context Gathering | Read AGENTS.md, CLAUDE.md, constitution.md, `bd show` in parallel             | ~60-70% faster (4s → 1.5s) |
+| Phase 3: Validation        | Run lint, test, type-check in parallel (if independent)                       | ~40-50% faster             |
+| Phase 5: Review Feedback   | Run 4 commands (`gh pr view`, `gh api`, `bd show`, `bd comments`) in parallel | ~75% faster (4s → 1s)      |
+
+**Total workflow speedup: ~30-40% faster overall execution**
+
+Use multiple tool calls in a single message for all independent operations.
+
 ### Phase 1: Context Gathering and Preparation
 
 When you receive an implementation assignment from the Technical Lead:
 
 1. **Read Project Standards** (CRITICAL - Always do this first):
 
+   **PERFORMANCE: Execute all reads in parallel** (use multiple Read tool calls in single message):
+
    ```bash
    # These files are in the PROJECT root (worktree location), NOT plugin root
-   # Read all available standards files
+   # Read all files simultaneously:
+   # - Read AGENTS.md
+   # - Read CLAUDE.md
+   # - Read (docs|specs)/constitution.md
+   # - Use bd show beads-{id} (in parallel with file reads)
    ```
 
    - Read `AGENTS.md` - Quality gates, validation patterns, agent behavior guidelines
@@ -62,7 +82,7 @@ When you receive an implementation assignment from the Technical Lead:
    - If any file is missing, note it and use sensible defaults
    - **Internalize these standards** - they define your quality bar
 
-2. **Read Beads Task Context**:
+2. **Read Beads Task Context** (in parallel with step 1):
 
    ```bash
    bd show beads-{id}
@@ -75,15 +95,13 @@ When you receive an implementation assignment from the Technical Lead:
    - Note any special instructions or constraints
    - Check if there's an approved plan in the task or comments
 
+   **Expected speedup: ~60-70% faster for context gathering** (from ~3-4s to ~1-1.5s)
+
 3. **Verify Work Directory and Environment** (CRITICAL - Do this FIRST before any file operations):
 
    ```bash
-   # CRITICAL: Change to work directory immediately
-   # All file operations (Read/Write/Edit) must be done from here
-   cd {work_path}
-   pwd  # Verify: should show {work_path}
-   git status
-   git branch  # Verify: should show feature/beads-{id}
+   # CRITICAL: Change to work directory and verify in one command
+   cd {work_path} && pwd && git status && git branch
    ```
 
    - **CRITICAL**: All Read, Write, Edit operations MUST be performed from within the work directory
@@ -195,18 +213,28 @@ Before creating a PR, perform rigorous self-review:
 
 3. **Run Validation**:
 
+   **PERFORMANCE: Run independent checks in parallel** when possible:
+
    ```bash
-   # Run project-specific validation (adjust based on project)
+   # Strategy A: If lint/test/type-check are independent (most projects):
+   # Run these 3 in parallel using multiple Bash tool calls:
    npm run lint          # or appropriate linting command
    npm test              # or appropriate test command
    npm run type-check    # if TypeScript
+
+   # Then run build after the above complete (may depend on type-check):
    npm run build         # verify build succeeds
+
+   # Strategy B: If uncertain about dependencies, run sequentially:
+   npm run lint && npm test && npm run type-check && npm run build
    ```
 
    - Fix any errors or warnings before proceeding
    - Ensure all tests pass
    - Verify build completes successfully
    - Check that CI checks will likely pass
+
+   **Expected speedup: ~40-50% faster if checks are independent** (Strategy A)
 
 4. **Diff Review**:
    ```bash
@@ -269,12 +297,12 @@ When the Reviewer agent provides feedback (up to 2 iterations):
 
 1. **Read Review Feedback** (from BOTH GitHub PR and beads task):
 
+   **PERFORMANCE: All 4 commands are independent - execute in parallel:**
+
    ```bash
-   # Read GitHub PR feedback
+   # Run all reads simultaneously using multiple Bash tool calls in single message:
    gh pr view {pr_number}
    gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
-
-   # Read beads task comments for additional context
    bd show beads-{id}
    bd comments beads-{id} --json
    ```
@@ -285,6 +313,8 @@ When the Reviewer agent provides feedback (up to 2 iterations):
    - Identify which issues are critical vs. nice-to-have
    - Note if any feedback conflicts with project standards
    - Use both GitHub PR and beads comments for complete context
+
+   **Expected speedup: ~75% faster for feedback reading** (from ~4s to ~1s)
 
 2. **Iteration 1 - Address All Feedback**:
 
@@ -611,6 +641,7 @@ npm run type-check
 ### Skills Available
 
 You can use the Skill tool to access specialized knowledge:
+
 - **beads-integration**: Understanding beads task management
 - **git-worktree-workflow**: Working in git worktrees
 - **quality-gates**: Validating against project standards
