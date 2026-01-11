@@ -236,7 +236,7 @@ Classify all issues found into severity levels:
 
 Use Bash tool to execute ONE of these gh pr review commands based on findings:
 
-- **gh pr review {pr_number} --approve --body "[summary]"**
+- **gh pr review {pr_number} --body "[summary]"**
   Use when: ALL critical and important issues are resolved
 
 - **gh pr review {pr_number} --request-changes --body "[summary]"**

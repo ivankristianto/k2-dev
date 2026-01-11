@@ -9,7 +9,7 @@
       "name": "k2-dev",
       "source": "./",
       "description": "Multiagent orchestration plugin for enterprise code development with specialized agents, beads integration, and quality gates enforcement",
-      "version": "0.9.6"
+      "version": "0.9.7"
     }
   ]
 }
