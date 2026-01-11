@@ -656,7 +656,46 @@ git checkout main  # or default branch
 
 **Generate reports:**
 
-Reports are available via `/k2:report {ticket-id}` command. Inform the user they can run this command for detailed status reports.
+For each ticket, fetch data in parallel and generate structured report:
+
+```bash
+# Run all 5 commands in parallel (multiple Bash tool calls in single message):
+bd show {ticket-id}
+bd comments {ticket-id}
+bd dep list {ticket-id}
+git worktree list | grep -q "beads-{ticket-id}" && echo "worktree" || (git branch --list "feature/beads-{ticket-id}" | grep -q . && echo "branch" || echo "none")
+gh pr view feature/beads-{ticket-id} --json url,state,reviewDecision 2>/dev/null || echo "No PR"
+```
+
+Format output as:
+
+```markdown
+# Ticket Report: {ticket-id}
+
+## Summary
+**Title:** {title} | **Status:** {status} | **Priority:** {priority}
+
+## Description
+{description}
+
+## Progress
+**Created:** {created_date} | **Last Updated:** {updated_date}
+
+## Related Work
+**Git Branch:** feature/beads-{ticket-id} ({worktree/branch/none})
+**Pull Request:** {PR URL & status or "Not created yet"}
+
+## Dependencies
+{list from bd dep list}
+
+## Recent Comments
+{last 3-5 comments from bd comments}
+
+## Next Steps
+{status-based recommendations}
+```
+
+Present complete report to user.
 
 **CRITICAL - Log to beads:**
 
