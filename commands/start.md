@@ -656,9 +656,7 @@ git checkout main  # or default branch
 
 **Generate reports:**
 
-```
-Skill tool → k2-dev:report (for each ticket-id)
-```
+Reports are available via `/k2:report {ticket-id}` command. Inform the user they can run this command for detailed status reports.
 
 **CRITICAL - Log to beads:**
 
