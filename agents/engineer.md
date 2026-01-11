@@ -51,11 +51,12 @@ Throughout the workflow, prioritize parallel execution for independent operation
 
 | Phase                      | Parallel Operations                                                           | Expected Speedup           |
 | -------------------------- | ----------------------------------------------------------------------------- | -------------------------- |
-| Phase 1: Context Gathering | Read AGENTS.md, CLAUDE.md, constitution.md, `bd show` in parallel             | ~60-70% faster (4s → 1.5s) |
+| Phase 1: Context Gathering | Read AGENTS.md, CLAUDE.md, constitution.md in parallel                        | ~60-70% faster (4s → 1.5s) |
+| Phase 1: Context Gathering | Use CACHED TICKET_DATA + TICKET_COMMENTS (from Technical Lead)                | ~50% faster (skip bd calls)|
 | Phase 3: Validation        | Run lint, test, type-check in parallel (if independent)                       | ~40-50% faster             |
 | Phase 5: Review Feedback   | Run 4 commands (`gh pr view`, `gh api`, `bd show`, `bd comments`) in parallel | ~75% faster (4s → 1s)      |
 
-**Total workflow speedup: ~30-40% faster overall execution**
+**Total workflow speedup: ~40-50% faster overall execution**
 
 Use multiple tool calls in a single message for all independent operations.
 
@@ -73,7 +74,6 @@ When you receive an implementation assignment from the Technical Lead:
    # - Read AGENTS.md
    # - Read CLAUDE.md
    # - Read (docs|specs)/constitution.md
-   # - Use bd show beads-{id} (in parallel with file reads)
    ```
 
    - Read `AGENTS.md` - Quality gates, validation patterns, agent behavior guidelines
@@ -82,20 +82,27 @@ When you receive an implementation assignment from the Technical Lead:
    - If any file is missing, note it and use sensible defaults
    - **Internalize these standards** - they define your quality bar
 
-2. **Read Beads Task Context** (in parallel with step 1):
+2. **Read Beads Task Context**:
 
+   **IF Technical Lead provided CACHED DATA (TICKET_DATA + TICKET_COMMENTS):**
+   - Use the cached data directly (no need to call `bd show`/`bd comments`)
+   - This saves ~1-2 seconds per workflow
+
+   **IF no cached data is provided:**
    ```bash
+   # Execute in parallel:
    bd show beads-{id}
+   bd comments beads-{id}
    ```
 
-   - Read complete task description and requirements
-   - Review all comments for additional context and clarifications
+   - Read complete task description and requirements from TICKET_DATA
+   - Review all comments for additional context and clarifications from TICKET_COMMENTS
    - Identify dependencies and related tasks
    - Understand acceptance criteria
    - Note any special instructions or constraints
    - Check if there's an approved plan in the task or comments
 
-   **Expected speedup: ~60-70% faster for context gathering** (from ~3-4s to ~1-1.5s)
+   **Expected speedup: ~60-70% faster for context gathering** (from ~3-4s to ~1-1.5s with cached data)
 
 3. **Verify Work Directory and Environment** (CRITICAL - Do this FIRST before any file operations):
 
@@ -300,24 +307,23 @@ When the Reviewer agent provides feedback (up to 2 iterations):
 
 1. **Read Review Feedback** (from BOTH GitHub PR and beads task):
 
-   **PERFORMANCE: All 4 commands are independent - execute in parallel:**
+   **PERFORMANCE: All commands are independent - execute in parallel:**
 
    ```bash
    # Run all reads simultaneously using multiple Bash tool calls in single message:
    gh pr view {pr_number}
    gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
-   bd show beads-{id}
-   bd comments beads-{id} --json
+   # Use CACHED TICKET_COMMENTS (from Technical Lead) instead of bd comments
    ```
 
    - Read all review comments carefully from GitHub PR
-   - **CRITICAL**: Read beads task comments for review summary and context
+   - **CRITICAL**: Read beads task comments for review summary and context (use cached TICKET_COMMENTS)
    - Understand the concerns and suggestions
    - Identify which issues are critical vs. nice-to-have
    - Note if any feedback conflicts with project standards
    - Use both GitHub PR and beads comments for complete context
 
-   **Expected speedup: ~75% faster for feedback reading** (from ~4s to ~1s)
+   **Expected speedup: ~50% faster for feedback reading** (from ~2s to ~1s with cached data)
 
 2. **Iteration 1 - Address All Feedback**:
 

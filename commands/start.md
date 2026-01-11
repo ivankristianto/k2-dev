@@ -20,6 +20,19 @@ Run Technical Lead orchestration logic directly to coordinate the full implement
 
 **CRITICAL:** Execute logic directly in this context. DO NOT launch "technical-lead" subagent (causes recursion).
 
+## Performance: Beads Data Caching
+
+**Speed optimization:** `bd show` and `bd comments` are called multiple times per workflow. Cache the results in P2 and reuse them:
+
+| Phase | Without Cache | With Cache |
+|-------|---------------|------------|
+| P2 | `bd show` (validation) | `bd show` + cache full data |
+| P3 | `bd show` + `bd comments` | Use cached TICKET_DATA + TICKET_COMMENTS |
+| P5 | Engineer re-fetches | Pass cached data in prompt |
+| P8 | Re-fetch comments | Use cached TICKET_COMMENTS |
+
+**Estimated savings:** ~2-3 seconds per workflow (fewer shell command executions)
+
 ## Ticket Selection & Parsing
 
 **No argument:** Run `bv --robot-next`, parse recommendation, inform user, continue with that ticket
@@ -77,11 +90,13 @@ EOF
 **Common mistake:** Calling `TaskOutput` with the agent ID after Task tool completes causes errors because the task has already been cleaned up.
 
 **Correct pattern:**
+
 ```
 Task tool → agent completes → read result from Task response → continue workflow
 ```
 
 **Incorrect pattern:**
+
 ```
 Task tool → agent completes → call TaskOutput → ERROR: task not found
 ```
@@ -251,9 +266,16 @@ Note: When `use_worktree = false`, there is no "Clean up git worktree" todo.
 
 ### P2: Validate Tickets & Identify Project Root
 
-**Step 1: Quick validation (fail-fast)**
+**Step 1: Quick validation (fail-fast) + Cache data**
 
-For each ticket: `bd show {ticket-id} --short` → verify exists & status is open/in_progress. If any ticket missing/closed: exit with error.
+For each ticket, execute in parallel:
+- `bd show {ticket-id} --short` → verify exists & status is open/in_progress
+- `bd show {ticket-id}` → full task details (CACHE as TICKET_DATA)
+- `bd comments {ticket-id}` → task comments (CACHE as TICKET_COMMENTS)
+
+**CRITICAL:** Cache these in your context - you'll use them in P3, P5, and P8 instead of re-fetching.
+
+If any ticket missing/closed: exit with error.
 
 Update status: `bd update {ticket-id} --status=in_progress`
 
@@ -280,11 +302,12 @@ EOF
 **PERFORMANCE OPTIMIZATION: Execute ALL reads in parallel using multiple tool calls in a single message.**
 
 Read in parallel:
+
 1. `AGENTS.md` - Quality gates, validation patterns (from project root)
 2. `CLAUDE.md` - Project standards (from project root)
 3. `(docs|specs)/constitution.md` - Project principles (optional, from project root)
-4. `bd show {ticket-id}` - Full task details with description (for each ticket)
-5. `bd comments {ticket-id}` - Task comments (for each ticket)
+4. **USE CACHED `TICKET_DATA`** - Task details (from P2, no re-fetch)
+5. **USE CACHED `TICKET_COMMENTS`** - Task comments (from P2, no re-fetch)
 
 **CRITICAL - Log to beads:**
 
@@ -366,10 +389,13 @@ Work path: {work_path}
 Project root: {project_root}
 Standards: AGENTS.md, CLAUDE.md, constitution.md
 
+CACHED DATA (from Technical Lead - no need to re-fetch):
+- TICKET_DATA: {ticket_details_from_cache}
+- TICKET_COMMENTS: {comments_from_cache}
+
 CRITICAL - First:
 cd {work_path}
 pwd && git branch  # verify location
-bd show beads-{id} && bd comments beads-{id}  # read context
 
 Then: implement following plan, self-review, push changes.
 IMPORTANT: Stay in work path for all file ops. Do NOT create PR."
@@ -498,7 +524,7 @@ Work path: {work_path}
 
 Read feedback:
 - gh pr view {pr_number} --comments
-- bd comments beads-{id}
+- USE CACHED TICKET_COMMENTS (from Technical Lead)
 
 Fix issues, respond to comments, run quality gates, push changes."
 ```
@@ -667,6 +693,7 @@ The report skill will fetch all ticket data in parallel (bd show, bd comments, b
 **CRITICAL - Log to beads:**
 
 If use_worktree = true:
+
 ```bash
 bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
 ## Phase 9: ✅ Completed
@@ -682,6 +709,7 @@ EOF
 ```
 
 If use_worktree = false:
+
 ```bash
 bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
 ## Phase 9: ✅ Completed
