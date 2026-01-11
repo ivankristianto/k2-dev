@@ -108,34 +108,19 @@ TodoWrite initial task list (conditional based on `use_worktree`):
 ```json
 [
   {
-    "content": "Validate tickets exist and are open",
+    "content": "Validate tickets and identify project root",
     "status": "in_progress",
-    "activeForm": "Validating tickets"
+    "activeForm": "Validating tickets and locating project root"
   },
   {
-    "content": "Read project standards (AGENTS.md, CLAUDE.md)",
+    "content": "Read project context (standards, task details, comments)",
     "status": "pending",
-    "activeForm": "Reading project standards"
-  },
-  {
-    "content": "Identify project root directory",
-    "status": "pending",
-    "activeForm": "Identifying project root"
+    "activeForm": "Reading project context"
   },
   {
     "content": "Create git worktree for feature branch",
     "status": "pending",
     "activeForm": "Creating git worktree"
-  },
-  {
-    "content": "Read task details and comments from beads",
-    "status": "pending",
-    "activeForm": "Reading task details"
-  },
-  {
-    "content": "Analyze task and add initial comments",
-    "status": "pending",
-    "activeForm": "Analyzing task"
   },
   {
     "content": "Launch Engineer agent for implementation",
@@ -195,34 +180,19 @@ TodoWrite initial task list (conditional based on `use_worktree`):
 ```json
 [
   {
-    "content": "Validate tickets exist and are open",
+    "content": "Validate tickets and identify project root",
     "status": "in_progress",
-    "activeForm": "Validating tickets"
+    "activeForm": "Validating tickets and locating project root"
   },
   {
-    "content": "Read project standards (AGENTS.md, CLAUDE.md)",
+    "content": "Read project context (standards, task details, comments)",
     "status": "pending",
-    "activeForm": "Reading project standards"
-  },
-  {
-    "content": "Identify project root directory",
-    "status": "pending",
-    "activeForm": "Identifying project root"
+    "activeForm": "Reading project context"
   },
   {
     "content": "Create new branch in main repository",
     "status": "pending",
     "activeForm": "Creating new branch"
-  },
-  {
-    "content": "Read task details and comments from beads",
-    "status": "pending",
-    "activeForm": "Reading task details"
-  },
-  {
-    "content": "Analyze task and add initial comments",
-    "status": "pending",
-    "activeForm": "Analyzing task"
   },
   {
     "content": "Launch Engineer agent for implementation",
@@ -274,55 +244,52 @@ TodoWrite initial task list (conditional based on `use_worktree`):
 
 Note: When `use_worktree = false`, there is no "Clean up git worktree" todo.
 
-### P2: Validate Tickets
+### P2: Validate Tickets & Identify Project Root
 
-For each ticket: `bd show {ticket-id}` → verify exists & status is open/in_progress. If any ticket missing/closed: exit with error.
+**Step 1: Quick validation (fail-fast)**
+
+For each ticket: `bd show {ticket-id} --short` → verify exists & status is open/in_progress. If any ticket missing/closed: exit with error.
 
 Update status: `bd update {ticket-id} --status=in_progress`
 
-**CRITICAL - Log to beads:**
-
-```bash
-bd comments add beads-{first_ticket_id} "## Phase 2: ✅ Completed
-
-Tickets Validated
-
-Tickets validated and status updated to in_progress: {ticket_ids}"
-```
-
-### P3: Read Project Standards
-
-Read from project root (where .beads/ directory is):
-
-- `AGENTS.md` - Quality gates, validation patterns
-- `CLAUDE.md` - Project standards
-- `(docs|specs)/constitution.md` - Project principles (optional)
-
-**CRITICAL - Log to beads:**
-
-```bash
-bd comments add beads-{first_ticket_id} "## Phase 3: ✅ Completed
-
-Project Standards Read
-
-AGENTS.md: {read/not_found}, CLAUDE.md: {read/not_found}, constitution.md: {read/not_found}"
-```
-
-### P4: Identify Project Root
+**Step 2: Identify project root**
 
 Ask user if unclear. Verify: git repo with `.beads/` directory.
 
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 4: ✅ Completed
+bd comments add beads-{first_ticket_id} "## Phase 2: ✅ Completed
 
-Project Root Identified
+Validation & Location
 
-Path: {project_root}"
+Tickets validated and status updated to in_progress: {ticket_ids}
+Project root: {project_root}"
 ```
 
-### P5: Create Git Worktree or Branch (Conditional)
+### P3: Read Project Context (Parallel)
+
+**PERFORMANCE OPTIMIZATION: Execute ALL reads in parallel using multiple tool calls in a single message.**
+
+Read in parallel:
+1. `AGENTS.md` - Quality gates, validation patterns (from project root)
+2. `CLAUDE.md` - Project standards (from project root)
+3. `(docs|specs)/constitution.md` - Project principles (optional, from project root)
+4. `bd show {ticket-id}` - Full task details with description (for each ticket)
+5. `bd comments {ticket-id}` - Task comments (for each ticket)
+
+**CRITICAL - Log to beads:**
+
+```bash
+bd comments add beads-{first_ticket_id} "## Phase 3: ✅ Completed
+
+Project Context Read
+
+Standards: AGENTS.md={read/not_found}, CLAUDE.md={read/not_found}, constitution.md={read/not_found}
+Task details and comments loaded for: {ticket_ids}"
+```
+
+### P4: Create Git Worktree or Branch (Conditional)
 
 **Mode Selection:** Based on `use_worktree` flag from P0.
 
@@ -340,7 +307,7 @@ Set: `work_path = ../worktrees/feature/beads-{first_ticket_id}`
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 5: ✅ Completed
+bd comments add beads-{first_ticket_id} "## Phase 4: ✅ Completed
 
 Git Worktree Created
 
@@ -363,7 +330,7 @@ Set: `work_path = {project_root}`
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 5: ✅ Completed
+bd comments add beads-{first_ticket_id} "## Phase 4: ✅ Completed
 
 Branch Created in Main Repository
 
@@ -372,57 +339,7 @@ Path: {project_root}
 Mode: main-branch"
 ```
 
-### P6: Read Task Details
-
-```bash
-bd show beads-{id}  # for each ticket
-```
-
-Read description, comments, requirements, dependencies.
-
-**CRITICAL - Log to beads:**
-
-```bash
-bd comments add beads-{first_ticket_id} "## Phase 6: ✅ Completed
-
-Task Details Read
-
-Tickets analyzed: {ticket_ids}"
-```
-
-### P7: Analyze & Document
-
-Add Technical Lead analysis to each ticket:
-
-```bash
-bd comments add beads-{id} "## Technical Lead Analysis
-
-### Task Assessment
-{complexity_assessment}
-{estimated_scope}
-{dependencies_noted}
-
-### Implementation Approach
-{suggested_approach}
-{technical_considerations}
-
-### Next Steps
-Ready for Engineer agent to implement"
-```
-
-**CRITICAL - Log to beads:**
-
-```bash
-bd comments add beads-{first_ticket_id} "## Phase 7: ✅ Completed
-
-Technical Lead Analysis Added
-
-Complexity: {complexity}
-Scope: {scope}
-Dependencies: {dependencies}"
-```
-
-### P8: Launch Engineer
+### P5: Launch Engineer
 
 ```
 Task tool → k2-dev:engineer
@@ -446,7 +363,7 @@ IMPORTANT: Stay in work path for all file ops. Do NOT create PR."
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 8: ✅ Completed
+bd comments add beads-{first_ticket_id} "## Phase 5: ✅ Completed
 
 Engineer Implementation Complete
 
@@ -454,7 +371,7 @@ Implementation completed and changes pushed
 Branch: feature/beads-{first_ticket_id}"
 ```
 
-### P9: Create Pull Request
+### P6: Create Pull Request
 
 **Change to work path:** `cd {work_path}`
 
@@ -475,7 +392,7 @@ generate description, create GitHub PR with proper formatting, link tickets, ret
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 9: ✅ Completed
+bd comments add beads-{first_ticket_id} "## Phase 6: ✅ Completed
 
 Pull Request Created
 
@@ -483,7 +400,7 @@ PR: {pr_url}
 Branch: feature/beads-{first_ticket_id}"
 ```
 
-### P10: Launch Reviewer
+### P7: Launch Reviewer
 
 **PERFORMANCE OPTIMIZATION:** Reviewer uses local git diff/log instead of GitHub API during review for faster execution.
 
@@ -531,7 +448,7 @@ The code has been reviewed and validated against project quality gates (AGENTS.m
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 10: ✅ Completed
+bd comments add beads-{first_ticket_id} "## Phase 7: ✅ Completed
 
 Initial Code Review Complete
 
@@ -539,9 +456,9 @@ Review result: {approved/changes_requested}
 Status: {if_approved: 'Approval comment added to PR, ready for merge' | if_changes: 'Feedback received, iterations needed'}"
 ```
 
-### P11: Review Iterations (max 2)
+### P8: Review Iterations (max 2)
 
-Check status: `bd comments beads-{id} | grep "Phase 11, Iteration"`
+Check status: `bd comments beads-{id} | grep "Phase 8, Iteration"`
 
 #### Iteration 1
 
@@ -565,18 +482,18 @@ Fix issues, respond to comments, run quality gates, push changes."
 **CRITICAL - Log iteration 1 to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 11, Iteration 1: ✅ Completed
+bd comments add beads-{first_ticket_id} "## Phase 8, Iteration 1: ✅ Completed
 
 Review Feedback Addressed
 
 Changes pushed and re-review requested"
 ```
 
-**Re-launch Reviewer** (same prompt as P10). The Task tool returns the result automatically. DO NOT call TaskOutput.
+**Re-launch Reviewer** (same prompt as P7). The Task tool returns the result automatically. DO NOT call TaskOutput.
 
 **Parse result:**
 
-- **Approved:** → Add approval comment to PR, then → P12
+- **Approved:** → Add approval comment to PR, then → P9
 - **Changes:** → Iteration 2
 
 **If approved, add comment to GitHub PR:**
@@ -595,7 +512,7 @@ Same process as Iteration 1.
 **CRITICAL - Log iteration 2 to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 11, Iteration 2: ✅ Completed
+bd comments add beads-{first_ticket_id} "## Phase 8, Iteration 2: ✅ Completed
 
 Second Review Feedback Addressed
 
@@ -606,7 +523,7 @@ Changes pushed and final review requested"
 
 **Parse result:**
 
-- **Approved:** → Add approval comment to PR, then → P12
+- **Approved:** → Add approval comment to PR, then → P9
 - **Issues remain:** → Create follow-up tickets
 
 **If approved, add comment to GitHub PR:**
@@ -644,7 +561,7 @@ EOF
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 11 (After Iteration 2): ✅ Completed
+bd comments add beads-{first_ticket_id} "## Phase 8 (After Iteration 2): ✅ Completed
 
 Follow-Up Tickets Created
 
@@ -652,7 +569,7 @@ Follow-up tickets: {ids}
 Decision: {merge_now_or_wait}"
 ```
 
-### P12: Merge & Cleanup
+### P9: Merge & Cleanup
 
 **Merge:**
 
@@ -709,7 +626,7 @@ Skill tool → k2-dev:report (for each ticket-id)
 
 If use_worktree = true:
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 12: ✅ Completed
+bd comments add beads-{first_ticket_id} "## Phase 9: ✅ Completed
 
 Merge and Cleanup Complete
 
@@ -721,7 +638,7 @@ Reports generated"
 
 If use_worktree = false:
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 12: ✅ Completed
+bd comments add beads-{first_ticket_id} "## Phase 9: ✅ Completed
 
 Merge and Cleanup Complete
 
