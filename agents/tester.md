@@ -13,16 +13,19 @@ tools: ["Read", "Grep", "Glob", "Bash"]
 > The Tester agent has been converted to the **Test Planning skill** which executes in the main conversation context for faster execution, easier debugging, and better user experience.
 >
 > **New invocation:**
+>
 > - Via command: `/k2:test` or `/tester`
 > - Via skill: `k2-dev:test-planning`
 >
 > **What changed:**
+>
 > - No longer runs as isolated subagent
 > - Executes in main conversation context
 > - Uses main conversation tools (not its own tool set)
 > - Questions asked directly in main conversation (not via AskUserQuestion in subagent)
 >
 > **Why the change:**
+>
 > - Faster execution (no agent spawning overhead)
 > - Easier debugging (everything in main conversation context)
 > - Direct context access (skill uses main conversation tools)

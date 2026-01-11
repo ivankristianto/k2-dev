@@ -29,6 +29,7 @@ Skill tool with:
 ```
 
 The pr-creation skill provides comprehensive guidance on:
+
 - Analyzing git changes and commit history
 - Reading PR templates
 - Generating well-structured PR descriptions
@@ -39,6 +40,7 @@ The pr-creation skill provides comprehensive guidance on:
 ### 3. Follow Skill Guidance
 
 Follow the instructions from the pr-creation skill to:
+
 - Analyze changes (git log, git diff)
 - Read beads ticket context (bd show, bd comments)
 - Read PR templates if they exist

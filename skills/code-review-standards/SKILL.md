@@ -83,17 +83,64 @@ Code review is a critical quality control process that catches bugs, ensures sta
 
 ### Security
 
-**OWASP Top 10 Check:**
-- [ ] No SQL injection vulnerabilities
-- [ ] No XSS vulnerabilities
-- [ ] No authentication bypass
-- [ ] No broken access control
-- [ ] No security misconfiguration
-- [ ] No sensitive data exposure
-- [ ] No insufficient logging
-- [ ] No insecure deserialization
-- [ ] No components with known vulnerabilities
-- [ ] No unvalidated redirects
+**OWASP Top 10 Security Checklist (Detailed)**
+
+For every PR, validate:
+
+1. **Injection**:
+   - [ ] SQL queries use parameterized statements or ORMs
+   - [ ] NoSQL queries don't use string concatenation
+   - [ ] OS commands don't use unsanitized user input
+   - [ ] LDAP queries are parameterized
+
+2. **Broken Authentication**:
+   - [ ] Passwords are hashed (bcrypt, Argon2)
+   - [ ] Session tokens are secure, random, and expire
+   - [ ] Multi-factor authentication is implemented (if required)
+   - [ ] No credentials in code or config
+
+3. **Sensitive Data Exposure**:
+   - [ ] No API keys, passwords, or secrets in code
+   - [ ] Sensitive data encrypted in transit (HTTPS/TLS)
+   - [ ] Sensitive data encrypted at rest
+   - [ ] No sensitive data in logs or error messages
+
+4. **XML External Entities (XXE)**:
+   - [ ] XML parsing disables external entity processing
+   - [ ] XML libraries are configured securely
+
+5. **Broken Access Control**:
+   - [ ] Authorization checks before sensitive operations
+   - [ ] Users can't access others' data without permission
+   - [ ] Admin functions require admin privileges
+   - [ ] CORS policies are restrictive
+
+6. **Security Misconfiguration**:
+   - [ ] No default passwords or credentials
+   - [ ] Error messages don't leak sensitive info
+   - [ ] Security headers are set (CSP, X-Frame-Options, etc.)
+   - [ ] Unnecessary features/services are disabled
+
+7. **Cross-Site Scripting (XSS)**:
+   - [ ] User input is escaped before rendering
+   - [ ] HTML sanitization is applied to rich content
+   - [ ] Content Security Policy is used
+   - [ ] No `dangerouslySetInnerHTML` or equivalent without sanitization
+
+8. **Insecure Deserialization**:
+   - [ ] Deserialization is from trusted sources only
+   - [ ] Input validation before deserialization
+   - [ ] Type checks on deserialized objects
+
+9. **Using Components with Known Vulnerabilities**:
+   - [ ] Dependencies are up-to-date
+   - [ ] No known CVEs in dependencies
+   - [ ] Dependency versions are locked
+
+10. **Insufficient Logging & Monitoring**:
+    - [ ] Security events are logged
+    - [ ] Errors are logged (without sensitive data)
+    - [ ] Audit trail for sensitive operations
 
 **Input Validation:**
 - [ ] All external input validated
