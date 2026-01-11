@@ -49,12 +49,17 @@ a) **Update TodoWrite:** Mark current todo as completed, next as in_progress
 b) **Log to beads (MANDATORY):**
 
 ```bash
-bd comments add beads-{id} "## Phase {N}: ✅ Completed
+bd comments add beads-{id} "$(cat <<'EOF'
+## Phase {N}: ✅ Completed
 
 {phase_name}
 
-{relevant_details}"
+{relevant_details}
+EOF
+)"
 ```
+
+**CRITICAL**: Always use heredoc (EOF) pattern for bd comments to prevent escaping issues. Never use inline strings with special characters.
 
 **Logging is NOT optional. Every phase MUST be logged to beads.**
 
@@ -259,12 +264,15 @@ Ask user if unclear. Verify: git repo with `.beads/` directory.
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 2: ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 2: ✅ Completed
 
 Validation & Location
 
 Tickets validated and status updated to in_progress: {ticket_ids}
-Project root: {project_root}"
+Project root: {project_root}
+EOF
+)"
 ```
 
 ### P3: Read Project Context (Parallel)
@@ -281,12 +289,15 @@ Read in parallel:
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 3: ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 3: ✅ Completed
 
 Project Context Read
 
 Standards: AGENTS.md={read/not_found}, CLAUDE.md={read/not_found}, constitution.md={read/not_found}
-Task details and comments loaded for: {ticket_ids}"
+Task details and comments loaded for: {ticket_ids}
+EOF
+)"
 ```
 
 ### P4: Create Git Worktree or Branch (Conditional)
@@ -307,13 +318,16 @@ Set: `work_path = ../worktrees/feature/beads-{first_ticket_id}`
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 4: ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 4: ✅ Completed
 
 Git Worktree Created
 
 Branch: feature/beads-{first_ticket_id}
 Path: {work_path}
-Mode: worktree"
+Mode: worktree
+EOF
+)"
 ```
 
 **If use_worktree = false:**
@@ -330,13 +344,16 @@ Set: `work_path = {project_root}`
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 4: ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 4: ✅ Completed
 
 Branch Created in Main Repository
 
 Branch: feature/beads-{first_ticket_id}
 Path: {project_root}
-Mode: main-branch"
+Mode: main-branch
+EOF
+)"
 ```
 
 ### P5: Launch Engineer
@@ -363,12 +380,15 @@ IMPORTANT: Stay in work path for all file ops. Do NOT create PR."
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 5: ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 5: ✅ Completed
 
 Engineer Implementation Complete
 
 Implementation completed and changes pushed
-Branch: feature/beads-{first_ticket_id}"
+Branch: feature/beads-{first_ticket_id}
+EOF
+)"
 ```
 
 ### P6: Create Pull Request
@@ -392,12 +412,15 @@ generate description, create GitHub PR with proper formatting, link tickets, ret
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 6: ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 6: ✅ Completed
 
 Pull Request Created
 
 PR: {pr_url}
-Branch: feature/beads-{first_ticket_id}"
+Branch: feature/beads-{first_ticket_id}
+EOF
+)"
 ```
 
 ### P7: Launch Reviewer
@@ -448,12 +471,15 @@ The code has been reviewed and validated against project quality gates (AGENTS.m
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 7: ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 7: ✅ Completed
 
 Initial Code Review Complete
 
 Review result: {approved/changes_requested}
-Status: {if_approved: 'Approval comment added to PR, ready for merge' | if_changes: 'Feedback received, iterations needed'}"
+Status: {if_approved: 'Approval comment added to PR, ready for merge' | if_changes: 'Feedback received, iterations needed'}
+EOF
+)"
 ```
 
 ### P8: Review Iterations (max 2)
@@ -482,11 +508,14 @@ Fix issues, respond to comments, run quality gates, push changes."
 **CRITICAL - Log iteration 1 to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 8, Iteration 1: ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 8, Iteration 1: ✅ Completed
 
 Review Feedback Addressed
 
-Changes pushed and re-review requested"
+Changes pushed and re-review requested
+EOF
+)"
 ```
 
 **Re-launch Reviewer** (same prompt as P7). The Task tool returns the result automatically. DO NOT call TaskOutput.
@@ -512,11 +541,14 @@ Same process as Iteration 1.
 **CRITICAL - Log iteration 2 to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 8, Iteration 2: ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 8, Iteration 2: ✅ Completed
 
 Second Review Feedback Addressed
 
-Changes pushed and final review requested"
+Changes pushed and final review requested
+EOF
+)"
 ```
 
 **Final Reviewer launch.** The Task tool returns the result automatically. DO NOT call TaskOutput.
@@ -561,12 +593,15 @@ EOF
 **CRITICAL - Log to beads:**
 
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 8 (After Iteration 2): ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 8 (After Iteration 2): ✅ Completed
 
 Follow-Up Tickets Created
 
 Follow-up tickets: {ids}
-Decision: {merge_now_or_wait}"
+Decision: {merge_now_or_wait}
+EOF
+)"
 ```
 
 ### P9: Merge & Cleanup
@@ -582,7 +617,8 @@ gh pr merge {pr_number} --squash
 
 ```bash
 bd update beads-{id} --status=closed  # for each
-bd comments add beads-{id} "Implementation complete!
+bd comments add beads-{id} "$(cat <<'EOF'
+Implementation complete!
 
 ## Pull Request
 PR: {pr_url}
@@ -593,7 +629,9 @@ Review iterations: {count}/2
 {summary}
 
 ## Follow-up Tickets
-{tickets_or_none}"
+{tickets_or_none}
+EOF
+)"
 ```
 
 **Sync:** `bd sync`
@@ -626,26 +664,32 @@ Skill tool → k2-dev:report (for each ticket-id)
 
 If use_worktree = true:
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 9: ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 9: ✅ Completed
 
 Merge and Cleanup Complete
 
 PR merged: {pr_url}
 Tickets closed: {ticket_ids}
 Worktree cleaned up
-Reports generated"
+Reports generated
+EOF
+)"
 ```
 
 If use_worktree = false:
 ```bash
-bd comments add beads-{first_ticket_id} "## Phase 9: ✅ Completed
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Phase 9: ✅ Completed
 
 Merge and Cleanup Complete
 
 PR merged: {pr_url}
 Tickets closed: {ticket_ids}
 Branch deleted
-Reports generated"
+Reports generated
+EOF
+)"
 ```
 
 **User summary:**

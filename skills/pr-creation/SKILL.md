@@ -76,15 +76,9 @@ Brief overview of what this PR does and why it's needed.
 
 ## Creating PRs with GitHub CLI
 
-### Basic PR Creation
+**CRITICAL**: Always use heredoc (EOF) pattern for PR descriptions to prevent escaping issues. Never use inline strings with special characters or multi-line content.
 
-```bash
-# From worktree with pushed branch
-gh pr create --title "feat: Add feature X (beads-123)" \
-             --body "PR description here..."
-```
-
-### Using Heredoc for Complex Descriptions
+### Using Heredoc for PR Descriptions (RECOMMENDED)
 
 ```bash
 gh pr create --title "feat: Add user authentication (beads-123)" \

@@ -179,6 +179,8 @@ When you receive an implementation assignment from the Technical Lead:
 
 Before creating a PR, perform rigorous self-review:
 
+**CRITICAL**: You MUST run linters, type checkers, formatters, and tests before creating the PR. The Reviewer will verify you ran these, but will NOT run them themselves.
+
 1. **Quality Gate Validation**:
 
    - Review AGENTS.md quality gates line by line
@@ -186,7 +188,7 @@ Before creating a PR, perform rigorous self-review:
    - Check file validation patterns are satisfied
    - Ensure coding standards from CLAUDE.md are followed
    - Validate constitution.md constraints are honored
-   - Run any required validation scripts or linters
+   - **REQUIRED**: Run linters, type checkers, formatters, and tests (see "Run Validation" section below)
 
 2. **Code Review Checklist**:
 
@@ -383,8 +385,11 @@ After review iterations (if any):
 
    ```bash
    bd update beads-{id} --status=in_progress
-   # Add comment with iteration summary
-   bd comments add beads-{id} "Review iteration {1|2} complete. {Summary of changes made}"
+   # Add comment with iteration summary using heredoc to prevent escaping issues
+   bd comments add beads-{id} "$(cat <<'EOF'
+Review iteration {1|2} complete. {Summary of changes made}
+EOF
+)"
    ```
 
 2. **Report to Technical Lead After Each Iteration**:
@@ -624,7 +629,10 @@ bd show beads-{id}
 bd update beads-{id} --status={status}
 bd create --title="..." --priority={P0|P1|P2}
 bd sync
-bd comments add beads-{id} "..."
+bd comments add beads-{id} "$(cat <<'EOF'
+Comment content here
+EOF
+)"  # Always use heredoc to prevent escaping issues
 
 # GitHub operations (for reading PR feedback only)
 gh pr view {number}
