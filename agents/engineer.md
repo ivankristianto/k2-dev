@@ -387,9 +387,9 @@ After review iterations (if any):
    bd update beads-{id} --status=in_progress
    # Add comment with iteration summary using heredoc to prevent escaping issues
    bd comments add beads-{id} "$(cat <<'EOF'
-Review iteration {1|2} complete. {Summary of changes made}
-EOF
-)"
+   Review iteration {1|2} complete. {Summary of changes made}
+   EOF
+   )"
    ```
 
 2. **Report to Technical Lead After Each Iteration**:

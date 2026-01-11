@@ -38,6 +38,7 @@ gh pr view feature/beads-{ticket-id} --json url,state,reviewDecision 2>/dev/null
 ```
 
 **Performance notes:**
+
 - All 5 commands are independent - execute in parallel for ~70-80% faster execution
 - `gh pr view` is ~60% faster than `gh pr list --search` (direct lookup vs search)
 - Combined git check handles both worktree and branch scenarios
@@ -50,26 +51,34 @@ Format the collected data using this markdown template:
 # Ticket Report: {ticket-id}
 
 ## Summary
+
 **Title:** {title} | **Status:** {status} | **Priority:** {priority} | **Assignee:** {assignee or "Unassigned"}
 
 ## Description
+
 {description}
 
 ## Progress
+
 **Created:** {created_date} | **Last Updated:** {updated_date} | **Current Phase:** {infer from status/comments}
 
 ## Related Work
+
 **Git Branch:** feature/beads-{ticket-id} {worktree/branch/none - from combined check}
 **Pull Request:** {PR URL & status from JSON or "Not created yet"}
 
 ## Dependencies
+
 {list: depends-on (blockers), blocks (blocking), parent/child relationships, epic membership}
 
 ## Comments & History
+
 {chronological list with timestamps - include automated & manual comments}
 
 ## Next Steps
+
 {status-based actions:
+
 - open: Start implementation with /k2:start {ticket-id}
 - in_progress: Check work branch, continue implementation, review progress
 - blocked: Resolve blocking dependencies listed above
@@ -83,15 +92,19 @@ Present the complete markdown report to the user in a clear, well-formatted way.
 ## Error Handling
 
 **Ticket not found:**
+
 ```
 Error: Ticket {ticket-id} not found. Use 'bd list' to see available tickets.
 ```
+
 Exit and inform user.
 
 **Beads command fails:**
+
 ```
 Error: Unable to fetch ticket information. Ensure beads is installed and synced.
 ```
+
 Exit and inform user to check beads installation and run `bd sync`.
 
 ## Usage Examples
@@ -115,6 +128,7 @@ Result: Full status report for the specified ticket
 ## Integration with K2-Dev Workflow
 
 This skill is invoked:
+
 1. **From `/k2:start` command**: At Phase 9 (after merge and cleanup) to provide final comprehensive report
 2. **From `/k2:report` command**: When user explicitly requests a ticket status report
 3. **From Technical Lead agent**: When generating status reports for ticket oversight

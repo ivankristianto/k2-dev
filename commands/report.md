@@ -23,6 +23,7 @@ args: "{ticket-id}"
 ```
 
 The report skill will:
+
 - Fetch all ticket data in parallel (bd show, bd comments, bd dep list, git worktree/branch check, PR status)
 - Generate a comprehensive structured markdown report
 - Present it to the user with summary, progress, dependencies, comments, and next steps
