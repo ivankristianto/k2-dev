@@ -656,7 +656,13 @@ git checkout main  # or default branch
 
 **Generate reports:**
 
-Reports are available via `/k2:report {ticket-id}` command. Inform the user they can run this command for detailed status reports.
+```
+Use Skill tool to generate comprehensive status reports for each ticket:
+Skill: k2-dev:report
+Args: {ticket-id} (for each completed ticket)
+```
+
+The report skill will fetch all ticket data in parallel (bd show, bd comments, bd dep list, git status, PR status) and present a comprehensive status report to the user.
 
 **CRITICAL - Log to beads:**
 
