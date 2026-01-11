@@ -221,13 +221,14 @@ TodoWrite: Add code review todos
 
    - Use Task tool to invoke reviewer agent with `model="sonnet"`
    - Sonnet required for deep code analysis and security validation
-   - Provide PR URL and quality gate requirements
+   - Provide work path, branch name, base branch, and ticket ID
    - Reviewer will:
-     - Analyze code changes
+     - Use local git diff and git log (no GitHub API during review)
+     - Analyze code changes against base branch
      - Validate against AGENTS.md/CLAUDE.md standards
      - Check for security issues, bugs, and anti-patterns
-     - Provide feedback on GitHub PR
-     - Approve or request changes
+     - Post final review results (approval or feedback) to GitHub PR
+     - Return review summary and approval status
 
 2. **Manage Review Iterations**:
 
@@ -381,9 +382,10 @@ You are the central hub. ALL agent interactions flow through you:
 
 - **When to invoke**: After Engineer creates PR, for code review
 - **Model to use**: `sonnet` - Deep code analysis and security validation required
-- **What to provide**: PR URL, quality gates, project standards
-- **What to expect**: Review feedback, approval or change requests
+- **What to provide**: Work path, branch name, base branch, ticket ID, PR number (for final comment)
+- **What to expect**: Review summary, approval status, and GitHub PR updated with final results
 - **How to invoke**: Use Task tool with "k2-dev:reviewer" and `model="sonnet"`
+- **Performance optimization**: Reviewer uses local git diff/log, not GitHub API during review
 
 ### PR Writer Agent
 

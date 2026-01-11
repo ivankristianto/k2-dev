@@ -485,14 +485,29 @@ Branch: feature/beads-{first_ticket_id}"
 
 ### P10: Launch Reviewer
 
+**PERFORMANCE OPTIMIZATION:** Reviewer uses local git diff/log instead of GitHub API during review for faster execution.
+
 ```
 Task tool → k2-dev:reviewer
 Model: sonnet  # Deep code analysis and security validation required
-Prompt: "Review PR {pr_url}
-Work path: {work_path}
-Quality gates: AGENTS.md, CLAUDE.md, constitution.md
+Prompt: "Review implementation for ticket {ticket-id}
 
-Validate standards, add GitHub comments, add summary to beads."
+**PERFORMANCE MODE - Use local git operations:**
+Work path: {work_path}
+Branch: feature/beads-{first_ticket_id}
+Base branch: {main_or_default}
+PR number: {pr_number} (for final comment only)
+Ticket ID: {ticket-id}
+
+**Review process:**
+1. cd {work_path}
+2. Use local git diff {base_branch}...HEAD (NO GitHub API during review)
+3. Use git log {base_branch}..HEAD for commit context
+4. Validate against AGENTS.md, CLAUDE.md, constitution.md
+5. Post final review results (approval or feedback) to GitHub PR as comment
+6. Add review summary to beads task comments
+
+Quality gates: AGENTS.md, CLAUDE.md, constitution.md"
 ```
 
 **Agent completion:** The Task tool blocks and returns the result automatically when the reviewer completes. Read the approval status from the Task tool response directly. DO NOT call TaskOutput - the output is already in the result.

@@ -52,12 +52,12 @@ k2-dev/
 
 ### Agent Tool Access
 
-| Agent          | Tools                               | Purpose                                |
-| -------------- | ----------------------------------- | -------------------------------------- |
-| Technical Lead | All tools                           | Orchestration, coordination, decisions |
-| Engineer       | Read, Write, Edit, Bash, Grep, Glob | Implementation only                    |
-| Reviewer       | Read, Grep, Glob, Bash              | Read-only review                       |
-| PR Writer      | Read, Write, Bash, Grep, Glob, TodoWrite | Pull request creation                  |
+| Agent          | Tools                               | Purpose                                | Performance Notes |
+| -------------- | ----------------------------------- | -------------------------------------- | ----------------- |
+| Technical Lead | All tools                           | Orchestration, coordination, decisions | - |
+| Engineer       | Read, Write, Edit, Bash, Grep, Glob | Implementation only                    | - |
+| Reviewer       | Read, Grep, Glob, Bash              | Read-only review                       | Uses local git diff/log (no GitHub API during review) |
+| PR Writer      | Read, Write, Bash, Grep, Glob, TodoWrite | Pull request creation                  | - |
 
 **Skills** (execute in main conversation context):
 | Skill | Access Method | Purpose |
@@ -99,6 +99,8 @@ k2-dev optimizes costs by using different Claude models based on task complexity
 5. Engineer implements, self-reviews against AGENTS.md/CLAUDE.md, pushes changes
 6. Technical Lead launches internal PR Writer agent to create PR
 7. Technical Lead launches Reviewer agent to validate code (max 2 iterations)
+   - **PERFORMANCE OPTIMIZATION**: Reviewer uses local `git diff` and `git log` instead of GitHub API during review
+   - Final review results posted to GitHub PR as single comprehensive comment
 8. Technical Lead merges, closes tickets, syncs beads, removes worktree (or deletes branch if using `--skip-worktree`)
 
 **Why PR Creation Uses Internal Subagent:**
