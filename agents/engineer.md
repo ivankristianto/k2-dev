@@ -292,6 +292,7 @@ After self-review is complete and all validations pass:
    ```
 
 **IMPORTANT**: Do NOT create the PR yourself. The Technical Lead will create the PR in the main context using the pr-creation skill to avoid hallucinations and ensure proper PR structure.
+**CRITICAL**: Do NOT CLOSE the beads task or PR yourself. You just do handover to the technical lead.
 
 ### Phase 5: Responding to Review Feedback
 
