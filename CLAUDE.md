@@ -40,6 +40,7 @@ k2-dev/
 ├── skills/                   # Knowledge domains and active workflows
 │   ├── planner/             # Planning skill (main context execution)
 │   ├── tester/              # Test Planning skill (main context execution)
+│   ├── report/              # Report skill (status report generation)
 │   ├── beads-integration/   # Beads CLI patterns
 │   ├── git-worktree-workflow/ # Git worktree management
 │   ├── quality-gates/       # Enforcing standards
@@ -64,6 +65,7 @@ k2-dev/
 | ------------------ | ------------- | -------------------------------------- |
 | Planning | `/k2:planner` | Requirements analysis, task creation |
 | Test Planning | `/k2:test` | Test strategy, test case definition |
+| Report Generation | `/k2:report` or invoked from `/k2:start` Phase 9 | Comprehensive ticket status reports |
 
 ### Model Optimization Strategy
 
