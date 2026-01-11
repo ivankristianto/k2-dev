@@ -163,6 +163,11 @@ TodoWrite initial task list (conditional based on `use_worktree`):
     "activeForm": "Review iteration 2"
   },
   {
+    "content": "Add approval comment to GitHub PR",
+    "status": "pending",
+    "activeForm": "Adding approval comment to PR"
+  },
+  {
     "content": "Merge approved pull request",
     "status": "pending",
     "activeForm": "Merging pull request"
@@ -243,6 +248,11 @@ TodoWrite initial task list (conditional based on `use_worktree`):
     "content": "Review iteration 2: Address final feedback (if needed)",
     "status": "pending",
     "activeForm": "Review iteration 2"
+  },
+  {
+    "content": "Add approval comment to GitHub PR",
+    "status": "pending",
+    "activeForm": "Adding approval comment to PR"
   },
   {
     "content": "Merge approved pull request",
@@ -489,8 +499,19 @@ Validate standards, add GitHub comments, add summary to beads."
 
 **Parse result:**
 
-- **Approved:** → P12 (merge)
+- **Approved:** → P11a (add approval comment to PR), then → P12 (merge)
 - **Changes requested:** → P11 (iterations)
+
+**If approved, add comment to GitHub PR:**
+
+```bash
+cd {work_path}
+gh pr comment {pr_number} --body "✅ Code review approved by k2-dev Reviewer agent.
+
+The code has been reviewed and validated against project quality gates (AGENTS.md, CLAUDE.md). Ready for merge."
+```
+
+**Why comment instead of approve?** GitHub doesn't allow approving your own PR. We add a comment to document the Reviewer agent's approval, then proceed to merge.
 
 **CRITICAL - Log to beads:**
 
@@ -500,7 +521,7 @@ bd comments add beads-{first_ticket_id} "## Phase 10: ✅ Completed
 Initial Code Review Complete
 
 Review result: {approved/changes_requested}
-Status: {if_approved: 'Ready for merge' | if_changes: 'Feedback received, iterations needed'}"
+Status: {if_approved: 'Approval comment added to PR, ready for merge' | if_changes: 'Feedback received, iterations needed'}"
 ```
 
 ### P11: Review Iterations (max 2)
@@ -540,8 +561,17 @@ Changes pushed and re-review requested"
 
 **Parse result:**
 
-- **Approved:** → P12
+- **Approved:** → Add approval comment to PR, then → P12
 - **Changes:** → Iteration 2
+
+**If approved, add comment to GitHub PR:**
+
+```bash
+cd {work_path}
+gh pr comment {pr_number} --body "✅ Re-review approved by k2-dev Reviewer agent (Iteration 1).
+
+Feedback has been addressed. Code validated against quality gates. Ready for merge."
+```
 
 #### Iteration 2
 
@@ -561,8 +591,17 @@ Changes pushed and final review requested"
 
 **Parse result:**
 
-- **Approved:** → P12
+- **Approved:** → Add approval comment to PR, then → P12
 - **Issues remain:** → Create follow-up tickets
+
+**If approved, add comment to GitHub PR:**
+
+```bash
+cd {work_path}
+gh pr comment {pr_number} --body "✅ Final review approved by k2-dev Reviewer agent (Iteration 2).
+
+All feedback has been addressed. Code validated against quality gates. Ready for merge."
+```
 
 #### Follow-Up Tickets (after 2 iterations with issues)
 
