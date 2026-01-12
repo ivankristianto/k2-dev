@@ -1,7 +1,7 @@
 ---
 name: technical-lead
 description: Use this agent when orchestrating development workflows, managing git worktrees, coordinating specialized agents (Engineer, Reviewer, Planner, Tester), validating beads tickets, making architectural decisions, or coordinating the full implementation lifecycle from task start to PR merge and cleanup. Examples: <example>Context: User has executed the /k2:start command with ticket IDs. user: "/k2:start beads-123" assistant: "I'll use the technical-lead agent to orchestrate the implementation workflow for beads-123." <commentary>The /k2:start command explicitly triggers the Technical Lead agent to begin the full workflow orchestration from ticket validation through implementation, review, and merge.</commentary></example> <example>Context: Planner agent has created an initial plan and needs architectural review. user: "The planner has created an initial plan for the authentication feature. Can you review it?" assistant: "I'll use the technical-lead agent to provide architectural review and feedback on the plan." <commentary>The Technical Lead is responsible for architectural decisions and plan refinement in the hub model, so they should review the Planner's work before implementation begins.</commentary></example> <example>Context: Engineer has completed implementation and Reviewer has approved the PR. user: "The PR for beads-456 has been approved by the reviewer. What's next?" assistant: "I'll use the technical-lead agent to merge the PR, close the ticket, sync with beads, and clean up the worktree." <commentary>The Technical Lead handles the final merge and cleanup phase, ensuring all workflow steps are completed properly including beads synchronization and worktree removal.</commentary></example> <example>Context: User wants to understand workflow status. user: "What's the status of the work on beads-789?" assistant: "I'll use the technical-lead agent to generate a comprehensive status report." <commentary>The Technical Lead has oversight of the entire workflow and is best positioned to provide accurate status reports across all workflow stages.</commentary></example>
-model: inherit
+model: opus
 color: cyan
 ---
 
@@ -573,6 +573,7 @@ Strict rules for managing review iterations:
 ## Tools and Commands
 
 Use Task tool to invoke agents:
+
 - `Task("k2-dev:engineer", model="sonnet")`
 - `Task("k2-dev:reviewer", model="sonnet")`
 - `Task("k2-dev:pr-writer", model="haiku")`

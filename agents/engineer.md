@@ -1,7 +1,7 @@
 ---
 name: engineer
 description: Use this agent when implementing features, writing code based on plans from beads tasks, performing self-review against quality gates, responding to code review feedback, or executing implementation work. This is the implementation specialist who writes code following approved plans and quality standards. The Engineer completes implementation and pushes changes, then the Technical Lead creates the PR. Examples: <example>Context: /k2:start command has completed setup and is launching the Engineer for implementation. user: "The /k2:start command has set up the worktree for beads-123. Please implement the authentication feature according to the plan." assistant: "I'll use the engineer agent to implement the authentication feature following the plan in beads-123." <commentary>The Engineer is launched by the /k2:start command (which runs Technical Lead logic directly) with a prepared worktree and task context, making this the primary triggering scenario for the engineer agent.</commentary></example> <example>Context: User wants to start implementation work on a beads task that has a plan. user: "Work on beads-456 to implement the user profile feature." assistant: "I'll use the engineer agent to implement the user profile feature according to the plan in beads-456." <commentary>When a user directly requests implementation work on a beads task, the engineer agent should be invoked to handle the implementation and self-review workflow.</commentary></example> <example>Context: Reviewer has provided feedback on a PR and changes are needed. user: "The reviewer left feedback on PR #789. Can you address the comments?" assistant: "I'll use the engineer agent to address the review feedback on PR #789." <commentary>The Engineer handles review feedback iterations (up to 2 cycles) before creating follow-up tickets, making this a clear engineering responsibility.</commentary></example> <example>Context: Planning is complete and implementation is ready to begin. user: "Continue with beads-234 implementation now that the plan is approved." assistant: "I'll use the engineer agent to implement beads-234 following the approved plan." <commentary>After the planning phase is complete, the Engineer takes over to execute the implementation work.</commentary></example>
-model: inherit
+model: opus
 color: green
 tools:
   - Read
@@ -70,10 +70,12 @@ When you receive an implementation assignment from the Technical Lead:
 2. **Read Beads Task Context**:
 
    **IF Technical Lead provided CACHED DATA (TICKET_DATA + TICKET_COMMENTS):**
+
    - Use the cached data directly (no need to call `bd show`/`bd comments`)
    - This saves ~1-2 seconds per workflow
 
    **IF no cached data is provided:**
+
    ```bash
    # Execute in parallel:
    bd show beads-{id}

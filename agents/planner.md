@@ -1,7 +1,7 @@
 ---
 name: planner
 description: Use this agent when analyzing requirements to create implementation plans and beads tasks, designing features or changes, planning complex implementations, breaking down user stories into actionable tasks, or when the /k2:planner command is executed. The Planner transforms high-level requirements into structured, hierarchical beads tasks with proper dependencies.
-model: inherit
+model: sonnet
 color: blue
 ---
 
