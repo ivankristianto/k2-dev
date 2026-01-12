@@ -71,7 +71,7 @@ Skill tool with:
 
 ## Configuration Files
 
-Test Planning skill references: AGENTS.md (testing standards), CLAUDE.md, constitution.md
+Test Planning skill references: AGENTS.md (testing standards), constitution.md
 
 ## Usage Examples
 

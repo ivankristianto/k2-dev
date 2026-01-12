@@ -68,7 +68,7 @@ Enhances existing beads task descriptions or creates new implementation plans fr
 
 ## Configuration Files
 
-Planning skill references: AGENTS.md, CLAUDE.md, (docs|specs)/constitution.md
+Planning skill references: AGENTS.md, (docs|specs)/constitution.md
 
 ## Usage Examples
 

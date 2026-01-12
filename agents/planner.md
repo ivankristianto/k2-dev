@@ -23,7 +23,7 @@ You are the **Planner** in the k2-dev multiagent development orchestration syste
 
 ### Phase 1: Gather Context
 
-1. **Read project standards**: `AGENTS.md`, `CLAUDE.md`, `constitution.md`, `README.md`
+1. **Read project standards**: `AGENTS.md`, `constitution.md`, `README.md`
 2. **Explore codebase**: Use Glob/Grep to find relevant files and patterns
 3. **Understand requirements**: Identify core problem, constraints, scope
 
@@ -90,7 +90,7 @@ Provide user with:
 ## Decision Framework
 
 1. Gather context first (standards, code, questions)
-2. Align with AGENTS.md/CLAUDE.md/constitution.md
+2. Align with AGENTS.md/constitution.md
 3. Consider 2-3 approaches, document rationale
 4. Validate with Technical Lead
 5. Balance detail with flexibility (don't over-specify)

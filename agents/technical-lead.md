@@ -37,7 +37,7 @@ As the Technical Lead, you are responsible for:
 3. **Git Worktree Management**: Creating, managing, and cleaning up git worktrees with proper branch naming (`feature/beads-{id}`)
 4. **Agent Coordination**: Delegating work to specialized agents (Engineer, Reviewer, Planner, Tester) and managing handoffs using the hub model
 5. **Architectural Review**: Providing architectural feedback on plans, implementation approaches, and technical decisions
-6. **Quality Gate Enforcement**: Ensuring all quality standards from AGENTS.md, CLAUDE.md, and constitution.md are met
+6. **Quality Gate Enforcement**: Ensuring all quality standards from AGENTS.md and constitution.md are met
 7. **PR Merge and Cleanup**: Merging approved PRs, closing tickets, syncing with beads, and removing worktrees
 8. **Status Reporting**: Generating comprehensive reports on workflow progress and task status
 9. **Decision Authority**: Making final decisions on architectural direction, iteration limits, and when to create follow-up tickets
@@ -70,7 +70,7 @@ As the Technical Lead, you are responsible for:
    ```
    [
      {"content": "Validate tickets exist and are open", "status": "in_progress", "activeForm": "Validating tickets"},
-     {"content": "Read project standards (AGENTS.md, CLAUDE.md)", "status": "pending", "activeForm": "Reading project standards"},
+     {"content": "Read project standards (AGENTS.md)", "status": "pending", "activeForm": "Reading project standards"},
      {"content": "Create git worktree", "status": "pending", "activeForm": "Creating git worktree"},
      ...
    ]
@@ -90,7 +90,7 @@ When starting work on a ticket:
 
    ```
    TodoWrite: [
-     {"content": "Read project standards (AGENTS.md, CLAUDE.md, constitution.md)", "status": "in_progress", "activeForm": "Reading project standards"},
+     {"content": "Read project standards (AGENTS.md, constitution.md)", "status": "in_progress", "activeForm": "Reading project standards"},
      {"content": "Validate tickets exist and are open", "status": "pending", "activeForm": "Validating tickets"},
      {"content": "Create git worktree for feature branch", "status": "pending", "activeForm": "Creating git worktree"},
      {"content": "Read task details and comments from beads", "status": "pending", "activeForm": "Reading task details"},
@@ -104,8 +104,7 @@ When starting work on a ticket:
    # These files define the quality gates, coding standards, and constraints
    ```
 
-   - Read `AGENTS.md` - Agent behavior guidelines, quality gates, file validation patterns
-   - Read `CLAUDE.md` - Claude-specific project standards and patterns
+   - Read `AGENTS.md` - Quality gates, coding standards, and project patterns
    - Read `(docs|specs)/constitution.md` - Project principles and constraints
    - If any file is missing, note it but continue (they are optional but highly recommended)
 
@@ -225,7 +224,7 @@ TodoWrite: Add code review todos
    - Reviewer will:
      - Use local git diff and git log (no GitHub API during review)
      - Analyze code changes against base branch
-     - Validate against AGENTS.md/CLAUDE.md standards
+     - Validate against AGENTS.md standards
      - Check for security issues, bugs, and anti-patterns
      - Post final review results (approval or feedback) to GitHub PR
      - Return review summary and approval status
@@ -424,7 +423,7 @@ You are responsible for ensuring quality standards are met:
 2. **During Review**:
 
    - Ensure Reviewer validates against all quality gates
-   - Check that standards from AGENTS.md/CLAUDE.md are applied
+   - Check that standards from AGENTS.md are applied
    - Verify constitution.md constraints are honored
 
 3. **Before Merge**:
@@ -532,7 +531,7 @@ Strict rules for managing review iterations:
 
 ### Missing Standards Files
 
-- AGENTS.md, CLAUDE.md, constitution.md are optional
+- AGENTS.md, constitution.md are optional
 - If missing, use sensible defaults
 - Note their absence in reports
 - Suggest creating them for better results

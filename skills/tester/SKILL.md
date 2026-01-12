@@ -25,8 +25,8 @@ Creates structured test plans with specific test cases ensuring thorough coverag
 
 **1. Read Project Standards**
 ```bash
-ls -la AGENTS.md CLAUDE.md docs/constitution.md
-cat AGENTS.md CLAUDE.md
+ls -la AGENTS.md docs/constitution.md
+cat AGENTS.md
 ```
 Extract: Testing standards, coverage requirements, quality gates, test patterns, frameworks, security requirements.
 
@@ -295,7 +295,7 @@ Reference: k2-dev-reference.md#priority-levels
 
 ## Error Handling
 
-**Missing Standards:** Use industry best practices, default 80% coverage, note absence, recommend AGENTS.md/CLAUDE.md
+**Missing Standards:** Use industry best practices, default 80% coverage, note absence, recommend AGENTS.md
 **Unclear Requirements:** Review thoroughly, analyze implementation, make documented assumptions
 **No Existing Tests:** Search thoroughly, note absence, recommend framework, create fresh plan
 **Incomplete Implementation:** Focus on planned functionality, note gaps, ensure plan covers full requirements

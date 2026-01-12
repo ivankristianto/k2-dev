@@ -1,6 +1,6 @@
 ---
 name: Quality Gates
-description: This skill should be used when the user asks to "check quality gates", "validate against standards", "read AGENTS.md", "enforce CLAUDE.md patterns", "follow constitution.md", "validate code quality", or needs guidance on quality standards enforcement in k2-dev workflows.
+description: This skill should be used when the user asks to "check quality gates", "validate against standards", "read AGENTS.md", "enforce project patterns", "follow constitution.md", "validate code quality", or needs guidance on quality standards enforcement in k2-dev workflows.
 version: 0.2.0
 ---
 
@@ -12,7 +12,6 @@ Quality gates are project-defined standards that all code changes must meet. In 
 
 **Configuration Files:**
 - **AGENTS.md** - Quality standards, file validation patterns, agent guidelines
-- **CLAUDE.md** - Claude-specific project standards and coding patterns
 - **constitution.md** - Core principles and immutable constraints
 
 **Reference:** See k2-dev-reference.md#quality-standards-files for overview.
@@ -71,28 +70,16 @@ Blocking: Security vulnerabilities, logic errors, performance regressions
 Non-Blocking: Style preferences, naming suggestions, refactoring opportunities
 ```
 
-### CLAUDE.md Structure
+### AGENTS.md Structure
 
-Defines Claude-specific patterns:
-- Project architecture patterns
-- Preferred libraries and tools
-- File organization conventions
-- Coding style preferences
-- Integration patterns
+Located at project root, defines all quality standards:
+- Quality gate thresholds (type checking, test coverage, linting)
+- File validation patterns (which files trigger validation)
+- Coding standards and review criteria
+- Agent behavioral guidelines
+- Project-specific patterns and conventions
 
-**Example:**
-```markdown
-## Architecture
-- API Layer: Express.js for REST APIs, routes in `api/routes/`
-- Data Layer: TypeORM, entities in `src/entities/`
-- Testing: Jest for unit/integration, test files colocated
-
-## Coding Patterns
-- Error Handling: Return `{ success: boolean, data?, error? }`
-- API Responses: Standard APIResponse<T> interface
-```
-
-### constitution.md Structure
+**Example sections:**
 
 Defines immutable principles:
 - Core project values
@@ -122,11 +109,10 @@ All agents must read configuration:
 
 ```bash
 # Check files exist
-ls -la AGENTS.md CLAUDE.md constitution.md
+ls -la AGENTS.md constitution.md
 
 # Read files
 cat AGENTS.md
-cat CLAUDE.md
 cat constitution.md
 ```
 
@@ -148,9 +134,8 @@ Reference configuration throughout:
 
 ### Before Self-Review
 
-Engineer validates against all three files:
-- AGENTS.md quality gates
-- CLAUDE.md patterns
+Engineer validates against both files:
+- AGENTS.md quality gates and patterns
 - constitution.md principles
 
 ## Validation Workflow
@@ -163,8 +148,6 @@ Engineer validates against all three files:
 - [ ] Linting passes
 - [ ] Security checks pass
 - [ ] File patterns match
-
-**From CLAUDE.md:**
 - [ ] Follows project architecture
 - [ ] Uses preferred libraries
 - [ ] Matches coding patterns
@@ -182,7 +165,7 @@ Reviewer checks compliance:
 
 ```bash
 # Read configuration
-cat AGENTS.md CLAUDE.md constitution.md
+cat AGENTS.md constitution.md
 
 # Review changes
 git diff main...feature/beads-123
@@ -298,14 +281,14 @@ vi src/auth.ts
 ## Best Practices
 
 ### DO
-✅ Read configuration first: `cat AGENTS.md CLAUDE.md constitution.md`
+✅ Read configuration first: `cat AGENTS.md constitution.md`
 ✅ Validate early and often during implementation
 ✅ Understand rationale for each standard
 ✅ Ask for clarification if standard is unclear
 ✅ Document exceptions with rationale and mitigation
 
 ### DON'T
-❌ Skip reading AGENTS.md, CLAUDE.md, constitution.md
+❌ Skip reading AGENTS.md, constitution.md
 ❌ Bypass quality gates (disable checks, commit --no-verify, merge failing PRs)
 ❌ Ignore warnings (address linting warnings, test failures, type errors)
 ❌ Negotiate immutable constraints (constitution.md is non-negotiable)
@@ -341,12 +324,11 @@ Non-Blocking: Style preferences
 **Engineer:**
 - Reads configuration at start
 - Validates during implementation
-- Self-reviews against all three files
+- Self-reviews against both files
 - Only creates PR when all gates pass
 
 **Reviewer:**
 - Validates against AGENTS.md standards
-- Checks CLAUDE.md pattern compliance
 - Ensures constitution.md principles upheld
 - Categorizes issues by severity (P0/P1/P2)
 

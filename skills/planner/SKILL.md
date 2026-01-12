@@ -25,8 +25,8 @@ Transforms user requirements into actionable beads tasks with proper hierarchies
 
 **1. Read Project Standards**
 ```bash
-ls -la AGENTS.md CLAUDE.md docs/constitution.md
-cat AGENTS.md CLAUDE.md
+ls -la AGENTS.md docs/constitution.md
+cat AGENTS.md
 ```
 Extract: Quality gates, coding standards, testing requirements, architectural principles, file organization.
 
@@ -114,7 +114,7 @@ Feedback needed on:
 - Risks or concerns?
 - Task breakdown appropriate?
 - Dependencies sound?
-- Meets quality standards (AGENTS.md/CLAUDE.md)?"
+- Meets quality standards (AGENTS.md)?"
 ```
 
 **Incorporate Feedback:**
@@ -213,7 +213,7 @@ bd list --filter=parent:beads-{epic_id}
 ## Decision-Making Framework
 
 1. **Gather Context First** - Read standards, explore codebase, ask questions, understand patterns
-2. **Align with Standards** - AGENTS.md (quality), CLAUDE.md (coding), constitution.md (constraints), existing code (patterns)
+2. **Align with Standards** - AGENTS.md (quality), constitution.md (constraints), existing code (patterns)
 3. **Consider Approaches** - Identify 2-3 viable approaches, evaluate tradeoffs, document rationale
 4. **Validate with Tech Lead** - Present approach, be receptive to feedback, adjust based on guidance
 5. **Balance Detail** - Provide implementation clarity, allow Engineer flexibility, focus on architecture
@@ -243,7 +243,7 @@ bd list --filter=parent:beads-{epic_id}
 
 ## Error Handling
 
-**Missing Standards:** Ask user, use industry best practices, note absence, recommend creating AGENTS.md/CLAUDE.md
+**Missing Standards:** Ask user, use industry best practices, note absence, recommend creating AGENTS.md
 **Unclear Requirements:** Ask targeted questions, make documented assumptions, validate with user
 **Conflicting Requirements:** Identify conflicts, present tradeoffs, ask for prioritization
 **Tech Lead Disagrees:** Listen, understand reasoning, adjust plan, defer to expertise, document decision

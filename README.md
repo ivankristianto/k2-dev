@@ -22,7 +22,7 @@ k2-dev simulates a complete development team with specialized agents and skills:
 
 - 🎯 **Task-Driven Development**: Integrated with beads task management
 - 🌲 **Git Worktree Workflow**: Isolated workspaces for each task
-- ✅ **Quality Gates**: Enforces standards from AGENTS.md and CLAUDE.md
+- ✅ **Quality Gates**: Enforces standards from AGENTS.md
 - 🔄 **Structured Workflows**: Planning → Implementation → PR Creation → Review → Merge
 - 📋 **Automated Reporting**: Track progress and generate status reports
 - 🧪 **Test Planning**: Automated test strategy and coverage planning
@@ -35,7 +35,6 @@ k2-dev simulates a complete development team with specialized agents and skills:
 - Git with worktree support
 - Project configuration files (optional but recommended):
   - `AGENTS.md` - Agent behavior guidelines
-  - `CLAUDE.md` - Claude-specific project standards
   - `constitution.md` - Project principles and constraints
 
 ## Installation
@@ -155,7 +154,7 @@ Check system prerequisites and project configuration.
 **What it checks:**
 
 - **System Prerequisites**: Verifies `bd` (beads), `bv` (beads_viewer), `gh` (GitHub CLI), and `git` with worktree support are installed
-- **Project Configuration**: Checks for `AGENTS.md`, `CLAUDE.md`, and `constitution.md` files
+- **Project Configuration**: Checks for `AGENTS.md` and `constitution.md` files
 - **Beads Setup**: Validates `.beads/` directory and beads operational status
 - **Beads Task Statistics**: Analyzes task health (open/closed/tombstone counts) and suggests maintenance with `bd compact` if needed
 
@@ -200,7 +199,7 @@ Check system prerequisites and project configuration.
 - **Role**: Code quality validator
 - **Responsibilities**:
   - Review code changes for quality and security
-  - Validate against AGENTS.md/CLAUDE.md standards
+  - Validate against AGENTS.md standards
   - Provide feedback on GitHub PRs
   - No code changes (review only)
 - **Tools**: Read, Grep, Glob, Bash (read-only operations)
@@ -271,9 +270,9 @@ Validate these file types before changes:
 ...
 ```
 
-#### CLAUDE.md (Project Root)
+#### AGENTS.md (Project Root)
 
-Claude-specific project standards and patterns.
+Project standards and patterns, including quality gates, coding standards, and agent guidelines.
 
 #### constitution.md (Project Root)
 
@@ -303,7 +302,7 @@ PR Writer:
     ↓
 Reviewer:
   - Reviews code changes
-  - Validates against AGENTS.md/CLAUDE.md
+  - Validates against AGENTS.md
   - Provides feedback on GitHub PR
     ↓
 [Iteration: max 2 times]
@@ -351,7 +350,7 @@ Planning Skill:
 Validates file changes against quality gates before Write/Edit operations.
 
 - Checks file patterns defined in AGENTS.md
-- Enforces project standards from CLAUDE.md
+- Enforces project standards from AGENTS.md
 - Blocks non-compliant changes
 
 ### Stop Hook
@@ -368,7 +367,7 @@ Runs cleanup on session end:
 2. **Keep beads tasks updated** with clear descriptions and plans
 3. **Use hierarchical tasks** for complex features
 4. **Set dependencies** between tasks to maintain order
-5. **Review AGENTS.md/CLAUDE.md** regularly and keep them current
+5. **Review AGENTS.md** regularly and keep it current
 6. **Follow PR templates** for consistency
 7. **Create follow-up tickets** rather than extending reviews beyond 2 iterations
 
@@ -390,7 +389,7 @@ Runs cleanup on session end:
 
 - Review AGENTS.md file patterns
 - Check if files match validation patterns
-- Verify standards in CLAUDE.md are achievable
+- Verify standards in AGENTS.md are achievable
 
 ### Agent Coordination Issues
 

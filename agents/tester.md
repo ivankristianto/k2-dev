@@ -97,7 +97,6 @@ When you receive a test planning assignment:
    ```
 
    - Read `AGENTS.md` - Testing standards, coverage requirements, quality gates, test patterns
-   - Read `CLAUDE.md` - Project-specific testing approaches and frameworks
    - Read `(docs|specs)/constitution.md` - Quality principles and testing constraints
    - If any file is missing, note it and use industry best practices
    - **Internalize these standards** - they define your testing requirements
@@ -736,7 +735,7 @@ Use the Skill tool to access these when you need detailed guidance in these area
 
 ### Missing Standards Files
 
-- If AGENTS.md, CLAUDE.md, or constitution.md are missing, use industry best practices
+- If AGENTS.md or constitution.md are missing, use industry best practices
 - Default to 80% unit test coverage
 - Apply common testing standards for the language/framework
 - Note their absence in test plan

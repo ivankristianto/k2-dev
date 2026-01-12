@@ -30,7 +30,6 @@ Code review is a critical quality control process that catches bugs, ensures sta
 
 **Pass 3: Standards Validation**
 - Validate against AGENTS.md quality gates
-- Check CLAUDE.md pattern compliance
 - Verify constitution.md principles
 - Ensure project standards followed
 
@@ -218,8 +217,6 @@ For every PR, validate:
 - [ ] File patterns follow conventions
 - [ ] Code review standards met
 - [ ] Testing requirements satisfied
-
-**CLAUDE.md Compliance:**
 - [ ] Architectural patterns followed
 - [ ] Preferred libraries used
 - [ ] File organization correct
@@ -386,7 +383,7 @@ Merging this PR to maintain forward progress. Critical issues tracked in P0 tick
 ```bash
 bd show beads-123
 bd comments beads-123
-cat AGENTS.md CLAUDE.md constitution.md
+cat AGENTS.md constitution.md
 ```
 
 2. **Review code:**
@@ -444,7 +441,7 @@ Beginning review of PR #456 for beads-123.
 Will be checking:
 ✓ Code quality and logic
 ✓ Security vulnerabilities
-✓ Standards compliance (AGENTS.md, CLAUDE.md, constitution.md)
+✓ Standards compliance (AGENTS.md, constitution.md)
 ✓ Test coverage
 ✓ Documentation
 
@@ -466,7 +463,6 @@ Great work on this implementation! All quality gates pass.
 
 ### Standards Validation
 ✅ AGENTS.md quality gates pass
-✅ CLAUDE.md patterns followed
 ✅ constitution.md principles upheld
 
 Ready to merge!

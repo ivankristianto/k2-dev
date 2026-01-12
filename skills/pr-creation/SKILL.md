@@ -169,7 +169,7 @@ Implements JWT authentication as specified in beads-123.
 ## References
 - Implements: beads-123
 - Follows: AGENTS.md authentication standards
-- Architecture: CLAUDE.md section on API middleware
+- Architecture: AGENTS.md section on API middleware
 - Security: constitution.md password handling requirements
 EOF
 )"

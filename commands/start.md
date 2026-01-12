@@ -282,8 +282,7 @@ Ask user if unclear. Verify: git repo with `.beads/` directory.
 Read in parallel:
 
 1. `AGENTS.md` - Quality gates, validation patterns (from project root)
-2. `CLAUDE.md` - Project standards (from project root)
-3. `(docs|specs)/constitution.md` - Project principles (optional, from project root)
+2. `(docs|specs)/constitution.md` - Project principles (optional, from project root)
 4. **USE CACHED `TICKET_DATA`** - Task details (from P2, no re-fetch)
 5. **USE CACHED `TICKET_COMMENTS`** - Task comments (from P2, no re-fetch)
 
@@ -325,7 +324,7 @@ bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
 **Project root:** {project_root}
 **Branch:** feature/beads-{first_ticket_id}
 **Path:** {work_path}
-**Standards:** AGENTS.md, CLAUDE.md, constitution.md loaded
+**Standards:** AGENTS.md, constitution.md loaded
 
 Ready for implementation.
 EOF
@@ -340,7 +339,7 @@ Model: sonnet  # Complex implementation requires deep reasoning
 Prompt: "Implement tickets: {ticket_ids}
 Work path: {work_path}
 Project root: {project_root}
-Standards: AGENTS.md, CLAUDE.md, constitution.md
+Standards: AGENTS.md, constitution.md
 
 CACHED DATA (from Technical Lead - no need to re-fetch):
 - TICKET_DATA: {ticket_details_from_cache}
@@ -398,11 +397,11 @@ Ticket ID: {ticket-id}
 1. cd {work_path}
 2. Use local git diff {base_branch}...HEAD (NO GitHub API during review)
 3. Use git log {base_branch}..HEAD for commit context
-4. Validate against AGENTS.md, CLAUDE.md, constitution.md
+4. Validate against AGENTS.md, constitution.md
 5. Post final review results (approval or feedback) to GitHub PR as comment
 6. Add review summary to beads task comments
 
-Quality gates: AGENTS.md, CLAUDE.md, constitution.md"
+Quality gates: AGENTS.md, constitution.md"
 ```
 
 **Agent completion:** The Task tool blocks and returns the result automatically when the reviewer completes. Read the approval status from the Task tool response directly. DO NOT call TaskOutput - the output is already in the result.
@@ -418,7 +417,7 @@ Quality gates: AGENTS.md, CLAUDE.md, constitution.md"
 cd {work_path}
 gh pr comment {pr_number} --body "✅ Code review approved by k2-dev Reviewer agent.
 
-The code has been reviewed and validated against project quality gates (AGENTS.md, CLAUDE.md). Ready for merge."
+The code has been reviewed and validated against project quality gates (AGENTS.md). Ready for merge."
 ```
 
 **Why comment instead of approve?** GitHub doesn't allow approving your own PR. We add a comment to document the Reviewer agent's approval, then proceed to merge.
@@ -627,7 +626,7 @@ Args: {ticket-id}
 
 ## Configuration
 
-**Quality gates:** AGENTS.md, CLAUDE.md, constitution.md
+**Quality gates:** AGENTS.md, constitution.md
 **Branch naming:** Single: `feature/beads-123`, Multiple: `feature/beads-123` (first ID)
 **Review limit:** Max 2 iterations → then create follow-up tickets (P0/P1/P2)
 **Workflow modes:**

@@ -34,7 +34,6 @@ Check for these files in the project root:
 
 **Recommended (but optional):**
 - `AGENTS.md` - Agent behavior guidelines and quality gates
-- `CLAUDE.md` - Claude-specific project standards
 - `constitution.md` - Project principles and constraints
 
 **Checks to perform:**
@@ -83,7 +82,6 @@ Provide a clear diagnostic report:
 
 ✅ Project Configuration
   ✓ AGENTS.md - Present (1,234 bytes)
-  ✓ CLAUDE.md - Present (5,678 bytes)
   ⚠ constitution.md - Missing (optional)
 
 ✅ Beads Setup
