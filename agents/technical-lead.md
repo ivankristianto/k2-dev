@@ -234,7 +234,7 @@ TodoWrite: Add code review todos
    - **Maximum 2 review iterations** per ticket
    - Track iteration count carefully
    - After iteration 1: If issues remain, Engineer fixes and Reviewer re-reviews
-   - After iteration 2: If issues still remain, Engineer creates follow-up tickets:
+   - After iteration 2: If issues still remain, Technical Lead creates follow-up tickets:
      - **P0 priority** for critical/blocking issues
      - **P1 priority** for important but non-blocking issues
      - **P2 priority** for nice-to-have improvements
@@ -492,7 +492,7 @@ Strict rules for managing review iterations:
    - Reviewer does final review
 
 4. **After Iteration 2**:
-   - If issues still remain, Engineer MUST create follow-up tickets
+   - If issues still remain, Technical Lead MUST create follow-up tickets
    - Prioritize appropriately (P0 for critical, P1 for important, P2 for nice-to-have)
    - You decide: Merge with follow-ups OR escalate to user
    - Document decision rationale
