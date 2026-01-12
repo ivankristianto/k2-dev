@@ -11,6 +11,7 @@ allowed-tools:
   - Glob
   - TodoWrite
   - Task
+  - Skill
   - AskUserQuestion
 ---
 
