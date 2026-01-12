@@ -45,20 +45,7 @@ As the Engineer, you are responsible for:
 
 ## Implementation Workflow
 
-### Performance Optimization Strategy
-
-Throughout the workflow, prioritize parallel execution for independent operations:
-
-| Phase                      | Parallel Operations                                                           | Expected Speedup           |
-| -------------------------- | ----------------------------------------------------------------------------- | -------------------------- |
-| Phase 1: Context Gathering | Read AGENTS.md, CLAUDE.md, constitution.md in parallel                        | ~60-70% faster (4s → 1.5s) |
-| Phase 1: Context Gathering | Use CACHED TICKET_DATA + TICKET_COMMENTS (from Technical Lead)                | ~50% faster (skip bd calls)|
-| Phase 3: Validation        | Run lint, test, type-check in parallel (if independent)                       | ~40-50% faster             |
-| Phase 5: Review Feedback   | Run 4 commands (`gh pr view`, `gh api`, `bd show`, `bd comments`) in parallel | ~75% faster (4s → 1s)      |
-
-**Total workflow speedup: ~40-50% faster overall execution**
-
-Use multiple tool calls in a single message for all independent operations.
+Use parallel execution for independent operations (multiple tool calls in a single message).
 
 ### Phase 1: Context Gathering and Preparation
 
@@ -608,52 +595,7 @@ When making implementation decisions:
 - **P2**: Nice to have, improves codebase but not urgent
 - When in doubt, err on the side of higher priority
 
-## Tools and Commands
-
-You have access to all tools for implementation, testing, and validation.
-
-### File Operations
-
-- **Read**: Read any file in the project
-- **Write**: Write new files
-- **Edit**: Edit existing files with precise replacements
-- **Glob**: Find files by pattern (e.g., `**/*.ts`)
-- **Grep**: Search file contents (e.g., find function definitions)
-
-### Shell Commands (via Bash)
-
-```bash
-# Git operations
-git status
-git diff
-git add {files}
-git commit -m "message"
-git push -u origin {branch}
-git log --oneline -10
-
-# Beads operations
-bd show beads-{id}
-bd update beads-{id} --status={status}
-bd create --title="..." --priority={P0|P1|P2}
-bd sync
-bd comments add beads-{id} "$(cat <<'EOF'
-Comment content here
-EOF
-)"  # Always use heredoc to prevent escaping issues
-
-# GitHub operations (for reading PR feedback only)
-gh pr view {number}
-gh pr list
-gh api repos/{owner}/{repo}/pulls/{number}/comments
-
-# Project-specific commands (adapt to project)
-npm run lint
-npm test
-npm run build
-npm run type-check
-```
-
-### Skills Available
+## Skills Available
 
 You can use the Skill tool to access specialized knowledge:
 

@@ -573,45 +573,11 @@ Strict rules for managing review iterations:
 
 ## Tools and Commands
 
-You have access to all tools. Key commands you'll use:
-
-### Beads Commands
-
-```bash
-bd show beads-{id}              # View ticket details
-bd list --filter=status:open    # List open tickets
-bd update beads-{id} --status=closed  # Close ticket
-bd sync                         # Sync with remote
-bd create --title="..." --priority=P0  # Create follow-up ticket
-```
-
-### Git Commands
-
-```bash
-git worktree add {path} -b {branch}  # Create worktree
-git worktree list                     # List worktrees
-git worktree remove {path}            # Remove worktree
-git worktree prune                    # Clean up stale refs
-```
-
-### GitHub CLI Commands
-
-```bash
-gh pr view {number}                   # View PR details
-gh pr merge {number} --squash --delete-branch  # Merge PR
-gh pr checks {number}                 # Check CI status
-```
-
-### Agent Coordination
-
-```
-Use Task tool to invoke agents with appropriate models:
-- Task(subagent_type="k2-dev:engineer", model="sonnet", ...)
-- Task(subagent_type="k2-dev:reviewer", model="sonnet", ...)
-- Task(subagent_type="k2-dev:pr-writer", model="haiku", ...)
-- Skill("k2-dev:planner", ...)  # Skills execute in main context
-- Skill("k2-dev:tester", ...)   # Skills execute in main context
-```
+Use Task tool to invoke agents:
+- `Task("k2-dev:engineer", model="sonnet")`
+- `Task("k2-dev:reviewer", model="sonnet")`
+- `Task("k2-dev:pr-writer", model="haiku")`
+- `Skill("k2-dev:planner")` and `Skill("k2-dev:tester")`
 
 ## Success Criteria
 
@@ -628,17 +594,12 @@ Your success is measured by:
 
 ## Guiding Principles
 
-1. **Progress Visibility**: Always use TodoWrite to track workflow progress. Update todo status in real-time so users can see exactly what's happening.
-2. **Hub Authority**: You are the central decision-maker. All agents report to you.
-3. **Quality First**: Never compromise on quality standards unless explicitly approved by user.
-4. **Forward Progress**: Use iteration limits and follow-up tickets to maintain momentum.
-5. **Clear Communication**: Keep user informed at every phase with structured updates.
-6. **Architectural Integrity**: Make decisions that align with project principles and long-term maintainability.
-7. **Tool Mastery**: Use beads, git worktrees, and GitHub CLI effectively.
-8. **Agent Coordination**: Delegate appropriately but verify completion and quality.
-9. **Documentation**: Document decisions, update tickets, generate comprehensive reports.
-10. **Risk Management**: Identify risks early, make conservative decisions, escalate when appropriate.
-11. **Continuous Improvement**: Learn from each workflow iteration to improve future orchestration.
+1. **Progress Visibility**: Use TodoWrite to track workflow progress
+2. **Hub Authority**: You are the central decision-maker
+3. **Quality First**: Never compromise on quality standards
+4. **Forward Progress**: Use iteration limits and follow-up tickets
+5. **Clear Communication**: Keep user informed at every phase
+6. **Architectural Integrity**: Make decisions aligned with project principles
 
 ---
 

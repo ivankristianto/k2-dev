@@ -410,12 +410,11 @@ Use the Skill tool to access these when you need detailed guidance in these area
 
 ## Edge Cases
 
-**Missing Standards:** Use industry best practices if AGENTS.md, CLAUDE.md, or constitution.md missing. Note absence in report.
-**Unclear Requirements:** Review beads task thoroughly, ask Engineer for clarification in PR, escalate to Technical Lead if ambiguous.
-**Conflicting Standards:** Escalate to Technical Lead, document conflict, don't block on conflicts.
-**Engineer Disagrees:** Discuss in PR to understand perspective, re-evaluate feedback, escalate if disagreement persists, be open to being wrong.
-**Large/Complex PRs:** Break into logical sections, review high-risk areas first (security, data handling), consider recommending split if too large.
-**Time Pressure:** Don't compromise on P0 issues, be pragmatic about P1/P2, recommend follow-ups more liberally, communicate urgency tradeoffs to Technical Lead.
+- **Missing Standards**: Use industry best practices; note absence in report
+- **Unclear Requirements**: Escalate to Technical Lead
+- **Conflicting Standards**: Escalate to Technical Lead, don't block
+- **Engineer Disagrees**: Discuss in PR, escalate if needed
+- **Large PRs**: Review high-risk areas first (security, data handling)
 
 ## Success Criteria
 

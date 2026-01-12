@@ -39,42 +39,32 @@ Run Technical Lead orchestration logic directly to coordinate the full implement
 **Parse argument:** Accept comma-separated `beads-123,beads-234` (multiple tickets share one worktree) or single `beads-123`
 **Flag support:** `--skip-worktree` to create branch in main repository instead of creating a worktree
 
-## Phase Execution Pattern
+## Checkpoint Logging Pattern
 
-Each phase follows this pattern to support stateless resumption:
+Instead of logging every phase, use **3 checkpoint comments** for efficiency:
 
-**1. Check completion:**
+| Checkpoint | Phases | Content |
+|------------|--------|---------|
+| CP1 | P1-P4 | Setup: validated, standards read, worktree created |
+| CP2 | P5-P7 | Execution: implementation, PR, initial review |
+| CP3 | P9 | Complete: merged, closed, cleaned up |
 
+**Resumption pattern:**
 ```bash
-bd comments beads-{id} | grep "Phase {N}: ✅"
+bd comments beads-{id} | grep "Checkpoint [1-3]:"
 ```
 
-If found → skip to next phase. If not found → execute phase.
-
-**2. Execute phase work** (see phase details below)
-
-**3. CRITICAL - Update Progress (Both Required):**
-
-You MUST complete BOTH of these before proceeding to the next phase:
-
-a) **Update TodoWrite:** Mark current todo as completed, next as in_progress
-
-b) **Log to beads (MANDATORY):**
-
+**Each checkpoint:**
 ```bash
 bd comments add beads-{id} "$(cat <<'EOF'
-## Phase {N}: ✅ Completed
+## Checkpoint N: ✅ {status}
 
-{phase_name}
-
-{relevant_details}
+{summary of phases completed}
 EOF
 )"
 ```
 
-**CRITICAL**: Always use heredoc (EOF) pattern for bd comments to prevent escaping issues. Never use inline strings with special characters.
-
-**Logging is NOT optional. Every phase MUST be logged to beads.**
+**CRITICAL:** Always log to beads at checkpoints. This is NOT optional.
 
 ---
 
@@ -283,19 +273,7 @@ Update status: `bd update {ticket-id} --status=in_progress`
 
 Ask user if unclear. Verify: git repo with `.beads/` directory.
 
-**CRITICAL - Log to beads:**
-
-```bash
-bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 2: ✅ Completed
-
-Validation & Location
-
-Tickets validated and status updated to in_progress: {ticket_ids}
-Project root: {project_root}
-EOF
-)"
-```
+**No individual logging - checkpoint at P4.**
 
 ### P3: Read Project Context (Parallel)
 
@@ -309,19 +287,7 @@ Read in parallel:
 4. **USE CACHED `TICKET_DATA`** - Task details (from P2, no re-fetch)
 5. **USE CACHED `TICKET_COMMENTS`** - Task comments (from P2, no re-fetch)
 
-**CRITICAL - Log to beads:**
-
-```bash
-bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 3: ✅ Completed
-
-Project Context Read
-
-Standards: AGENTS.md={read/not_found}, CLAUDE.md={read/not_found}, constitution.md={read/not_found}
-Task details and comments loaded for: {ticket_ids}
-EOF
-)"
-```
+**No individual logging - checkpoint at P4.**
 
 ### P4: Create Git Worktree or Branch (Conditional)
 
@@ -338,21 +304,6 @@ Naming: `feature/beads-{id}` (first ticket ID for multiple). Record worktree pat
 
 Set: `work_path = ../worktrees/feature/beads-{first_ticket_id}`
 
-**CRITICAL - Log to beads:**
-
-```bash
-bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 4: ✅ Completed
-
-Git Worktree Created
-
-Branch: feature/beads-{first_ticket_id}
-Path: {work_path}
-Mode: worktree
-EOF
-)"
-```
-
 **If use_worktree = false:**
 
 ```bash
@@ -364,17 +315,19 @@ Naming: `feature/beads-{id}` (first ticket ID for multiple). Work happens in mai
 
 Set: `work_path = {project_root}`
 
-**CRITICAL - Log to beads:**
+**Checkpoint 1 - Log setup completion:**
 
 ```bash
 bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 4: ✅ Completed
+## Checkpoint 1: ✅ Setup Complete
 
-Branch Created in Main Repository
+**Tickets:** {ticket_ids}
+**Project root:** {project_root}
+**Branch:** feature/beads-{first_ticket_id}
+**Path:** {work_path}
+**Standards:** AGENTS.md, CLAUDE.md, constitution.md loaded
 
-Branch: feature/beads-{first_ticket_id}
-Path: {project_root}
-Mode: main-branch
+Ready for implementation.
 EOF
 )"
 ```
@@ -403,19 +356,7 @@ IMPORTANT: Stay in work path for all file ops. Do NOT create PR."
 
 **Agent completion:** The Task tool blocks and returns the result automatically when the engineer completes. Read the result from the Task tool response directly. DO NOT call TaskOutput - the output is already in the result.
 
-**CRITICAL - Log to beads:**
-
-```bash
-bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 5: ✅ Completed
-
-Engineer Implementation Complete
-
-Implementation completed and changes pushed
-Branch: feature/beads-{first_ticket_id}
-EOF
-)"
-```
+**No individual logging - checkpoint at P7.**
 
 ### P6: Create Pull Request
 
@@ -435,19 +376,7 @@ generate description, create GitHub PR with proper formatting, link tickets, ret
 
 **Agent completion:** The Task tool returns the result (including PR URL) automatically. DO NOT call TaskOutput. Extract PR URL from the Task tool response.
 
-**CRITICAL - Log to beads:**
-
-```bash
-bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 6: ✅ Completed
-
-Pull Request Created
-
-PR: {pr_url}
-Branch: feature/beads-{first_ticket_id}
-EOF
-)"
-```
+**No individual logging - checkpoint at P7.**
 
 ### P7: Launch Reviewer
 
@@ -480,8 +409,8 @@ Quality gates: AGENTS.md, CLAUDE.md, constitution.md"
 
 **Parse result:**
 
-- **Approved:** → P11a (add approval comment to PR), then → P12 (merge)
-- **Changes requested:** → P11 (iterations)
+- **Approved:** → P9 (merge)
+- **Changes requested:** → P8 (iterations)
 
 **If approved, add comment to GitHub PR:**
 
@@ -494,23 +423,24 @@ The code has been reviewed and validated against project quality gates (AGENTS.m
 
 **Why comment instead of approve?** GitHub doesn't allow approving your own PR. We add a comment to document the Reviewer agent's approval, then proceed to merge.
 
-**CRITICAL - Log to beads:**
+**Checkpoint 2 - Log execution completion:**
 
 ```bash
 bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 7: ✅ Completed
+## Checkpoint 2: ✅ Execution Complete
 
-Initial Code Review Complete
+**Implementation:** Engineer completed, changes pushed
+**PR:** {pr_url}
+**Review:** {approved/changes_requested}
 
-Review result: {approved/changes_requested}
-Status: {if_approved: 'Approval comment added to PR, ready for merge' | if_changes: 'Feedback received, iterations needed'}
+{if_approved: 'Ready for merge' | if_changes: 'Iterations pending'}
 EOF
 )"
 ```
 
 ### P8: Review Iterations (max 2)
 
-Check status: `bd comments beads-{id} | grep "Phase 8, Iteration"`
+Check status: `bd comments beads-{id} | grep "Iteration"`
 
 #### Iteration 1
 
@@ -531,15 +461,13 @@ Fix issues, respond to comments, run quality gates, push changes."
 
 **Agent completion:** The Task tool returns the result automatically. DO NOT call TaskOutput.
 
-**CRITICAL - Log iteration 1 to beads:**
+**Log iteration 1:**
 
 ```bash
 bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 8, Iteration 1: ✅ Completed
+## Iteration 1: ✅ Feedback Addressed
 
-Review Feedback Addressed
-
-Changes pushed and re-review requested
+Changes pushed, re-review requested
 EOF
 )"
 ```
@@ -547,7 +475,6 @@ EOF
 **Re-launch Reviewer** (same prompt as P7). The Task tool returns the result automatically. DO NOT call TaskOutput.
 
 **Parse result:**
-
 - **Approved:** → Add approval comment to PR, then → P9
 - **Changes:** → Iteration 2
 
@@ -555,24 +482,22 @@ EOF
 
 ```bash
 cd {work_path}
-gh pr comment {pr_number} --body "✅ Re-review approved by k2-dev Reviewer agent (Iteration 1).
+gh pr comment {pr_number} --body "✅ Re-review approved (Iteration 1).
 
-Feedback has been addressed. Code validated against quality gates. Ready for merge."
+Feedback addressed. Ready for merge."
 ```
 
 #### Iteration 2
 
 Same process as Iteration 1.
 
-**CRITICAL - Log iteration 2 to beads:**
+**Log iteration 2:**
 
 ```bash
 bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 8, Iteration 2: ✅ Completed
+## Iteration 2: ✅ Final Review Passed
 
-Second Review Feedback Addressed
-
-Changes pushed and final review requested
+All feedback addressed
 EOF
 )"
 ```
@@ -580,7 +505,6 @@ EOF
 **Final Reviewer launch.** The Task tool returns the result automatically. DO NOT call TaskOutput.
 
 **Parse result:**
-
 - **Approved:** → Add approval comment to PR, then → P9
 - **Issues remain:** → Create follow-up tickets
 
@@ -588,9 +512,9 @@ EOF
 
 ```bash
 cd {work_path}
-gh pr comment {pr_number} --body "✅ Final review approved by k2-dev Reviewer agent (Iteration 2).
+gh pr comment {pr_number} --body "✅ Final review approved (Iteration 2).
 
-All feedback has been addressed. Code validated against quality gates. Ready for merge."
+All feedback addressed. Ready for merge."
 ```
 
 #### Follow-Up Tickets (after 2 iterations with issues)
@@ -616,51 +540,33 @@ EOF
 
 **Decision:** P0 → ask user (merge now or wait?). P1/P2 → can merge with follow-ups.
 
-**CRITICAL - Log to beads:**
+**Log follow-ups:**
 
 ```bash
 bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 8 (After Iteration 2): ✅ Completed
+## Follow-Ups Created
 
-Follow-Up Tickets Created
-
-Follow-up tickets: {ids}
+Tickets: {ids}
 Decision: {merge_now_or_wait}
 EOF
 )"
 ```
 
-### P9: Merge & Cleanup
+### P9: Merge & Cleanup (Checkpoint 3)
 
 **Merge:**
 
 ```bash
 cd {work_path}
-gh pr merge {pr_number} --squash
+gh pr merge {pr_number} --squash --delete-branch
 ```
 
 **Close tickets:**
 
 ```bash
 bd update beads-{id} --status=closed  # for each
-bd comments add beads-{id} "$(cat <<'EOF'
-Implementation complete!
-
-## Pull Request
-PR: {pr_url}
-Branch: feature/beads-{id}
-Review iterations: {count}/2
-
-## Changes
-{summary}
-
-## Follow-up Tickets
-{tickets_or_none}
-EOF
-)"
+bd sync
 ```
-
-**Sync:** `bd sync`
 
 **Cleanup (conditional):**
 
@@ -672,56 +578,32 @@ bd worktree remove {worktree_path}
 git worktree prune
 ```
 
-**If use_worktree = false:**
+**If use_worktree = false:** Branch deleted automatically during merge.
+
+**Checkpoint 3 - Final summary:**
 
 ```bash
-cd {project_root}
-git checkout main  # or default branch
-# Branch automatically deleted during PR merge (gh pr merge --delete-branch in P12)
+bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
+## Checkpoint 3: ✅ Complete
+
+**PR:** {pr_url}
+**Iterations:** {count}/2
+**Status:** Merged and closed
+
+## Follow-ups
+{tickets_or_none}
+
+---
+_Implementation complete_
+EOF
+)"
 ```
 
 **Generate reports:**
 
 ```
-Use Skill tool to generate comprehensive status reports for each ticket:
 Skill: k2-dev:report
-Args: {ticket-id} (for each completed ticket)
-```
-
-The report skill will fetch all ticket data in parallel (bd show, bd comments, bd dep list, git status, PR status) and present a comprehensive status report to the user.
-
-**CRITICAL - Log to beads:**
-
-If use_worktree = true:
-
-```bash
-bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 9: ✅ Completed
-
-Merge and Cleanup Complete
-
-PR merged: {pr_url}
-Tickets closed: {ticket_ids}
-Worktree cleaned up
-Reports generated
-EOF
-)"
-```
-
-If use_worktree = false:
-
-```bash
-bd comments add beads-{first_ticket_id} "$(cat <<'EOF'
-## Phase 9: ✅ Completed
-
-Merge and Cleanup Complete
-
-PR merged: {pr_url}
-Tickets closed: {ticket_ids}
-Branch deleted
-Reports generated
-EOF
-)"
+Args: {ticket-id}
 ```
 
 **User summary:**
@@ -729,19 +611,9 @@ EOF
 ```markdown
 ## Implementation Complete: {ticket_ids}
 
-### Workflow Summary
-
-✅ Validated → ✅ Worktree → ✅ Implemented → ✅ Reviewed → ✅ Merged → ✅ Closed → ✅ Cleaned
-
-### Pull Request
-
-URL: {pr_url}
-Branch: feature/beads-{id}
-Review iterations: {count}/2
-
-### Follow-up Tickets
-
-{any_created}
+✅ Merged: {pr_url}
+✅ Iterations: {count}/2
+✅ Follow-ups: {any_created}
 ```
 
 ---
@@ -768,4 +640,4 @@ Review iterations: {count}/2
 - Run Technical Lead logic directly (not as subagent)
 - Use TodoWrite throughout
 - Launch Engineer/Reviewer/PR-Writer as subagents (safe from command context)
-- Update beads comments at key milestones
+- Log to beads at checkpoints (CP1, CP2, CP3) + iteration notes
