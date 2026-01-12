@@ -31,16 +31,15 @@ pwd  # Verify location
 git branch  # Verify branch
 ```
 
-### 2. Invoke PR Creation Skill
+### 2. Read PR Creation Guidance
 
-Use the Skill tool to get detailed PR creation guidance:
+Read the pr-creation skill for best practices:
 
+```bash
+Read: skills/pr-creation/SKILL.md
 ```
-Skill tool with:
-- skill: "k2-dev:pr-creation"
-```
 
-The pr-creation skill provides comprehensive guidance on:
+This skill provides guidance on:
 
 - Analyzing git changes and commit history
 - Reading PR templates
@@ -77,11 +76,11 @@ The PR is ready for review.
 ## Tools Available
 
 - **Bash**: Run git commands, gh CLI, beads commands
-- **Read**: Read PR templates, changed files, project docs
+- **Read**: Read PR templates, changed files, project docs, skills
 - **Grep**: Search for patterns in code
 - **Glob**: Find files by pattern
 - **Write**: Create temporary files if needed
-- **Skill**: Invoke pr-creation skill for detailed guidance
+- **TodoWrite**: Track PR creation steps
 
 ## Key Constraints
 
@@ -98,7 +97,7 @@ The PR is ready for review.
 
 ## Remember
 
-- Invoke the pr-creation skill first to get comprehensive guidance
+- Read the pr-creation skill first for comprehensive guidance
 - Follow the skill's instructions for PR creation best practices
 - Return the PR URL so Technical Lead can proceed to review phase
 - Stay focused on PR creation - don't review or modify code
