@@ -9,7 +9,11 @@
       "name": "k2-dev",
       "source": "./",
       "description": "Multiagent orchestration plugin for enterprise code development with specialized agents, beads integration, and quality gates enforcement",
+<<<<<<< HEAD
       "version": "0.12.2"
+=======
+      "version": "0.12.3"
+>>>>>>> 97c0317 (docs: Improve formatting in planner command)
     }
   ]
 }
