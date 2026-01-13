@@ -1,145 +1,61 @@
 ---
 name: k2:planner
-description: Enhance beads task descriptions or create new implementation plans
-argument-hint: beads-123 [beads-456 ...] or feature description
+description: Start planning workflow to analyze requirements and create actionable beads tasks
+argument-hint: optional feature description
 allowed-tools:
   - Read
-  - Bash
   - Task
   - AskUserQuestion
 ---
 
-# K2:Planner - Requirements Planning & Task Enhancement
+# K2:Planner - Requirements Planning
 
-Enhances existing beads task descriptions or creates new implementation plans from scratch.
+Invoke Planning skill to analyze requirements, clarify details, and create structured beads tasks with dependencies.
 
-## Two Modes
+## Benefits of Skill-Based Approach
 
-### Mode 1: Enhance Existing Tickets (when beads IDs provided)
+- **Faster:** No agent spawning overhead - executes in main conversation context
+- **Direct interaction:** Questions asked directly, not via isolated subagent
+- **Full context access:** Uses main conversation tools (Read/Grep/Glob/Bash)
 
-1. **Parse ticket IDs** from argument (space-separated, e.g., `beads-123 beads-456`)
-2. **Visit each ticket** one by one:
-   ```bash
-   bd show {ticket-id}              # Get task details
-   ```
-3. **Evaluate description quality:**
-   - Check for: clear requirements, acceptance criteria, technical approach, file references
-   - If adequate → note as "already descriptive"
-   - If lacking → run Planning skill to enhance
-4. **Enhance via Planning skill** (if needed):
-   ```bash
-   Skill tool with:
-   - skill: "k2-dev:planner"
-   - args: "Enhance description for task {ticket-id}: {title}\n\nCurrent description:\n{description}"
-   ```
-5. **Update existing ticket** instead of creating new:
+## How to Use
 
-   ```bash
-   # Read the beads file directly
-   read .beads/tickets/{ticket-id}.md
+**1. Capture requirement:**
 
-   # Update the description section
-   # (replace content after the `---` frontmatter block)
+- If argument provided → use it
+- If no argument → ask: "What feature or change would you like to plan?"
 
-   # Sync changes
-   bd sync
-   ```
+**2. Invoke Planning skill:**
 
-### Mode 2: Create New Plan (when no beads IDs, feature description provided)
+```
+Skill tool with:
+- skill: "k2-dev:planning"
+- args: "User wants to: {user requirement}"
+```
 
-1. **Capture requirement:**
+**3. Skill executes workflow in main context:**
 
-   - If argument provided → use it
-   - If no argument → ask: "What feature or change would you like to plan?"
-
-2. **Invoke Planning skill:**
-
-   ```
-   Skill tool with:
-   - skill: "k2-dev:planner"
-   - args: "User wants to: {user requirement}"
-   ```
-
-3. **Skill executes workflow:**
-   - Analysis: Explore codebase (Read/Grep/Glob/Bash)
-   - Clarification: Ask questions directly in main conversation
-   - Planning: Create detailed implementation plan
-   - Tech Review: Invoke Technical Lead agent for feedback
-   - Refinement: Incorporate feedback
-   - **Task Creation:** Convert to beads tasks using `bd create`
-   - **Sync & Report:** Run `bd sync`, generate task graph
+- **Analysis:** Explore codebase (Read/Grep/Glob/Bash), understand architecture
+- **Clarification:** Ask questions directly in main conversation (scope, approach, constraints, integration points)
+- **Planning:** Create detailed implementation plan with logical steps, dependencies, patterns
+- **Tech Review:** Invoke Technical Lead agent (via Task tool) for architectural feedback, validation, standards check
+- **Refinement:** Incorporate feedback, iterate until solid approach finalized
+- **Task Creation:** Convert to beads tasks using `bd create`, set up hierarchy (epics/stories/subtasks), add dependencies with `bd dep add`
+- **Sync & Report:** Run `bd sync`, generate structured report with task graph and unblocked/blocked tickets
 
 ## Configuration Files
 
-Read planning skill: `skills/planner/SKILL.md`
-Planning skill references: AGENTS.md, (docs|specs)/constitution.md
+Planning skill references: AGENTS.md, CLAUDE.md, (docs|specs)/constitution.md, project documentation
 
 ## Usage Examples
 
 ```bash
-/k2:planner beads-123                     # Enhance single ticket
-/k2:planner beads-123 beads-456 beads-789 # Enhance multiple tickets
-/k2:planner Add user authentication       # Create new plan
-/k2:planner                               # Interactive - asks for requirement
+/k2:planner Add user authentication with JWT  # with description
+/k2:planner  # interactive - asks for requirement
+/planner     # alias (direct skill invocation)
 ```
 
-## Enhanced Description Format
-
-When updating existing tickets, use this format:
-
-```markdown
-## Summary
-
-{2-3 sentence high-level summary}
-
-## Requirements
-
-- {Specific requirement}
-- {Specific requirement}
-
-## Technical Approach
-
-{How to implement, key files, patterns to follow}
-
-## Acceptance Criteria
-
-- [ ] {Verify requirement 1}
-- [ ] {Verify requirement 2}
-
-## Files to Modify
-
-- `{path}` - {what changes}
-
-## Dependencies
-
-- {blocking tasks, if any}
-
-## Testing Strategy
-
-{How to verify the implementation}
-```
-
-## Final Report (Mode 1 - Enhancement)
-
-```markdown
-## Enhancement Complete
-
-### Tickets Processed
-
-| Ticket    | Status              | Notes                     |
-| --------- | ------------------- | ------------------------- |
-| beads-123 | Enhanced            | Added acceptance criteria |
-| beads-456 | Already Descriptive | No changes needed         |
-| beads-789 | Enhanced            | Added technical approach  |
-
-### Summary
-
-- Total: {count} tickets
-- Enhanced: {count}
-- Already adequate: {count}
-```
-
-## Final Report (Mode 2 - New Plan)
+## Final Report Structure
 
 ```markdown
 ## Feature: {name}
@@ -163,6 +79,6 @@ When updating existing tickets, use this format:
 
 ## Success Indicators
 
-**Mode 1:** All tickets have clear, actionable descriptions with requirements, acceptance criteria, and technical approach.
+✅ Requirements clarified → ✅ Tech Lead approved → ✅ Beads tasks created → ✅ Dependencies set → ✅ Execution order clear
 
-**Mode 2:** Requirements clarified → ✅ Tech Lead approved → ✅ Beads tasks created → ✅ Dependencies set → ✅ Execution order clear
+Present: task IDs/titles, parent-child relationships, dependencies, execution order, next steps (`/k2:start beads-XXX`)
