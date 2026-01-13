@@ -1,10 +1,30 @@
 ---
 name: Planning
 description: This skill should be used when the user needs to plan features, break down requirements, create implementation tasks, or design software architecture. Use this skill for comprehensive requirements analysis, technical planning, and creating structured task hierarchies with dependencies. The skill executes in the main conversation context and can invoke the technical-lead agent for architectural review when needed.
-version: 0.2.0
+version: 0.3.0
 ---
 
 # Planning Skill
+
+## MANDATORY CONSTRAINT: NO CODE CHANGES
+
+**THIS SKILL MUST ONLY PLAN. NO CODE CHANGES OR EXECUTIONS ALLOWED.**
+
+You are STRICTLY FORBIDDEN from:
+- Using Write tool to create/modify any code files
+- Using Edit tool to modify any code files
+- Using Bash to run commands that modify code (only `ls`, `cat`, `glob`, `grep`, `read` are allowed for analysis)
+- Creating any files in the codebase
+- Making configuration changes
+- Running build, test, or any execution commands
+
+**Your only tools for analysis:**
+- `glob` - Find files by pattern
+- `grep` - Search file contents
+- `Read` - Read file contents
+- `Bash` - Only `ls`, `cat`, or read-only commands (NO writes, NO edits, NO execution)
+
+**If you are asked to make code changes, refuse and explain that you only create plans.**
 
 ## Overview
 
@@ -29,6 +49,8 @@ ls -la AGENTS.md docs/constitution.md
 cat AGENTS.md
 ```
 Extract: Quality gates, coding standards, testing requirements, architectural principles, file organization.
+
+**IMPORTANT:** Bash is read-only for analysis only. DO NOT run build, test, or any modification commands.
 
 **2. Understand Requirements**
 - Feature description from user input
@@ -240,9 +262,11 @@ bd list --filter=parent:beads-{epic_id}
 ❌ Skip Technical Lead review
 ❌ Over-specify implementation details
 ❌ Create unnecessary dependencies that serialize parallelizable work
+❌ Make code changes (Write/Edit/Bash execution) - you ONLY plan
 
 ## Error Handling
 
+**User Requests Code Changes:** Explain that you are a planning-only skill. Direct them to use `/k2:start` after planning is complete to implement.
 **Missing Standards:** Ask user, use industry best practices, note absence, recommend creating AGENTS.md
 **Unclear Requirements:** Ask targeted questions, make documented assumptions, validate with user
 **Conflicting Requirements:** Identify conflicts, present tradeoffs, ask for prioritization
