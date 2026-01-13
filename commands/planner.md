@@ -29,7 +29,7 @@ Invoke Planning skill to analyze requirements, clarify details, and create struc
 
 ```
 Skill tool with:
-- skill: "k2-dev:planning"
+- skill: "k2-dev:planner"
 - args: "User wants to: {user requirement}"
 ```
 

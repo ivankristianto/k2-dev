@@ -53,12 +53,12 @@ k2-dev/
 
 ### Agent Tool Access
 
-| Agent          | Tools                               | Purpose                                | Performance Notes |
-| -------------- | ----------------------------------- | -------------------------------------- | ----------------- |
-| Technical Lead | All tools                           | Orchestration, coordination, decisions | - |
-| Engineer       | Read, Write, Edit, Bash, Grep, Glob | Implementation only                    | - |
-| Reviewer       | Read, Grep, Glob, Bash              | Read-only review                       | Uses local git diff/log (no GitHub API during review) |
-| PR Writer      | Read, Write, Bash, Grep, Glob, TodoWrite | Pull request creation                  | - |
+| Agent          | Tools                                    | Purpose                                | Performance Notes                                     |
+| -------------- | ---------------------------------------- | -------------------------------------- | ----------------------------------------------------- |
+| Technical Lead | All tools                                | Orchestration, coordination, decisions | -                                                     |
+| Engineer       | Read, Write, Edit, Bash, Grep, Glob      | Implementation only                    | -                                                     |
+| Reviewer       | Read, Grep, Glob, Bash                   | Read-only review                       | Uses local git diff/log (no GitHub API during review) |
+| PR Writer      | Read, Write, Bash, Grep, Glob, TodoWrite | Pull request creation                  | -                                                     |
 
 **Skills** (execute in main conversation context):
 | Skill | Access Method | Purpose |
@@ -71,21 +71,23 @@ k2-dev/
 
 k2-dev optimizes costs by using different Claude models based on task complexity:
 
-| Agent/Task | Model  | Rationale                                             | Cost Impact |
-| ---------- | ------ | ----------------------------------------------------- | ----------- |
-| Engineer   | Sonnet | Complex implementation, deep reasoning, self-review   | High value  |
-| Reviewer   | Sonnet | Security validation, code analysis, quality gates     | High value  |
-| PR Writer  | Haiku  | Formulaic task, structured output, template-based     | ~60% savings|
-| Planner    | Inherit| Runs in main context, uses user's selected model      | Variable    |
-| Tester     | Inherit| Runs in main context, uses user's selected model      | Variable    |
+| Agent/Task | Model   | Rationale                                           | Cost Impact  |
+| ---------- | ------- | --------------------------------------------------- | ------------ |
+| Engineer   | Sonnet  | Complex implementation, deep reasoning, self-review | High value   |
+| Reviewer   | Sonnet  | Security validation, code analysis, quality gates   | High value   |
+| PR Writer  | Haiku   | Formulaic task, structured output, template-based   | ~60% savings |
+| Planner    | Inherit | Runs in main context, uses user's selected model    | Variable     |
+| Tester     | Inherit | Runs in main context, uses user's selected model    | Variable     |
 
 **Implementation:**
+
 - `/k2:start` command specifies model when launching agents via Task tool
 - `model="sonnet"` for Engineer and Reviewer (critical quality work)
 - `model="haiku"` for PR Writer (cost optimization without quality loss)
 - Skills execute in main conversation context and inherit the user's model selection
 
 **Cost savings:**
+
 - ~60% reduction on PR creation (Haiku vs Sonnet)
 - ~15-25% overall workflow cost reduction
 - Maintains quality where it matters (implementation and review)

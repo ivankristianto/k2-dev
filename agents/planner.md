@@ -14,7 +14,7 @@ color: blue
 > **New invocation:**
 >
 > - Via command: `/k2:planner` or `/planner`
-> - Via skill: `k2-dev:planning`
+> - Via skill: `k2-dev:planner`
 >
 > **What changed:**
 >
