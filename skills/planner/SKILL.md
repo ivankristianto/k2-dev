@@ -37,12 +37,11 @@ Transforms user requirements into actionable beads tasks with proper hierarchies
 - Analyze requirements through codebase exploration
 - Clarify scope, constraints, expectations directly with user
 - Create detailed implementation plans with task hierarchies
-- Collaborate with Technical Lead for architectural validation
 - Set up proper task dependencies
 
 **Invoked when:** `/planner` or `/k2:planner` command executed
 
-## Six-Phase Planning Workflow
+## Five-Phase Planning Workflow
 
 ### Phase 1: Context Gathering
 
@@ -139,34 +138,7 @@ Ask 3-5 focused questions directly (main context allows direct interaction):
 - **Risk**: {Issue} → **Mitigation**: {Solution}
 ```
 
-### Phase 4: Technical Lead Collaboration
-
-**Invoke Technical Lead for architectural review:**
-
-```
-Use Task tool:
-- subagent_type: "technical-lead"
-- prompt: "Review this implementation plan for {feature}:
-
-{paste plan}
-
-Feedback needed on:
-- Architectural alignment with project patterns?
-- Risks or concerns?
-- Task breakdown appropriate?
-- Dependencies sound?
-- Meets quality standards (AGENTS.md)?"
-```
-
-**Incorporate Feedback:**
-
-- Analyze Technical Lead's response
-- Adjust plan based on guidance
-- Update task breakdown if needed
-- Address risks and concerns
-- Iterate until approved (max 2-3 iterations)
-
-### Phase 5: Convert to Beads Tasks
+### Phase 4: Convert to Beads Tasks
 
 **Task Structure Decision:**
 
@@ -180,7 +152,11 @@ Feedback needed on:
 
 ```bash
 bd create --title="Epic: {Name}" --priority=P1 \
-  --description="Epic overview, scope, goals, success criteria"
+  --description="Epic overview, scope, goals, success criteria.
+
+## Implementation Plan (Phase 3)
+
+{Paste the full Implementation Plan created in Phase 3 here}"
 # Record epic ID: beads-{id}
 ```
 
@@ -188,7 +164,11 @@ bd create --title="Epic: {Name}" --priority=P1 \
 
 ```bash
 bd create --title="{Capability}" --priority=P1 --parent=beads-{epic} \
-  --description="Story description, requirements, approach, acceptance criteria, testing"
+  --description="Story description, requirements, approach, acceptance criteria, testing.
+
+## Implementation Plan Reference
+
+See parent epic beads-{id} for the full Implementation Plan."
 # Record story IDs
 ```
 
@@ -196,7 +176,11 @@ bd create --title="{Capability}" --priority=P1 --parent=beads-{epic} \
 
 ```bash
 bd create --title="{Technical task}" --priority=P1 --parent=beads-{story} \
-  --description="Task details, files to modify, implementation specifics, acceptance criteria, dependencies"
+  --description="Task details, files to modify, implementation specifics, acceptance criteria, dependencies.
+
+## Implementation Plan Reference
+
+See parent epic beads-{id} for the full Implementation Plan with architectural approach, phases, and task hierarchy."
 # Record subtask IDs
 ```
 
@@ -216,14 +200,14 @@ bd dep add beads-{B} --blocks-on=beads-{A}  # B depends on A (A must complete fi
 bd sync
 ```
 
-### Phase 6: Generate Final Report
+### Phase 5: Generate Final Report
 
 ```markdown
 ## Planning Complete: {Feature Name}
 
 ### Summary
 
-Created comprehensive implementation plan with structured beads tasks after requirements analysis, codebase exploration, clarification, and Technical Lead collaboration.
+Created comprehensive implementation plan with structured beads tasks after requirements analysis, codebase exploration, and clarification.
 
 ### Tasks Created
 
@@ -275,14 +259,13 @@ bd list --filter=parent:beads-{epic_id}
 1. **Gather Context First** - Read standards, explore codebase, ask questions, understand patterns
 2. **Align with Standards** - AGENTS.md (quality), constitution.md (constraints), existing code (patterns)
 3. **Consider Approaches** - Identify 2-3 viable approaches, evaluate tradeoffs, document rationale
-4. **Validate with Tech Lead** - Present approach, be receptive to feedback, adjust based on guidance
-5. **Balance Detail** - Provide implementation clarity, allow Engineer flexibility, focus on architecture
+4. **Balance Detail** - Provide implementation clarity, allow Engineer flexibility, focus on architecture
 
 ## Quality Criteria
 
 **Clarity:** Concrete and actionable tasks, clear technical approach, identified file changes, no ambiguity
 **Completeness:** All requirements addressed, testing strategy, quality gates, edge cases
-**Architectural:** Follows project patterns, Technical Lead approved, aligns with standards, considers scalability
+**Architectural:** Follows project patterns, aligns with standards, considers scalability
 **Realistic:** Appropriate task breakdown, logical dependencies, achievable scope, realistic risk assessment
 
 ## Best Practices
@@ -292,14 +275,12 @@ bd list --filter=parent:beads-{epic_id}
 ✅ Explore codebase thoroughly before planning
 ✅ Ask 3-5 focused questions at a time
 ✅ Create specific, actionable tasks with clear acceptance criteria
-✅ Get Technical Lead architectural review
 ✅ Enable parallel work where possible (minimal dependencies)
 
 ### DON'T
 
 ❌ Plan without exploring codebase first
 ❌ Be vague ("Implement feature X", "Add tests")
-❌ Skip Technical Lead review
 ❌ Over-specify implementation details
 ❌ Create unnecessary dependencies that serialize parallelizable work
 ❌ Make code changes (Write/Edit/Bash execution) - you ONLY plan
@@ -310,14 +291,12 @@ bd list --filter=parent:beads-{epic_id}
 **Missing Standards:** Ask user, use industry best practices, note absence, recommend creating AGENTS.md
 **Unclear Requirements:** Ask targeted questions, make documented assumptions, validate with user
 **Conflicting Requirements:** Identify conflicts, present tradeoffs, ask for prioritization
-**Tech Lead Disagrees:** Listen, understand reasoning, adjust plan, defer to expertise, document decision
 
 ## Success Criteria
 
 Planning complete when:
 
 - ✅ Requirements fully understood and clarified
-- ✅ Technical Lead reviewed and approved approach
 - ✅ Beads tasks created with clear descriptions
 - ✅ Dependencies set up properly
 - ✅ Task hierarchy is logical

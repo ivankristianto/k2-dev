@@ -10,6 +10,8 @@ allowed-tools:
 
 # K2:Planner - Requirements Planning
 
+**ALWAYS use skill `k2-dev:planner` with reference to `skills/planner/SKILL.md` for comprehensive planning patterns and workflow steps.**
+
 Invoke Planning skill to analyze requirements, clarify details, and create structured beads tasks with dependencies.
 
 ## Benefits of Skill-Based Approach
@@ -17,6 +19,7 @@ Invoke Planning skill to analyze requirements, clarify details, and create struc
 - **Faster:** No agent spawning overhead - executes in main conversation context
 - **Direct interaction:** Questions asked directly, not via isolated subagent
 - **Full context access:** Uses main conversation tools (Read/Grep/Glob/Bash)
+- **Referenced patterns:** Always consult `skills/planner/SKILL.md` for detailed workflow guidance
 
 ## How to Use
 
@@ -31,6 +34,8 @@ Invoke Planning skill to analyze requirements, clarify details, and create struc
 Skill tool with:
 - skill: "k2-dev:planner"
 - args: "User wants to: {user requirement}"
+
+**IMPORTANT:** Always reference skills/planner/SKILL.md for detailed planning patterns and workflow steps.
 ```
 
 **3. Skill executes workflow in main context:**
