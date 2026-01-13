@@ -1,6 +1,6 @@
 ---
 name: k2:start
-description: Start implementation workflow for one or more beads tickets (runs Technical Lead orchestration logic directly)
+description: Start implementation workflow for one or more beads tickets
 argument-hint: "[beads-123] [--skip-worktree] or beads-123,beads-234 (optional - auto-selects if omitted)"
 allowed-tools:
   - Read
@@ -17,9 +17,9 @@ allowed-tools:
 
 # K2:Start - Implementation Workflow
 
-Run Technical Lead orchestration logic directly to coordinate the full implementation lifecycle: validation → worktree/branch → implementation → review → merge → cleanup.
+Coordinate the full implementation lifecycle: validation → worktree/branch → implementation → review → merge → cleanup.
 
-**CRITICAL:** Execute logic directly in this context. DO NOT launch "technical-lead" subagent (causes recursion).
+**CRITICAL:** Execute logic directly in this context.
 
 ## Performance: Beads Data Caching
 
@@ -342,7 +342,7 @@ Work path: {work_path}
 Project root: {project_root}
 Standards: AGENTS.md, constitution.md
 
-CACHED DATA (from Technical Lead - no need to re-fetch):
+CACHED DATA (from command - no need to re-fetch):
 - TICKET_DATA: {ticket_details_from_cache}
 - TICKET_COMMENTS: {comments_from_cache}
 
@@ -454,7 +454,7 @@ Work path: {work_path}
 
 Read feedback:
 - gh pr view {pr_number} --comments
-- USE CACHED TICKET_COMMENTS (from Technical Lead)
+- USE CACHED TICKET_COMMENTS (from command)
 
 Fix issues, respond to comments, run quality gates, push changes."
 ```
@@ -637,7 +637,7 @@ Args: {ticket-id}
 
 ## Reminders
 
-- Run Technical Lead logic directly (not as subagent)
+- Execute logic directly in this context
 - Use TodoWrite throughout
 - Launch Engineer/Reviewer/PR-Writer as subagents (safe from command context)
 - Log to beads at checkpoints (CP1, CP2, CP3) + iteration notes

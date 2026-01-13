@@ -4,22 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-k2-dev is a multiagent orchestration plugin for Claude Code that simulates a complete development team. It coordinates specialized AI agents and skills (Technical Lead, Engineer, Reviewer, plus Planning and Test Planning skills) for enterprise-grade software development workflows with beads task management integration.
+k2-dev is a multiagent orchestration plugin for Claude Code that simulates a complete development team. It coordinates specialized AI agents (Engineer, Reviewer) and skills (Planning, Test Planning, Technical Lead architecture) for enterprise-grade software development with beads task management.
 
 **Agent vs Skills:**
 
-- **Agents** (Technical Lead, Engineer, Reviewer, PR Writer): Run as isolated subagents for complex, multi-step workflows with isolated context
-- **Skills** (Planning, Test Planning): Execute in main conversation context for faster execution and direct user interaction
+- **Agents** (Engineer, Reviewer, PR Writer): Run as isolated subagents for complex, multi-step workflows with isolated context
+- **Skills** (Planning, Test Planning, Technical Lead): Execute in main conversation context for faster execution and direct user interaction
 
 ## Architecture
 
-### Hub-and-Spoke Model
+### Direct Command Orchestration
 
-The plugin uses a hub-and-spoke coordination pattern:
+The plugin uses direct command execution for workflow orchestration:
 
-- **Technical Lead** is the hub that orchestrates all workflows
-- Other agents (Engineer, Reviewer, PR Writer) are spokes launched by Technical Lead and report back
-- No direct agent-to-agent communication; all coordination flows through Technical Lead
+- **Technical Lead** skill provides architectural analysis and design guidance
+- **/k2:start** command handles implementation workflow directly
+- No hub-and-spoke model - commands execute logic directly in context
 
 ### Plugin Structure
 
@@ -28,7 +28,7 @@ k2-dev/
 ├── .claude-plugin/
 │   └── plugin.json          # Plugin manifest
 ├── agents/                   # Agent definitions (system prompts)
-│   ├── technical-lead.md    # Hub: orchestrates workflows
+│   ├── technical-lead.md    # Architecture analysis, design review, ticket refinement
 │   ├── engineer.md          # Implementation
 │   ├── reviewer.md          # Code review (read-only)
 │   └── pr-writer.md         # Pull request creation
@@ -36,7 +36,8 @@ k2-dev/
 │   ├── start.md             # /k2:start - begin implementation
 │   ├── planner.md           # /k2:planner - create plans (invokes skill)
 │   ├── report.md            # /k2:report - status reports
-│   └── test.md              # /k2:test - test planning (invokes skill)
+│   ├── test.md              # /k2:test - test planning (invokes skill)
+│   └── refine.md            # /k2:refine - ticket refinement (invokes Technical Lead skill)
 ├── skills/                   # Knowledge domains and active workflows
 │   ├── planner/             # Planning skill (main context execution)
 │   ├── tester/              # Test Planning skill (main context execution)
@@ -55,7 +56,6 @@ k2-dev/
 
 | Agent          | Tools                                    | Purpose                                | Performance Notes                                     |
 | -------------- | ---------------------------------------- | -------------------------------------- | ----------------------------------------------------- |
-| Technical Lead | All tools                                | Orchestration, coordination, decisions | -                                                     |
 | Engineer       | Read, Write, Edit, Bash, Grep, Glob      | Implementation only                    | -                                                     |
 | Reviewer       | Read, Grep, Glob, Bash                   | Read-only review                       | Uses local git diff/log (no GitHub API during review) |
 | PR Writer      | Read, Write, Bash, Grep, Glob, TodoWrite | Pull request creation                  | -                                                     |
@@ -63,6 +63,7 @@ k2-dev/
 **Skills** (execute in main conversation context):
 | Skill | Access Method | Purpose |
 | ------------------ | ------------- | -------------------------------------- |
+| Technical Lead | `/k2:refine` | Architecture analysis, design review, ticket refinement |
 | Planning | `/k2:planner` | Requirements analysis, task creation |
 | Test Planning | `/k2:test` | Test strategy, test case definition |
 | Report Generation | `/k2:report` or invoked from `/k2:start` Phase 9 | Comprehensive ticket status reports |
@@ -76,6 +77,7 @@ k2-dev optimizes costs by using different Claude models based on task complexity
 | Engineer   | Sonnet  | Complex implementation, deep reasoning, self-review | High value   |
 | Reviewer   | Sonnet  | Security validation, code analysis, quality gates   | High value   |
 | PR Writer  | Haiku   | Formulaic task, structured output, template-based   | ~60% savings |
+| Technical Lead | Opus | Deep architecture analysis, system design           | High value   |
 | Planner    | Inherit | Runs in main context, uses user's selected model    | Variable     |
 | Tester     | Inherit | Runs in main context, uses user's selected model    | Variable     |
 
@@ -84,6 +86,7 @@ k2-dev optimizes costs by using different Claude models based on task complexity
 - `/k2:start` command specifies model when launching agents via Task tool
 - `model="sonnet"` for Engineer and Reviewer (critical quality work)
 - `model="haiku"` for PR Writer (cost optimization without quality loss)
+- `model="opus"` for Technical Lead (architecture analysis requires deep reasoning)
 - Skills execute in main conversation context and inherit the user's model selection
 
 **Cost savings:**
@@ -96,16 +99,15 @@ k2-dev optimizes costs by using different Claude models based on task complexity
 
 ### Implementation Flow (`/k2:start`)
 
-1. Technical Lead validates tickets exist and are open
-2. Creates git worktree: `bd worktree create ../worktrees/feature-beads-123` OR creates branch in main repo if `--skip-worktree` flag is used
-3. Reads task details via `bd show` and `bd comments`
-4. Launches Engineer agent for implementation
-5. Engineer implements, self-reviews against AGENTS.md/CLAUDE.md, pushes changes
-6. Technical Lead launches internal PR Writer agent to create PR
-7. Technical Lead launches Reviewer agent to validate code (max 2 iterations)
+1. `/k2:start` command validates tickets and creates worktree/branch
+2. Reads task details via `bd show` and `bd comments`
+3. Launches Engineer agent for implementation
+4. Engineer implements, self-reviews against AGENTS.md/CLAUDE.md, pushes changes
+5. Launches PR Writer agent to create PR
+6. Launches Reviewer agent to validate code (max 2 iterations)
    - **PERFORMANCE OPTIMIZATION**: Reviewer uses local `git diff` and `git log` instead of GitHub API during review
    - Final review results posted to GitHub PR as single comprehensive comment
-8. Technical Lead merges, closes tickets, syncs beads, removes worktree (or deletes branch if using `--skip-worktree`)
+7. Command merges, closes tickets, syncs beads, removes worktree (or deletes branch if using `--skip-worktree`)
 
 **Why PR Creation Uses Internal Subagent:**
 
@@ -121,9 +123,8 @@ k2-dev optimizes costs by using different Claude models based on task complexity
 2. Explores codebase using main conversation tools (Glob/Grep/Read)
 3. Asks clarifying questions directly in main conversation
 4. Creates structured implementation plan
-5. Invokes Technical Lead agent via Task tool for architectural review
-6. Planning skill incorporates feedback and refines plan
-7. Converts to hierarchical beads tasks with dependencies
+5. Planning skill incorporates feedback and refines plan
+6. Converts to hierarchical beads tasks with dependencies
 
 **Benefits of skill-based approach:**
 
@@ -184,7 +185,7 @@ Each implementation uses isolated worktrees by default, or can use main reposito
 **Default (Worktree Mode):**
 
 ```bash
-# Create worktree (Technical Lead)
+# Create worktree (/k2:start command)
 bd worktree create ../worktrees/feature-beads-123
 
 # Work in isolated directory
@@ -310,7 +311,6 @@ claude plugin install k2-dev@k2-dev-marketplace
 
 ## Important Constraints
 
-- **No direct agent-to-agent communication**: All flows through Technical Lead
 - **Reviewer is read-only**: Cannot use Write/Edit tools
 - **Max 2 review iterations**: Prevents loops, creates follow-up tickets instead
 - **Worktrees outside main tree**: Created at `../feature-beads-{id}` level
