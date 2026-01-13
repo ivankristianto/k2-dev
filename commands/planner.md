@@ -56,7 +56,6 @@ Planning skill references: AGENTS.md, CLAUDE.md, (docs|specs)/constitution.md, p
 ```bash
 /k2:planner Add user authentication with JWT  # with description
 /k2:planner  # interactive - asks for requirement
-/planner     # alias (direct skill invocation)
 ```
 
 ## Final Report Structure

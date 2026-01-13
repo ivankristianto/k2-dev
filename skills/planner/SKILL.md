@@ -140,6 +140,16 @@ Ask 3-5 focused questions directly (main context allows direct interaction):
 
 ### Phase 4: Convert to Beads Tasks
 
+**CRITICAL: Ticket description is MANDATORY**
+
+Every ticket (epic, story, subtask) MUST have a comprehensive description. Never create tickets without --description. The description must include:
+
+- Clear explanation of what the ticket covers
+- Context and rationale
+- Links to planning artifacts (e.g., "See parent epic beads-{id} for the full Implementation Plan")
+- For epics: Full implementation plan from Phase 3
+- For stories/subtasks: Reference to parent epic + specific implementation details
+
 **Task Structure Decision:**
 
 - **Simple** (1-3 days): Single story + subtasks
@@ -281,6 +291,7 @@ bd list --filter=parent:beads-{epic_id}
 
 ❌ Plan without exploring codebase first
 ❌ Be vague ("Implement feature X", "Add tests")
+❌ Create tickets without --description (description is MANDATORY)
 ❌ Over-specify implementation details
 ❌ Create unnecessary dependencies that serialize parallelizable work
 ❌ Make code changes (Write/Edit/Bash execution) - you ONLY plan
