@@ -29,7 +29,7 @@ Enhances existing beads task descriptions or creates new implementation plans fr
 4. **Enhance via Planning skill** (if needed):
    ```bash
    Skill tool with:
-   - skill: "k2-dev:planning"
+   - skill: "k2-dev:planner"
    - args: "Enhance description for task {ticket-id}: {title}\n\nCurrent description:\n{description}"
    ```
 5. **Update existing ticket** instead of creating new:
@@ -53,7 +53,7 @@ Enhances existing beads task descriptions or creates new implementation plans fr
 2. **Invoke Planning skill:**
    ```
    Skill tool with:
-   - skill: "k2-dev:planning"
+   - skill: "k2-dev:planner"
    - args: "User wants to: {user requirement}"
    ```
 
