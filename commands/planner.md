@@ -33,6 +33,7 @@ Enhances existing beads task descriptions or creates new implementation plans fr
    - args: "Enhance description for task {ticket-id}: {title}\n\nCurrent description:\n{description}"
    ```
 5. **Update existing ticket** instead of creating new:
+
    ```bash
    # Read the beads file directly
    read .beads/tickets/{ticket-id}.md
@@ -47,10 +48,12 @@ Enhances existing beads task descriptions or creates new implementation plans fr
 ### Mode 2: Create New Plan (when no beads IDs, feature description provided)
 
 1. **Capture requirement:**
+
    - If argument provided → use it
    - If no argument → ask: "What feature or change would you like to plan?"
 
 2. **Invoke Planning skill:**
+
    ```
    Skill tool with:
    - skill: "k2-dev:planner"
@@ -68,6 +71,7 @@ Enhances existing beads task descriptions or creates new implementation plans fr
 
 ## Configuration Files
 
+Read planning skill: `skills/planner/SKILL.md`
 Planning skill references: AGENTS.md, (docs|specs)/constitution.md
 
 ## Usage Examples
@@ -122,11 +126,11 @@ When updating existing tickets, use this format:
 
 ### Tickets Processed
 
-| Ticket | Status | Notes |
-|--------|--------|-------|
-| beads-123 | Enhanced | Added acceptance criteria |
-| beads-456 | Already Descriptive | No changes needed |
-| beads-789 | Enhanced | Added technical approach |
+| Ticket    | Status              | Notes                     |
+| --------- | ------------------- | ------------------------- |
+| beads-123 | Enhanced            | Added acceptance criteria |
+| beads-456 | Already Descriptive | No changes needed         |
+| beads-789 | Enhanced            | Added technical approach  |
 
 ### Summary
 
