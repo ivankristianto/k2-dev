@@ -43,7 +43,6 @@ Skill tool with:
 - **Analysis:** Explore codebase (Read/Grep/Glob/Bash), understand architecture
 - **Clarification:** Ask questions directly in main conversation (scope, approach, constraints, integration points)
 - **Planning:** Create detailed implementation plan with logical steps, dependencies, patterns
-- **Tech Review:** Invoke Technical Lead agent (via Task tool) for architectural feedback, validation, standards check
 - **Refinement:** Incorporate feedback, iterate until solid approach finalized
 - **Task Creation:** Convert to beads tasks using `bd create`, set up hierarchy (epics/stories/subtasks), add dependencies with `bd dep add`
 - **Sync & Report:** Run `bd sync`, generate structured report with task graph and unblocked/blocked tickets
@@ -84,6 +83,6 @@ Planning skill references: AGENTS.md, CLAUDE.md, (docs|specs)/constitution.md, p
 
 ## Success Indicators
 
-✅ Requirements clarified → ✅ Tech Lead approved → ✅ Beads tasks created → ✅ Dependencies set → ✅ Execution order clear
+✅ Requirements clarified → ✅ Plan finalized → ✅ Beads tasks created → ✅ Dependencies set → ✅ Execution order clear
 
 Present: task IDs/titles, parent-child relationships, dependencies, execution order, next steps (`/k2:start beads-XXX`)

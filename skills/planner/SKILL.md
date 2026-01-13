@@ -1,6 +1,6 @@
 ---
 name: k2-dev:planner
-description: This skill should be used when the user needs to plan features, break down requirements, create implementation tasks, or design software architecture. Use this skill for comprehensive requirements analysis, technical planning, and creating structured task hierarchies with dependencies. The skill executes in the main conversation context and can invoke the technical-lead agent for architectural review when needed.
+description: This skill should be used when the user needs to plan features, break down requirements, create implementation tasks, or design software architecture. Use this skill for comprehensive requirements analysis, technical planning, and creating structured task hierarchies with dependencies. The skill executes in the main conversation context.
 version: 0.3.0
 ---
 
