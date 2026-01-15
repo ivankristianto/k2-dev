@@ -1,7 +1,7 @@
 ---
 name: k2:start
 description: Start implementation workflow for one or more beads tickets
-argument-hint: "[beads-123] [--skip-worktree] or beads-123,beads-234 (optional - auto-selects if omitted)"
+argument-hint: "[beads-123] or beads-123,beads-234 (optional - auto-selects if omitted) [--skip-worktree]"
 allowed-tools:
   - Read
   - Write
@@ -25,18 +25,16 @@ Coordinate the full implementation lifecycle: validation → worktree/branch →
 
 **Speed optimization:** `bd show` and `bd comments` are called multiple times per workflow. Cache the results in P2 and reuse them:
 
-| Phase | Without Cache | With Cache |
-|-------|---------------|------------|
-| P2 | `bd show` (validation) | `bd show` + cache full data |
-| P3 | `bd show` + `bd comments` | Use cached TICKET_DATA + TICKET_COMMENTS |
-| P5 | Engineer re-fetches | Pass cached data in prompt |
-| P8 | Re-fetch comments | Use cached TICKET_COMMENTS |
-
-**Estimated savings:** ~2-3 seconds per workflow (fewer shell command executions)
+| Phase | Without Cache             | With Cache                               |
+| ----- | ------------------------- | ---------------------------------------- |
+| P2    | `bd show` (validation)    | `bd show` + cache full data              |
+| P3    | `bd show` + `bd comments` | Use cached TICKET_DATA + TICKET_COMMENTS |
+| P5    | Engineer re-fetches       | Pass cached data in prompt               |
+| P8    | Re-fetch comments         | Use cached TICKET_COMMENTS               |
 
 ## Ticket Selection & Parsing
 
-**No argument:** Run `bv --robot-next`, parse recommendation, inform user, continue with that ticket
+**No argument:** Run `bd ready`, read list of tickets and recommend high important tickets or quick wins, inform user, continue with that ticket
 **Parse argument:** Accept comma-separated `beads-123,beads-234` (multiple tickets share one worktree) or single `beads-123`
 **Flag support:** `--skip-worktree` to create branch in main repository instead of creating a worktree
 
@@ -44,18 +42,20 @@ Coordinate the full implementation lifecycle: validation → worktree/branch →
 
 Instead of logging every phase, use **3 checkpoint comments** for efficiency:
 
-| Checkpoint | Phases | Content |
-|------------|--------|---------|
-| CP1 | P1-P4 | Setup: validated, standards read, worktree created |
-| CP2 | P5-P7 | Execution: implementation, PR, initial review |
-| CP3 | P9 | Complete: merged, closed, cleaned up |
+| Checkpoint | Phases | Content                                            |
+| ---------- | ------ | -------------------------------------------------- |
+| CP1        | P1-P4  | Setup: validated, standards read, worktree created |
+| CP2        | P5-P7  | Execution: implementation, PR, initial review      |
+| CP3        | P9     | Complete: merged, closed, cleaned up               |
 
 **Resumption pattern:**
+
 ```bash
 bd comments beads-{id} | grep "Checkpoint [1-3]:"
 ```
 
 **Each checkpoint:**
+
 ```bash
 bd comments add beads-{id} "$(cat <<'EOF'
 ## Checkpoint N: ✅ {status}
@@ -260,6 +260,7 @@ Note: When `use_worktree = false`, there is no "Clean up git worktree" todo.
 **Step 1: Quick validation (fail-fast) + Cache data**
 
 For each ticket, execute in parallel:
+
 - `bd show {ticket-id} --short` → verify exists & status is open/in_progress
 - `bd show {ticket-id}` → full task details (CACHE as TICKET_DATA)
 - `bd comments {ticket-id}` → task comments (CACHE as TICKET_COMMENTS)
@@ -284,8 +285,8 @@ Read in parallel:
 
 1. `AGENTS.md` - Quality gates, validation patterns (from project root)
 2. `(docs|specs)/constitution.md` - Project principles (optional, from project root)
-4. **USE CACHED `TICKET_DATA`** - Task details (from P2, no re-fetch)
-5. **USE CACHED `TICKET_COMMENTS`** - Task comments (from P2, no re-fetch)
+3. **USE CACHED `TICKET_DATA`** - Task details (from P2, no re-fetch)
+4. **USE CACHED `TICKET_COMMENTS`** - Task comments (from P2, no re-fetch)
 
 **No individual logging - checkpoint at P4.**
 
@@ -475,6 +476,7 @@ EOF
 **Re-launch Reviewer** (same prompt as P7). The Task tool returns the result automatically. DO NOT call TaskOutput.
 
 **Parse result:**
+
 - **Approved:** → Add approval comment to PR, then → P9
 - **Changes:** → Iteration 2
 
@@ -505,6 +507,7 @@ EOF
 **Final Reviewer launch.** The Task tool returns the result automatically. DO NOT call TaskOutput.
 
 **Parse result:**
+
 - **Approved:** → Add approval comment to PR, then → P9
 - **Issues remain:** → Create follow-up tickets
 
