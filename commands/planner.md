@@ -10,7 +10,7 @@ allowed-tools:
 
 # K2:Planner - Requirements Planning
 
-**ALWAYS use skill `k2-dev:planner` with reference to `skills/planner/SKILL.md` for comprehensive planning patterns and workflow steps.**
+**ALWAYS use skill `k2-dev:planner` for comprehensive planning patterns and workflow steps.**
 
 Invoke Planning skill to analyze requirements, clarify details, and create structured beads tasks with dependencies.
 
@@ -19,7 +19,7 @@ Invoke Planning skill to analyze requirements, clarify details, and create struc
 - **Faster:** No agent spawning overhead - executes in main conversation context
 - **Direct interaction:** Questions asked directly, not via isolated subagent
 - **Full context access:** Uses main conversation tools (Read/Grep/Glob/Bash)
-- **Referenced patterns:** Always consult `skills/planner/SKILL.md` for detailed workflow guidance
+- **Self-contained:** The Planning skill references its own documentation internally
 
 ## How to Use
 
@@ -35,7 +35,7 @@ Skill tool with:
 - skill: "k2-dev:planner"
 - args: "User wants to: {user requirement}"
 
-**IMPORTANT:** Always reference skills/planner/SKILL.md for detailed planning patterns and workflow steps.
+**IMPORTANT:** The Planning skill has built-in documentation and workflow patterns.
 ```
 
 **3. Skill executes workflow in main context:**
@@ -49,7 +49,7 @@ Skill tool with:
 
 ## Configuration Files
 
-Planning skill references: AGENTS.md, CLAUDE.md, (docs|specs)/constitution.md, project documentation
+Planning skill references: AGENTS.md, (docs|specs)/constitution.md, project documentation
 
 ## Usage Examples
 
