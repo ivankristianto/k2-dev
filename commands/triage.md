@@ -1,7 +1,7 @@
 ---
 name: k2:triage
 description: Analyze ready tickets and recommend the best next ticket to work on
-argument-hint: "(optional)"
+argument-hint: "[--json]"
 allowed-tools:
   - Read
   - Bash
@@ -16,16 +16,21 @@ Analyze unblocked tickets and recommend the single best next ticket to work on.
 ## Usage
 
 ```
-k2:triage  # Analyze ready tickets and recommend the best one to work on
+k2:triage              # Analyze ready tickets and recommend the best one(s) to work on
+k2:triage --json       # Output ticket IDs in JSON format
 ```
 
 ## Output
 
-Ticket recommendation(s):
+**Default (no --json):** Human-readable markdown with ticket details.
 
-- Ticket ID and title
-- Priority and type (bug, epic, story, task)
-- Why this ticket(s) is recommended
+**With --json:** Machine-readable JSON output:
+
+```json
+{
+  "ticket": ["beads-123", "beads-234"]
+}
+```
 
 **Outputs one or more tickets that can be worked on together.**
 
@@ -74,7 +79,19 @@ Sort by:
 
 **Limit:** Maximum 3 tickets in one recommendation.
 
-### P5: Output Recommendation
+### P5: Output (Conditional)
+
+**If --json flag is present:** Output JSON:
+
+```json
+{
+  "ticket": ["beads-123", "beads-234"]
+}
+```
+
+**If no --json flag:** Output markdown template below.
+
+### P6: Markdown Output Template
 
 ```
 ## Recommended Next Ticket(s)
